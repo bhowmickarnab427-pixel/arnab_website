@@ -112,6 +112,7 @@ document.addEventListener("DOMContentLoaded", function () {
         namePage.classList.remove("hidden");
 
         
+
 const hour = new Date().getHours();
 
 let greeting;
