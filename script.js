@@ -1,7 +1,7 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    // ===== Get HTML Elements =====
+    // ===== HTML Elements =====
     const loginPage = document.getElementById("loginPage");
     const signupPage = document.getElementById("signupPage");
     const namePage = document.getElementById("namePage");
@@ -12,7 +12,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const loginUsername = document.getElementById("loginUsername");
     const loginPassword = document.getElementById("loginPassword");
-
     const signupUsername = document.getElementById("signupUsername");
     const signupPassword = document.getElementById("signupPassword");
 
@@ -44,8 +43,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // Edit Profile
     const editProfileButton =
         document.getElementById("editProfileButton");
-    const editProfileBox = document.getElementById("editProfileBox");
-    const editProfileForm = document.getElementById("editProfileForm");
+    const editProfileBox =
+        document.getElementById("editProfileBox");
+    const editProfileForm =
+        document.getElementById("editProfileForm");
     const profileDisplayName =
         document.getElementById("profileDisplayName");
     const profileBio = document.getElementById("profileBio");
@@ -56,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentUsername = "";
     let notificationTimer;
 
-    // ===== Get Saved Users =====
+    // ===== Get Users =====
     function getUsers() {
         try {
             return JSON.parse(localStorage.getItem("users")) || {};
@@ -65,16 +66,18 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // ===== Get Saved Profiles =====
+    // ===== Get Profiles =====
     function getProfiles() {
         try {
-            return JSON.parse(localStorage.getItem("userProfiles")) || {};
+            return JSON.parse(
+                localStorage.getItem("userProfiles")
+            ) || {};
         } catch (error) {
             return {};
         }
     }
 
-    // ===== Notification System =====
+    // ===== Notification =====
     function showNotification(message, type = "success") {
         if (!notification) return;
 
@@ -99,14 +102,23 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateClock() {
         const now = new Date();
 
-        liveClock.textContent = now.toLocaleTimeString("en-IN");
+        if (liveClock) {
+            liveClock.textContent = now.toLocaleTimeString("en-IN", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: true
+            });
+        }
 
-        liveDate.textContent = now.toLocaleDateString("en-IN", {
-            weekday: "long",
-            day: "numeric",
-            month: "long",
-            year: "numeric"
-        });
+        if (liveDate) {
+            liveDate.textContent = now.toLocaleDateString("en-IN", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+            });
+        }
     }
 
     updateClock();
@@ -133,21 +145,20 @@ document.addEventListener("DOMContentLoaded", function () {
         const profile = profiles[currentUsername] || {};
 
         const savedName = profile.name || currentUsername;
-        const savedBio = profile.bio || "";
 
         profileDisplayName.value = savedName;
-        profileBio.value = savedBio;
+        profileBio.value = profile.bio || "";
 
         displayName.textContent =
             "Hi, " + savedName + "! " + getGreeting();
 
         displayName3.textContent =
-            savedBio || "Welcome to your account.";
+            profile.bio || "Welcome to your account.";
 
         profileStatus.textContent = "";
     }
 
-    // ===== Open Sign Up Page =====
+    // ===== Sign Up Page =====
     signupButton.addEventListener("click", function () {
         loginPage.classList.add("hidden");
         signupPage.classList.remove("hidden");
@@ -242,20 +253,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         loadProfile();
 
-        // Show the greeting based on current time
-        const profiles = getProfiles();
-        const savedProfile = profiles[currentUsername] || {};
-        const savedName = savedProfile.name || currentUsername;
-
-        displayName.textContent =
-            "Hi, " + savedName + "! " + getGreeting();
-
         messageStatus.textContent = "";
         messageForm.reset();
         loginMessage.textContent = "";
 
         showNotification(
-            "Welcome, " + savedName + "!",
+            "Welcome, " + currentUsername + "!",
             "success"
         );
     });
@@ -294,6 +297,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ===== Edit Profile Button =====
     editProfileButton.addEventListener("click", function () {
+        if (!currentUsername) return;
+
         loadProfile();
         editProfileBox.classList.remove("hidden");
     });
@@ -307,6 +312,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // ===== Save Profile =====
     editProfileForm.addEventListener("submit", function (event) {
         event.preventDefault();
+
+        if (!currentUsername) return;
 
         const name = profileDisplayName.value.trim();
         const bio = profileBio.value.trim();
@@ -360,8 +367,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (message === "") {
             messageStatus.style.color = "red";
-            messageStatus.textContent =
-                "Please write a message.";
+            messageStatus.textContent = "Please write a message.";
             return;
         }
 
@@ -395,7 +401,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(function (error) {
             console.error("EmailJS Error:", error);
 
-            messageStatus.style.color = "#ff7777";
+            messageStatus.style.color = "red";
             messageStatus.textContent =
                 "Message could not be sent. Check EmailJS settings.";
 
