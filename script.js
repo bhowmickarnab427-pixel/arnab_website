@@ -37,7 +37,6 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentUsername = "";
     let notificationTimer;
 
-    // Get Users
     function getUsers() {
         try {
             return JSON.parse(localStorage.getItem("users")) || {};
@@ -69,11 +68,10 @@ document.addEventListener("DOMContentLoaded", function () {
         if (hour < 12) return "Good Morning";
         if (hour < 17) return "Good Afternoon";
         if (hour < 21) return "Good Evening";
-
         return "Good Night";
     }
 
-    // Show Login
+    // Show Login Page
     function showLoginPage() {
         if (loginPage) loginPage.classList.remove("hidden");
         if (signupPage) signupPage.classList.add("hidden");
@@ -91,7 +89,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Back Button
+    // Back to Login
     if (backButton) {
         backButton.addEventListener("click", showLoginPage);
     }
@@ -105,7 +103,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const password = signupPassword.value.trim();
 
             if (!username || !password) {
-                signupMessage.textContent = "Please enter username and password.";
+                signupMessage.textContent =
+                    "Please enter username and password.";
                 return;
             }
 
@@ -123,7 +122,9 @@ document.addEventListener("DOMContentLoaded", function () {
             users[username] = password;
             localStorage.setItem("users", JSON.stringify(users));
 
-            signupMessage.textContent = "Account created successfully!";
+            signupMessage.textContent =
+                "Account created successfully! Please log in.";
+
             signupForm.reset();
 
             setTimeout(showLoginPage, 1000);
@@ -163,7 +164,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 loginForm.reset();
                 showNotification("Welcome, " + username + "!", "success");
-
             } else {
                 loginMessage.textContent = "Invalid username or password.";
             }
@@ -227,7 +227,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 showNotification("Message sent successfully!", "success");
             })
             .catch(function (error) {
-                console.error(error);
+                console.error("EmailJS error:", error);
 
                 if (messageStatus) {
                     messageStatus.textContent =
