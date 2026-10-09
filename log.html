@@ -4,133 +4,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
-
-<title>Login Page</title>
-<link rel="icon" type="image/png" href="./favicon.png">
-
-
+    <title>Login Page | Arnab Bhowmick</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <!-- Login Page -->
-    <div class="container" id="loginPage">
-        <h2>Login</h2>
+    <main class="container">
 
-        <form id="loginForm">
-            <input type="text" id="loginUsername"
-                placeholder="Enter Username" required>
+        <!-- Login Page -->
+        <section id="loginPage" class="form-box">
+            <h1>Welcome Back</h1>
+            <p class="subtitle">Login to your account</p>
 
-            <input type="password" id="loginPassword"
-                placeholder="Enter Password" required>
+            <form id="loginForm">
+                <label for="loginUsername">Username</label>
+                <input type="text" id="loginUsername"
+                       placeholder="Enter username" required>
 
-            <button type="submit">Login</button>
-        </form>
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword"
+                       placeholder="Enter password" required>
 
-        <p id="loginMessage"></p>
-
-        <button type="button" class="forgot-btn"
-            id="forgotPasswordButton">Forgot Password?</button>
-
-        <p>Don't have an account?</p>
-        <button type="button" id="signupButton">Sign Up</button>
-
-        <p class="developer-credit">Developed by Arnab Bhowmick</p>
-    </div>
-
-    <!-- Sign Up Page -->
-    <div class="container hidden" id="signupPage">
-        <h2>Sign Up</h2>
-
-        <form id="signupForm">
-            <input type="text" id="signupUsername"
-                placeholder="Create Username" required>
-
-            <input type="password" id="signupPassword"
-                placeholder="Create Password" required>
-
-            <button type="submit">Create Account</button>
-        </form>
-
-        <p id="signupMessage"></p>
-
-        <button type="button" id="backButton">Back to Login</button>
-    </div>
-
-    <!-- Welcome Page -->
-    <div class="welcome-page hidden" id="namePage">
-
-        <h1 id="displayName">Hi</h1>
-
-        <p id="displayName2">Login Successful!</p>
-        <p id="displayName3">Welcome to your account.</p>
-        
-<!-- Live Clock and Date -->
-<div class="live-clock-box">
-    <h3 id="liveClock">00:00:00</h3>
-    <p id="liveDate">Loading date...</p>
-</div>
-
-<!-- Notification -->
-<div id="notification" class="notification" role="status"
-     aria-live="polite"></div>
-
-<!-- Edit Profile Button -->
-<button type="button" id="editProfileButton">
-    Edit Profile
-</button>
-
-<!-- Edit Profile Form -->
-<div id="editProfileBox" class="edit-profile-box hidden">
-    <h2>Edit Profile</h2>
-
-    <form id="editProfileForm">
-        <input
-            type="text"
-            id="profileDisplayName"
-            placeholder="Enter display name"
-            required
-        >
-
-        <textarea
-            id="profileBio"
-            placeholder="Write something about yourself"
-            rows="3"
-        ></textarea>
-
-        <button type="submit">Save Profile</button>
-        <button type="button" id="cancelProfileButton">
-            Cancel
-        </button>
-    </form>
-
-    <p id="profileStatus"></p>
-</div>
-
-
-        <!-- Message Box -->
-        <div class="message-box">
-            <h2>Send Me a Message</h2>
-
-            <form id="messageForm">
-                <textarea id="userMessage"
-                    placeholder="Write your message here..."
-                    required></textarea>
-
-                <button type="submit" id="sendMessageButton">
-                    Send Message
-                </button>
+                <button type="submit">Login</button>
             </form>
 
-            <p id="messageStatus"></p>
-        </div>
+            <p id="loginMessage" class="message"></p>
 
-        <button type="button" id="logoutButton">Logout</button>
+            <button type="button" id="forgotPasswordButton"
+                    class="text-button">Forgot Password?</button>
 
-    </div>
+            <p class="bottom-text">
+                Don't have an account?
+                <button type="button" id="signupButton"
+                        class="text-button">Sign Up</button>
+            </p>
 
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script src="script.js"></script>
+            <p class="developer">Developed by Arnab Bhowmick</p>
+        </section>
+
+        <!-- Sign Up Page -->
+        <section id="signupPage" class="form-box hidden">
+            <h1>Create Account</h1>
+            <p class="subtitle">Join us today</p>
+
+            <form id="signupForm">
+                <label for="signupUsername">Username</label>
+                <input type="text" id="signupUsername"
+                       placeholder="Create username" required>
+
+                <label for="signupPassword">Password</label>
+                <input type="password" id="signupPassword"
+                       placeholder="Create password" required>
+
+                <button type="submit">Create Account</button>
+            </form>
+
+            <p id="signupMessage" class="message"></p>
+
+            <button type="button" id="backButton"
+                    class="text-button">Back to Login</button>
+
+            <p class="developer">Developed by Arnab Bhowmick</p>
+        </section>
+
+        <!-- Welcome Page -->
+        <section id="namePage" class="welcome-page hidden">
+
+            <h1 id="displayName">Hi!</h1>
+            <h2 id="displayName2">Login Successful!</h2>
+            <p id="displayName3">Welcome</p>
+
+            <!-- Live Clock and Date -->
+            <div class="live-clock-box">
+                <h3>Live Clock</h3>
+                <p id="liveClock">00:00:00</p>
+                <p id="liveDate">Loading date...</p>
+            </div>
+
+            <!-- Message Box -->
+            <div class="message-box">
+                <h3>Send a Message</h3>
+
+                <form id="messageForm">
+                    <textarea id="userMessage"
+                              placeholder="Write your message here..."
+                              rows="4" required></textarea>
+
+                    <button type="submit" id="sendMessageButton">
+                        Send Message
+                    </button>
+                </form>
+
+                <p id="messageStatus" class="message"></p>
+            </div>
+
+            <button type="button" id="logoutButton"
+                    class="logout-button">Logout</button>
+
+            <p class="developer">Developed by Arnab Bhowmick</p>
+        </section>
+
+        <!-- Notification -->
+        <div id="notification" class="notification"
+             role="status" aria-live="polite"></div>
+
+    </main>
+
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+
 </body>
 </html>
