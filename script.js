@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", function () {
         signupPage.classList.add("hidden");
         namePage.classList.remove("hidden");
 
-        displayName.textContent = "Hi " + username;
+        displayName.textContent = "Hi ,, " + username;
         displayName2.textContent = "Login Successful!";
         displayName3.textContent = "Welcome to your account.";
 
