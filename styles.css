@@ -221,3 +221,105 @@ p {
         padding: 15px;
     }
 }
+
+/* ===== Live Clock and Date ===== */
+.live-clock-box {
+    width: 340px;
+    max-width: 100%;
+    margin: 15px auto;
+    padding: 18px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 181, 71, 0.4);
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.live-clock-box h3 {
+    margin: 0;
+    color: #ffb547;
+    font-size: 30px;
+    letter-spacing: 2px;
+    font-family: monospace;
+}
+
+.live-clock-box p {
+    margin: 8px 0 0;
+    color: #deddf5;
+    font-size: 14px;
+}
+
+/* ===== Notification System ===== */
+.notification {
+    display: none;
+    width: 340px;
+    max-width: 100%;
+    margin: 12px auto;
+    padding: 12px 15px;
+    border-radius: 10px;
+    background: #243c35;
+    border: 1px solid #4caf80;
+    color: #d9ffea;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+.notification.show {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+/* ===== Edit Profile ===== */
+#editProfileButton {
+    width: 180px;
+    margin: 15px auto;
+}
+
+.edit-profile-box {
+    width: 380px;
+    max-width: 100%;
+    margin: 15px auto;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+}
+
+.edit-profile-box h2 {
+    color: #ffb547;
+    font-size: 22px;
+    margin-bottom: 18px;
+}
+
+.edit-profile-box input,
+.edit-profile-box textarea {
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 12px;
+    border: 1px solid #777;
+    border-radius: 9px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+.edit-profile-box textarea {
+    resize: vertical;
+}
+
+.edit-profile-box button {
+    margin-top: 8px;
+}
+
+#profileStatus {
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 480px) {
+    .live-clock-box h3 {
+        font-size: 25px;
+    }
+
+    .edit-profile-box {
+        padding: 15px;
+    }
+}
