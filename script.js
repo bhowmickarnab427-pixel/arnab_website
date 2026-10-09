@@ -1,7 +1,6 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    // ===== HTML Elements =====
     const loginPage = document.getElementById("loginPage");
     const signupPage = document.getElementById("signupPage");
     const namePage = document.getElementById("namePage");
@@ -20,8 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const signupButton = document.getElementById("signupButton");
     const backButton = document.getElementById("backButton");
-    const forgotPasswordButton =
-        document.getElementById("forgotPasswordButton");
+    const forgotPasswordButton = document.getElementById("forgotPasswordButton");
     const logoutButton = document.getElementById("logoutButton");
 
     const displayName = document.getElementById("displayName");
@@ -30,34 +28,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const userMessage = document.getElementById("userMessage");
     const messageStatus = document.getElementById("messageStatus");
-    const sendMessageButton =
-        document.getElementById("sendMessageButton");
+    const sendMessageButton = document.getElementById("sendMessageButton");
 
-    // Live Clock and Date
     const liveClock = document.getElementById("liveClock");
     const liveDate = document.getElementById("liveDate");
-
-    // Notification
     const notification = document.getElementById("notification");
-
-    // Edit Profile
-    const editProfileButton =
-        document.getElementById("editProfileButton");
-    const editProfileBox =
-        document.getElementById("editProfileBox");
-    const editProfileForm =
-        document.getElementById("editProfileForm");
-    const profileDisplayName =
-        document.getElementById("profileDisplayName");
-    const profileBio = document.getElementById("profileBio");
-    const cancelProfileButton =
-        document.getElementById("cancelProfileButton");
-    const profileStatus = document.getElementById("profileStatus");
 
     let currentUsername = "";
     let notificationTimer;
 
-    // ===== Get Users =====
+    // Get Users
     function getUsers() {
         try {
             return JSON.parse(localStorage.getItem("users")) || {};
@@ -66,39 +46,204 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // ===== Get Profiles =====
-    function getProfiles() {
-        try {
-            return JSON.parse(
-                localStorage.getItem("userProfiles")
-            ) || {};
-        } catch (error) {
-            return {};
+    // Notification
+    function showNotification(message, type = "info") {
+        if (!notification) {
+            alert(message);
+            return;
         }
-    }
-
-    // ===== Notification =====
-    function showNotification(message, type = "success") {
-        if (!notification) return;
 
         clearTimeout(notificationTimer);
-
         notification.textContent = message;
         notification.className = "notification show " + type;
 
         notificationTimer = setTimeout(function () {
             notification.classList.remove("show");
-        }, 3500);
+        }, 3000);
     }
 
-    // ===== Show Login Page =====
+    // Greeting
+    function getGreeting() {
+        const hour = new Date().getHours();
+
+        if (hour < 12) return "Good Morning";
+        if (hour < 17) return "Good Afternoon";
+        if (hour < 21) return "Good Evening";
+
+        return "Good Night";
+    }
+
+    // Show Login
     function showLoginPage() {
-        loginPage.classList.remove("hidden");
-        signupPage.classList.add("hidden");
-        namePage.classList.add("hidden");
+        if (loginPage) loginPage.classList.remove("hidden");
+        if (signupPage) signupPage.classList.add("hidden");
+        if (namePage) namePage.classList.add("hidden");
     }
 
-    // ===== Live Clock and Date =====
+    // Open Sign Up
+    if (signupButton) {
+        signupButton.addEventListener("click", function () {
+            if (loginPage) loginPage.classList.add("hidden");
+            if (signupPage) signupPage.classList.remove("hidden");
+
+            if (loginMessage) loginMessage.textContent = "";
+            if (signupMessage) signupMessage.textContent = "";
+        });
+    }
+
+    // Back Button
+    if (backButton) {
+        backButton.addEventListener("click", showLoginPage);
+    }
+
+    // Sign Up
+    if (signupForm) {
+        signupForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const username = signupUsername.value.trim();
+            const password = signupPassword.value.trim();
+
+            if (!username || !password) {
+                signupMessage.textContent = "Please enter username and password.";
+                return;
+            }
+
+            const users = getUsers();
+
+            const existingUsername = Object.keys(users).find(function (name) {
+                return name.toLowerCase() === username.toLowerCase();
+            });
+
+            if (existingUsername) {
+                signupMessage.textContent = "Username already exists.";
+                return;
+            }
+
+            users[username] = password;
+            localStorage.setItem("users", JSON.stringify(users));
+
+            signupMessage.textContent = "Account created successfully!";
+            signupForm.reset();
+
+            setTimeout(showLoginPage, 1000);
+        });
+    }
+
+    // Login
+    if (loginForm) {
+        loginForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const username = loginUsername.value.trim();
+            const password = loginPassword.value.trim();
+            const users = getUsers();
+
+            if (users[username] === password) {
+                currentUsername = username;
+
+                if (loginPage) loginPage.classList.add("hidden");
+                if (signupPage) signupPage.classList.add("hidden");
+                if (namePage) namePage.classList.remove("hidden");
+
+                if (displayName) {
+                    displayName.textContent = "Hi, " + username + "!";
+                }
+
+                if (displayName2) {
+                    displayName2.textContent = "Login Successful!";
+                }
+
+                if (displayName3) {
+                    displayName3.textContent = getGreeting();
+                }
+
+                if (loginMessage) loginMessage.textContent = "";
+                if (messageStatus) messageStatus.textContent = "";
+
+                loginForm.reset();
+                showNotification("Welcome, " + username + "!", "success");
+
+            } else {
+                loginMessage.textContent = "Invalid username or password.";
+            }
+        });
+    }
+
+    // Forgot Password
+    if (forgotPasswordButton) {
+        forgotPasswordButton.addEventListener("click", function () {
+            const username = prompt("Enter your registered username:");
+
+            if (!username || !username.trim()) return;
+
+            const users = getUsers();
+            const name = username.trim();
+
+            if (Object.prototype.hasOwnProperty.call(users, name)) {
+                alert("Your password is: " + users[name]);
+            } else {
+                alert("Username not found. Please sign up first.");
+            }
+        });
+    }
+
+    // Send Message using EmailJS
+    if (messageForm) {
+        messageForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const message = userMessage ? userMessage.value.trim() : "";
+
+            if (!message) {
+                if (messageStatus) {
+                    messageStatus.textContent = "Please write a message.";
+                }
+                return;
+            }
+
+            if (typeof emailjs === "undefined") {
+                if (messageStatus) {
+                    messageStatus.textContent = "Email service is not loaded.";
+                }
+                return;
+            }
+
+            if (sendMessageButton) {
+                sendMessageButton.disabled = true;
+                sendMessageButton.textContent = "Sending...";
+            }
+
+            emailjs.send("7602720057", "template_o4g9k6t", {
+                from_name: currentUsername,
+                message: message
+            })
+            .then(function () {
+                if (messageStatus) {
+                    messageStatus.textContent = "Message sent successfully!";
+                }
+
+                messageForm.reset();
+                showNotification("Message sent successfully!", "success");
+            })
+            .catch(function (error) {
+                console.error(error);
+
+                if (messageStatus) {
+                    messageStatus.textContent =
+                        "Message could not be sent. Please try again.";
+                }
+            })
+            .finally(function () {
+                if (sendMessageButton) {
+                    sendMessageButton.disabled = false;
+                    sendMessageButton.textContent = "Send Message";
+                }
+            });
+        });
+    }
+
+    // Live Clock and Date
     function updateClock() {
         const now = new Date();
 
@@ -124,313 +269,21 @@ document.addEventListener("DOMContentLoaded", function () {
     updateClock();
     setInterval(updateClock, 1000);
 
-    // ===== Greeting =====
-    function getGreeting() {
-        const hour = new Date().getHours();
+    // Logout
+    if (logoutButton) {
+        logoutButton.addEventListener("click", function () {
+            currentUsername = "";
 
-        if (hour >= 5 && hour < 12) {
-            return "Good Morning 🌅";
-        } else if (hour >= 12 && hour < 17) {
-            return "Good Afternoon ☀️";
-        } else if (hour >= 17 && hour < 21) {
-            return "Good Evening 🌇";
-        } else {
-            return "Good Night 🌙";
-        }
-    }
+            if (loginForm) loginForm.reset();
+            if (signupForm) signupForm.reset();
+            if (messageForm) messageForm.reset();
 
-    // ===== Load Profile =====
-    function loadProfile() {
-        const profiles = getProfiles();
-        const profile = profiles[currentUsername] || {};
+            if (loginMessage) loginMessage.textContent = "";
+            if (signupMessage) signupMessage.textContent = "";
+            if (messageStatus) messageStatus.textContent = "";
 
-        const savedName = profile.name || currentUsername;
-
-        profileDisplayName.value = savedName;
-        profileBio.value = profile.bio || "";
-
-        displayName.textContent =
-            "Hi, " + savedName + "! " + getGreeting();
-
-        displayName3.textContent =
-            profile.bio || "Welcome to your account.";
-
-        profileStatus.textContent = "";
-    }
-
-    // ===== Sign Up Page =====
-    signupButton.addEventListener("click", function () {
-        loginPage.classList.add("hidden");
-        signupPage.classList.remove("hidden");
-        namePage.classList.add("hidden");
-
-        signupMessage.textContent = "";
-        loginMessage.textContent = "";
-    });
-
-    // ===== Back to Login =====
-    backButton.addEventListener("click", function () {
-        showLoginPage();
-        signupMessage.textContent = "";
-    });
-
-    // ===== Sign Up =====
-    signupForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        const username = signupUsername.value.trim();
-        const password = signupPassword.value;
-        const users = getUsers();
-
-        if (!username || !password) {
-            signupMessage.style.color = "red";
-            signupMessage.textContent =
-                "Please enter a username and password.";
-            return;
-        }
-
-        const existingUsername = Object.keys(users).find(function (name) {
-            return name.toLowerCase() === username.toLowerCase();
-        });
-
-        if (existingUsername) {
-            signupMessage.style.color = "red";
-            signupMessage.textContent = "Username already exists!";
-            return;
-        }
-
-        users[username] = password;
-        localStorage.setItem("users", JSON.stringify(users));
-
-        signupMessage.style.color = "green";
-        signupMessage.textContent =
-            "Account created successfully!";
-
-        signupForm.reset();
-
-        setTimeout(function () {
             showLoginPage();
-            loginUsername.value = username;
-            loginMessage.style.color = "green";
-            loginMessage.textContent =
-                "Now login with your password.";
-        }, 1000);
-    });
-
-    // ===== Login =====
-    loginForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        const username = loginUsername.value.trim();
-        const password = loginPassword.value;
-        const users = getUsers();
-
-        const actualUsername = Object.keys(users).find(function (name) {
-            return name.toLowerCase() === username.toLowerCase();
-        });
-
-        if (!actualUsername) {
-            loginMessage.style.color = "red";
-            loginMessage.textContent = "Account does not exist!";
-            showNotification("Account does not exist!", "error");
-            return;
-        }
-
-        if (users[actualUsername] !== password) {
-            loginMessage.style.color = "red";
-            loginMessage.textContent = "Incorrect password!";
-            showNotification("Incorrect password!", "error");
-            return;
-        }
-
-        currentUsername = actualUsername;
-
-        loginPage.classList.add("hidden");
-        signupPage.classList.add("hidden");
-        namePage.classList.remove("hidden");
-
-        displayName2.textContent = "Login Successful!";
-
-        loadProfile();
-
-        messageStatus.textContent = "";
-        messageForm.reset();
-        loginMessage.textContent = "";
-
-        showNotification(
-            "Welcome, " + currentUsername + "!",
-            "success"
-        );
-    });
-
-    // ===== Forgot Password =====
-    forgotPasswordButton.addEventListener("click", function () {
-        const username = prompt("Enter your username:");
-
-        if (username === null || username.trim() === "") {
-            return;
-        }
-
-        const users = getUsers();
-
-        const actualUsername = Object.keys(users).find(function (name) {
-            return name.toLowerCase() === username.trim().toLowerCase();
-        });
-
-        if (!actualUsername) {
-            alert("Username does not exist!");
-            return;
-        }
-
-        const newPassword = prompt("Enter your new password:");
-
-        if (newPassword === null || newPassword.trim() === "") {
-            alert("Password cannot be empty!");
-            return;
-        }
-
-        users[actualUsername] = newPassword;
-        localStorage.setItem("users", JSON.stringify(users));
-
-        alert("Password changed successfully!");
-    });
-
-    // ===== Edit Profile Button =====
-    editProfileButton.addEventListener("click", function () {
-        if (!currentUsername) return;
-
-        loadProfile();
-        editProfileBox.classList.remove("hidden");
-    });
-
-    // ===== Cancel Edit Profile =====
-    cancelProfileButton.addEventListener("click", function () {
-        editProfileBox.classList.add("hidden");
-        profileStatus.textContent = "";
-    });
-
-    // ===== Save Profile =====
-    editProfileForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        if (!currentUsername) return;
-
-        const name = profileDisplayName.value.trim();
-        const bio = profileBio.value.trim();
-
-        if (name === "") {
-            showNotification(
-                "Please enter your display name.",
-                "error"
-            );
-            return;
-        }
-
-        const profiles = getProfiles();
-
-        profiles[currentUsername] = {
-            name: name,
-            bio: bio
-        };
-
-        localStorage.setItem(
-            "userProfiles",
-            JSON.stringify(profiles)
-        );
-
-        displayName.textContent =
-            "Hi, " + name + "! " + getGreeting();
-
-        displayName3.textContent =
-            bio || "Welcome to your account.";
-
-        editProfileBox.classList.add("hidden");
-
-        showNotification(
-            "Profile updated successfully!",
-            "success"
-        );
-    });
-
-    // ===== EmailJS Setup =====
-    if (typeof emailjs !== "undefined") {
-        emailjs.init({
-            publicKey: "YrXDJS1iftBH_jxh3"
         });
     }
-
-    // ===== Send Message =====
-    messageForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        const message = userMessage.value.trim();
-
-        if (message === "") {
-            messageStatus.style.color = "red";
-            messageStatus.textContent = "Please write a message.";
-            return;
-        }
-
-        if (typeof emailjs === "undefined") {
-            messageStatus.style.color = "red";
-            messageStatus.textContent =
-                "Email service is not available.";
-            return;
-        }
-
-        messageStatus.style.color = "#ffb547";
-        messageStatus.textContent = "Sending...";
-        sendMessageButton.disabled = true;
-
-        emailjs.send("7602720057", "template_o4g9k6t", {
-            from_name: currentUsername,
-            message: message
-        })
-        .then(function () {
-            messageStatus.style.color = "#4caf80";
-            messageStatus.textContent =
-                "Message sent successfully!";
-
-            userMessage.value = "";
-
-            showNotification(
-                "Your message was sent!",
-                "success"
-            );
-        })
-        .catch(function (error) {
-            console.error("EmailJS Error:", error);
-
-            messageStatus.style.color = "red";
-            messageStatus.textContent =
-                "Message could not be sent. Check EmailJS settings.";
-
-            showNotification(
-                "Message could not be sent.",
-                "error"
-            );
-        })
-        .finally(function () {
-            sendMessageButton.disabled = false;
-        });
-    });
-
-    // ===== Logout =====
-    logoutButton.addEventListener("click", function () {
-        loginForm.reset();
-        loginMessage.textContent = "";
-
-        messageForm.reset();
-        messageStatus.textContent = "";
-
-        editProfileForm.reset();
-        editProfileBox.classList.add("hidden");
-
-        currentUsername = "";
-
-        showLoginPage();
-
-        showNotification("You have logged out.", "info");
-    });
 
 });
