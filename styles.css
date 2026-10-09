@@ -1,5 +1,5 @@
 
-/* Main Background */
+/* ===== General Settings ===== */
 * {
     box-sizing: border-box;
 }
@@ -13,313 +13,313 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    color: #ffffff;
 }
 
-/* Login and Sign Up Box */
 .container {
-    width: 370px;
-    max-width: 100%;
-    padding: 35px 30px;
-    background: rgba(255, 255, 255, 0.97);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    width: 100%;
+    max-width: 480px;
+    margin: auto;
+}
+
+/* ===== Login and Signup Box ===== */
+.form-box,
+.welcome-page {
+    width: 100%;
+    padding: 32px;
+    background: rgba(16, 18, 48, 0.94);
+    border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 20px;
-    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.35);
     text-align: center;
-    animation: fadeIn 0.5s ease;
+    animation: fadeIn 0.4s ease;
 }
 
-/* Heading */
-h2 {
-    color: #201b50;
-    font-size: 28px;
-    margin-top: 0;
-    margin-bottom: 25px;
-    font-weight: 700;
-}
-
-/* Input Fields */
-input {
-    display: block;
-    width: 100%;
-    padding: 14px 15px;
-    margin-bottom: 16px;
-    border: 1px solid #dedcf0;
-    border-radius: 10px;
-    background-color: #f7f7fc;
-    color: #24213f;
-    font-size: 14px;
-    outline: none;
-    transition: 0.3s;
-}
-
-input::placeholder {
-    color: #8987a5;
-}
-
-input:focus {
-    border-color: #6c4de6;
-    background-color: white;
-    box-shadow: 0 0 0 3px rgba(108, 77, 230, 0.13);
-}
-
-/* Buttons */
-button {
-    width: 100%;
-    padding: 13px;
-    margin-top: 8px;
-    border: none;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #7148e8, #4169e1);
-    color: white;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: 0 5px 12px rgba(83, 68, 200, 0.2);
-    transition: 0.3s;
-}
-
-button:hover {
-    background: linear-gradient(135deg, #5832c7, #304fc1);
-    transform: translateY(-2px);
-}
-
-button:active {
-    transform: scale(0.98);
-}
-
-/* Paragraphs */
-p {
-    color: #666580;
-    font-size: 14px;
-    line-height: 1.5;
-}
-
-/* Forgot Password */
-.forgot-btn {
-    background: transparent;
-    color: #6546d7;
-    box-shadow: none;
-    padding: 5px;
-    font-size: 13px;
-}
-
-.forgot-btn:hover {
-    background: transparent;
-    color: #3924a5;
-    text-decoration: underline;
-    box-shadow: none;
-    transform: none;
-}
-
-/* Developer Credit */
-.developer-credit {
-    margin-top: 20px;
-    margin-bottom: 0;
-    font-size: 12px;
-    color: #777;
-    text-align: center;
-}
-
-/* Hide Pages */
 .hidden {
     display: none !important;
 }
 
-/* Welcome Page */
-.welcome-page {
-    position: fixed;
-    inset: 0;
-    z-index: 10;
-    background: radial-gradient(circle at top, #25234f 0%, #10101e 45%, #080810 100%);
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    text-align: center;
-    padding: 35px 20px;
-    overflow-y: auto;
-}
-
-/* Welcome Heading */
-.welcome-page h1 {
-    color: #ffb547;
-    font-size: 42px;
-    font-weight: 800;
+h1 {
+    margin-top: 0;
     margin-bottom: 10px;
-    text-shadow: 0 0 25px rgba(255, 181, 71, 0.35);
+    font-size: 30px;
 }
 
-.welcome-page p {
-    color: #deddf5;
-    font-size: 16px;
+h2 {
+    font-size: 22px;
+    margin-bottom: 10px;
 }
 
-/* Message Box */
-.message-box {
-    width: 380px;
-    max-width: 100%;
-    margin-top: 15px;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 15px;
+h3 {
+    margin-top: 0;
+    font-size: 19px;
 }
 
-.message-box h2 {
-    color: #ffb547;
-    font-size: 21px;
-    margin-bottom: 15px;
+.subtitle {
+    color: #c7c9e8;
+    margin-bottom: 25px;
 }
 
-.message-box textarea {
+/* ===== Form Elements ===== */
+form {
+    text-align: left;
+}
+
+label {
+    display: block;
+    margin: 15px 0 7px;
+    font-size: 14px;
+    color: #e4e5ff;
+}
+
+input,
+textarea {
     width: 100%;
-    min-height: 110px;
-    padding: 12px;
-    border: 1px solid #777;
+    padding: 13px 14px;
+    border: 1px solid #555a94;
     border-radius: 10px;
+    outline: none;
+    background: #171a40;
+    color: #ffffff;
+    font-size: 15px;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus,
+textarea:focus {
+    border-color: #8d91ff;
+    box-shadow: 0 0 0 3px rgba(141, 145, 255, 0.15);
+}
+
+textarea {
     resize: vertical;
-    font-family: Arial, sans-serif;
+    min-height: 100px;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #a8abce;
+}
+
+/* ===== Buttons ===== */
+button {
+    width: 100%;
+    margin-top: 18px;
+    padding: 13px 16px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #696cff, #8c5bff);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.text-button {
+    width: auto;
+    margin: 5px 0;
+    padding: 4px;
+    background: transparent;
+    color: #aeb4ff;
+    font-size: 14px;
+    box-shadow: none;
+}
+
+.text-button:hover {
+    background: transparent;
+    text-decoration: underline;
+    transform: none;
+}
+
+.bottom-text {
+    margin-top: 20px;
+    color: #d0d2ee;
     font-size: 14px;
 }
 
-.message-box #messageStatus {
+.message {
+    min-height: 18px;
+    margin: 12px 0;
+    color: #ffb5b5;
+    font-size: 14px;
     overflow-wrap: anywhere;
 }
 
-/* Logout Button */
-.welcome-page > button {
-    width: 160px;
-    margin-top: 20px;
-    background: linear-gradient(135deg, #ffbd59, #ff8c42);
-    color: #19142d;
+/* ===== Welcome Page ===== */
+.welcome-page {
+    text-align: center;
 }
 
-/* Animation */
+#displayName {
+    overflow-wrap: anywhere;
+    color: #c7c9ff;
+}
+
+#displayName2 {
+    color: #a8ffcf;
+}
+
+#displayName3 {
+    color: #e0e1ff;
+    margin-bottom: 22px;
+}
+
+/* ===== Live Clock and Date ===== */
+.live-clock-box {
+    margin: 22px 0;
+    padding: 20px 12px;
+    background: linear-gradient(135deg, #22265b, #383b83);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 15px;
+}
+
+.live-clock-box h3 {
+    margin-bottom: 12px;
+    color: #c6caff;
+}
+
+#liveClock {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #ffffff;
+    font-variant-numeric: tabular-nums;
+}
+
+#liveDate {
+    margin: 10px 0 0;
+    color: #d4d6ff;
+    font-size: 14px;
+}
+
+/* ===== Message Box ===== */
+.message-box {
+    margin-top: 22px;
+    padding: 20px;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: left;
+}
+
+.message-box h3 {
+    text-align: center;
+    color: #d5d7ff;
+}
+
+.message-box button {
+    margin-top: 12px;
+}
+
+/* ===== Logout Button ===== */
+.logout-button {
+    background: linear-gradient(135deg, #e34f69, #c52d4d);
+    margin-top: 22px;
+}
+
+/* ===== Notification ===== */
+.notification {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 1000;
+    width: auto;
+    max-width: min(360px, calc(100vw - 40px));
+    padding: 14px 20px;
+    background: #252950;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: 0.25s ease;
+    overflow-wrap: anywhere;
+    pointer-events: none;
+}
+
+.notification.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.notification.success {
+    border-color: #4ade80;
+}
+
+.notification.error {
+    border-color: #fb7185;
+}
+
+.notification.info {
+    border-color: #818cf8;
+}
+
+/* ===== Developer Credit ===== */
+.developer {
+    margin-top: 25px;
+    margin-bottom: 0;
+    color: #aeb2dc;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+}
+
+/* ===== Animation ===== */
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(8px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-/* Mobile Screen */
+/* ===== Mobile Responsive ===== */
 @media (max-width: 480px) {
-    .container {
-        padding: 28px 22px;
+    body {
+        padding: 14px;
+    }
+
+    .form-box,
+    .welcome-page {
+        padding: 23px 18px;
         border-radius: 16px;
     }
 
-    .welcome-page h1 {
-        font-size: 34px;
+    h1 {
+        font-size: 26px;
+    }
+
+    #liveClock {
+        font-size: 27px;
     }
 
     .message-box {
         padding: 15px;
     }
-}
 
-/* ===== Live Clock and Date ===== */
-.live-clock-box {
-    width: 340px;
-    max-width: 100%;
-    margin: 15px auto;
-    padding: 18px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 181, 71, 0.4);
-    border-radius: 15px;
-    text-align: center;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
-
-.live-clock-box h3 {
-    margin: 0;
-    color: #ffb547;
-    font-size: 30px;
-    letter-spacing: 2px;
-    font-family: monospace;
-}
-
-.live-clock-box p {
-    margin: 8px 0 0;
-    color: #deddf5;
-    font-size: 14px;
-}
-
-/* ===== Notification System ===== */
-.notification {
-    display: none;
-    width: 340px;
-    max-width: 100%;
-    margin: 12px auto;
-    padding: 12px 15px;
-    border-radius: 10px;
-    background: #243c35;
-    border: 1px solid #4caf80;
-    color: #d9ffea;
-    font-size: 14px;
-    overflow-wrap: anywhere;
-}
-
-.notification.show {
-    display: block;
-    animation: fadeIn 0.3s ease;
-}
-
-/* ===== Edit Profile ===== */
-#editProfileButton {
-    width: 180px;
-    margin: 15px auto;
-}
-
-.edit-profile-box {
-    width: 380px;
-    max-width: 100%;
-    margin: 15px auto;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 15px;
-}
-
-.edit-profile-box h2 {
-    color: #ffb547;
-    font-size: 22px;
-    margin-bottom: 18px;
-}
-
-.edit-profile-box input,
-.edit-profile-box textarea {
-    width: 100%;
-    margin-bottom: 12px;
-    padding: 12px;
-    border: 1px solid #777;
-    border-radius: 9px;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-}
-
-.edit-profile-box textarea {
-    resize: vertical;
-}
-
-.edit-profile-box button {
-    margin-top: 8px;
-}
-
-#profileStatus {
-    overflow-wrap: anywhere;
-}
-
-@media (max-width: 480px) {
-    .live-clock-box h3 {
-        font-size: 25px;
-    }
-
-    .edit-profile-box {
-        padding: 15px;
+    .notification {
+        right: 14px;
+        bottom: 14px;
+        max-width: calc(100vw - 28px);
     }
 }
