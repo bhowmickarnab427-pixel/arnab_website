@@ -111,7 +111,23 @@ document.addEventListener("DOMContentLoaded", function () {
         signupPage.classList.add("hidden");
         namePage.classList.remove("hidden");
 
-        displayName.textContent = "Hi ; " + username;
+        
+const hour = new Date().getHours();
+
+let greeting;
+
+if (hour >= 5 && hour < 12) {
+    greeting = "Good Morning 🌅";
+} else if (hour >= 12 && hour < 17) {
+    greeting = "Good Afternoon ☀️";
+} else if (hour >= 17 && hour < 21) {
+    greeting = "Good Evening 🌇";
+} else {
+    greeting = "Good Night 🌙";
+}
+
+displayName.textContent = "Hi, " + username + "! " + greeting;
+
         displayName2.textContent = "Login Successful!";
         displayName3.textContent = "Welcome to your account.";
 
