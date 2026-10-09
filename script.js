@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", function () {
 
     const loginPage = document.getElementById("loginPage");
@@ -37,6 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentUsername = "";
     let notificationTimer;
 
+    // Get saved users
     function getUsers() {
         try {
             return JSON.parse(localStorage.getItem("users")) || {};
@@ -163,6 +163,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (messageStatus) messageStatus.textContent = "";
 
                 loginForm.reset();
+
                 showNotification("Welcome, " + username + "!", "success");
             } else {
                 loginMessage.textContent = "Invalid username or password.";
