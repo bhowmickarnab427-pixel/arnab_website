@@ -65,6 +65,49 @@
 
         <p id="displayName2">Login Successful!</p>
         <p id="displayName3">Welcome to your account.</p>
+        
+<!-- Live Clock and Date -->
+<div class="live-clock-box">
+    <h3 id="liveClock">00:00:00</h3>
+    <p id="liveDate">Loading date...</p>
+</div>
+
+<!-- Notification -->
+<div id="notification" class="notification" role="status"
+     aria-live="polite"></div>
+
+<!-- Edit Profile Button -->
+<button type="button" id="editProfileButton">
+    Edit Profile
+</button>
+
+<!-- Edit Profile Form -->
+<div id="editProfileBox" class="edit-profile-box hidden">
+    <h2>Edit Profile</h2>
+
+    <form id="editProfileForm">
+        <input
+            type="text"
+            id="profileDisplayName"
+            placeholder="Enter display name"
+            required
+        >
+
+        <textarea
+            id="profileBio"
+            placeholder="Write something about yourself"
+            rows="3"
+        ></textarea>
+
+        <button type="submit">Save Profile</button>
+        <button type="button" id="cancelProfileButton">
+            Cancel
+        </button>
+    </form>
+
+    <p id="profileStatus"></p>
+</div>
+
 
         <!-- Message Box -->
         <div class="message-box">
