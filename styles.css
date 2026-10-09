@@ -1,0 +1,223 @@
+
+/* Main Background */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(135deg, #0f1029, #27205a, #3438a5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Login and Sign Up Box */
+.container {
+    width: 370px;
+    max-width: 100%;
+    padding: 35px 30px;
+    background: rgba(255, 255, 255, 0.97);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    animation: fadeIn 0.5s ease;
+}
+
+/* Heading */
+h2 {
+    color: #201b50;
+    font-size: 28px;
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-weight: 700;
+}
+
+/* Input Fields */
+input {
+    display: block;
+    width: 100%;
+    padding: 14px 15px;
+    margin-bottom: 16px;
+    border: 1px solid #dedcf0;
+    border-radius: 10px;
+    background-color: #f7f7fc;
+    color: #24213f;
+    font-size: 14px;
+    outline: none;
+    transition: 0.3s;
+}
+
+input::placeholder {
+    color: #8987a5;
+}
+
+input:focus {
+    border-color: #6c4de6;
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(108, 77, 230, 0.13);
+}
+
+/* Buttons */
+button {
+    width: 100%;
+    padding: 13px;
+    margin-top: 8px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #7148e8, #4169e1);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 5px 12px rgba(83, 68, 200, 0.2);
+    transition: 0.3s;
+}
+
+button:hover {
+    background: linear-gradient(135deg, #5832c7, #304fc1);
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* Paragraphs */
+p {
+    color: #666580;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Forgot Password */
+.forgot-btn {
+    background: transparent;
+    color: #6546d7;
+    box-shadow: none;
+    padding: 5px;
+    font-size: 13px;
+}
+
+.forgot-btn:hover {
+    background: transparent;
+    color: #3924a5;
+    text-decoration: underline;
+    box-shadow: none;
+    transform: none;
+}
+
+/* Developer Credit */
+.developer-credit {
+    margin-top: 20px;
+    margin-bottom: 0;
+    font-size: 12px;
+    color: #777;
+    text-align: center;
+}
+
+/* Hide Pages */
+.hidden {
+    display: none !important;
+}
+
+/* Welcome Page */
+.welcome-page {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    background: radial-gradient(circle at top, #25234f 0%, #10101e 45%, #080810 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    text-align: center;
+    padding: 35px 20px;
+    overflow-y: auto;
+}
+
+/* Welcome Heading */
+.welcome-page h1 {
+    color: #ffb547;
+    font-size: 42px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    text-shadow: 0 0 25px rgba(255, 181, 71, 0.35);
+}
+
+.welcome-page p {
+    color: #deddf5;
+    font-size: 16px;
+}
+
+/* Message Box */
+.message-box {
+    width: 380px;
+    max-width: 100%;
+    margin-top: 15px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+}
+
+.message-box h2 {
+    color: #ffb547;
+    font-size: 21px;
+    margin-bottom: 15px;
+}
+
+.message-box textarea {
+    width: 100%;
+    min-height: 110px;
+    padding: 12px;
+    border: 1px solid #777;
+    border-radius: 10px;
+    resize: vertical;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+.message-box #messageStatus {
+    overflow-wrap: anywhere;
+}
+
+/* Logout Button */
+.welcome-page > button {
+    width: 160px;
+    margin-top: 20px;
+    background: linear-gradient(135deg, #ffbd59, #ff8c42);
+    color: #19142d;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mobile Screen */
+@media (max-width: 480px) {
+    .container {
+        padding: 28px 22px;
+        border-radius: 16px;
+    }
+
+    .welcome-page h1 {
+        font-size: 34px;
+    }
+
+    .message-box {
+        padding: 15px;
+    }
+}

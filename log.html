@@ -1,0 +1,88 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Login Page -->
+    <div class="container" id="loginPage">
+        <h2>Login</h2>
+
+        <form id="loginForm">
+            <input type="text" id="loginUsername"
+                placeholder="Enter Username" required>
+
+            <input type="password" id="loginPassword"
+                placeholder="Enter Password" required>
+
+            <button type="submit">Login</button>
+        </form>
+
+        <p id="loginMessage"></p>
+
+        <button type="button" class="forgot-btn"
+            id="forgotPasswordButton">Forgot Password?</button>
+
+        <p>Don't have an account?</p>
+        <button type="button" id="signupButton">Sign Up</button>
+
+        <p class="developer-credit">Developed by Arnab Bhowmick</p>
+    </div>
+
+    <!-- Sign Up Page -->
+    <div class="container hidden" id="signupPage">
+        <h2>Sign Up</h2>
+
+        <form id="signupForm">
+            <input type="text" id="signupUsername"
+                placeholder="Create Username" required>
+
+            <input type="password" id="signupPassword"
+                placeholder="Create Password" required>
+
+            <button type="submit">Create Account</button>
+        </form>
+
+        <p id="signupMessage"></p>
+
+        <button type="button" id="backButton">Back to Login</button>
+    </div>
+
+    <!-- Welcome Page -->
+    <div class="welcome-page hidden" id="namePage">
+
+        <h1 id="displayName">Hi</h1>
+
+        <p id="displayName2">Login Successful!</p>
+        <p id="displayName3">Welcome to your account.</p>
+
+        <!-- Message Box -->
+        <div class="message-box">
+            <h2>Send Me a Message</h2>
+
+            <form id="messageForm">
+                <textarea id="userMessage"
+                    placeholder="Write your message here..."
+                    required></textarea>
+
+                <button type="submit" id="sendMessageButton">
+                    Send Message
+                </button>
+            </form>
+
+            <p id="messageStatus"></p>
+        </div>
+
+        <button type="button" id="logoutButton">Logout</button>
+
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
