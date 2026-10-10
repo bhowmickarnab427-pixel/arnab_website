@@ -1,116 +1,173 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
+    <title>Arnab Web Portal</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<div class="container">
 
-    <div class="container">
+    <section id="loginPage" class="form-box">
+        <h1>Welcome Back</h1>
+        <p class="subtitle">Login to your account</p>
 
-        <!-- Login Page -->
-        <section id="loginPage" class="form-box">
-            <h1>Welcome Back</h1>
-            <p class="subtitle">Login to your account</p>
+        <form id="loginForm">
+            <label for="loginUsername">Email</label>
+            <input type="email" id="loginUsername"
+                   placeholder="Enter your email" required>
 
-            <form id="loginForm">
-                <label for="loginUsername">Username</label>
-                <input type="text" id="loginUsername"
-                       placeholder="Enter username" required>
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword"
+                   placeholder="Enter password" required>
 
-                <label for="loginPassword">Password</label>
-                <input type="password" id="loginPassword"
-                       placeholder="Enter password" required>
+            <button type="submit">Login</button>
+        </form>
 
-                <button type="submit">Login</button>
-            </form>
+        <p id="loginMessage" class="message"></p>
+        <button type="button" id="forgotPasswordButton" class="text-button">
+            Forgot Password?
+        </button>
+        <p class="bottom-text">
+            Don't have an account?
+            <button type="button" id="signupButton" class="text-button">
+                Sign Up
+            </button>
+        </p>
+        <p class="developer">Developed by Arnab Bhowmick</p>
+    </section>
 
-            <p id="loginMessage" class="message"></p>
-            <button type="button" id="forgotPasswordButton"
-                    class="text-button">Forgot Password?</button>
+    <section id="signupPage" class="form-box hidden">
+        <h1>Create Account</h1>
+        <p class="subtitle">Join us today</p>
 
-            <p class="bottom-text">
-                Don't have an account?
-                <button type="button" id="signupButton"
-                        class="text-button">Sign Up</button>
-            </p>
+        <form id="signupForm">
+            <label for="signupUsername">Username</label>
+            <input type="text" id="signupUsername"
+                   placeholder="Create username" required>
 
-            <p class="developer">Developed by Arnab Bhowmick</p>
-        </section>
+            <label for="signupEmail">Email</label>
+            <input type="email" id="signupEmail"
+                   placeholder="Enter your email" required>
 
-        <!-- Sign Up Page -->
-        <section id="signupPage" class="form-box hidden">
-            <h1>Create Account</h1>
-            <p class="subtitle">Join us today</p>
+            <label for="signupPassword">Password</label>
+            <input type="password" id="signupPassword"
+                   placeholder="Create password (min 8 characters)"
+                   minlength="8" required>
 
-            <form id="signupForm">
-                <label for="signupUsername">Username</label>
-                <input type="text" id="signupUsername"
-                       placeholder="Create username" required>
+            <button type="submit">Create Account</button>
+        </form>
 
-                <label for="signupPassword">Password</label>
-                <input type="password" id="signupPassword"
-                       placeholder="Create password" required>
+        <p id="signupMessage" class="message"></p>
+        <button type="button" id="backButton" class="text-button">
+            Back to Login
+        </button>
+        <p class="developer">Developed by Arnab Bhowmick</p>
+    </section>
 
-                <button type="submit">Create Account</button>
-            </form>
+    <section id="resetPage" class="form-box hidden">
+        <h1>Reset Password</h1>
+        <p class="subtitle">Enter your account email</p>
+        <form id="resetForm">
+            <label for="resetEmail">Email</label>
+            <input type="email" id="resetEmail" required>
+            <button type="submit">Send Reset Link</button>
+        </form>
+        <p id="resetMessage" class="message"></p>
+        <button type="button" id="resetBackButton" class="text-button">
+            Back to Login
+        </button>
+    </section>
 
-            <p id="signupMessage" class="message"></p>
-
-            <button type="button" id="backButton"
-                    class="text-button">Back to Login</button>
-
-            <p class="developer">Developed by Arnab Bhowmick</p>
-        </section>
-
-        <!-- Welcome Page -->
-        <section id="namePage" class="welcome-page hidden">
-            <h1 id="displayName">Hi!</h1>
-            <h2 id="displayName2">Login Successful!</h2>
-            <p id="displayName3">Welcome</p>
-
-            <!-- Live Clock and Date -->
-            <div class="live-clock-box">
-                <h3>Live Clock</h3>
-                <p id="liveClock">00:00:00</p>
-                <p id="liveDate">Loading date...</p>
+    <section id="namePage" class="welcome-page hidden">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">PERSONAL WEB PORTAL</p>
+                <h1 id="displayName">Hi!</h1>
+                <h2 id="displayName2">Login Successful!</h2>
+                <p id="displayName3">Welcome to your dashboard.</p>
             </div>
-            <div id="currentLocation">
-    Getting your location...
+            <button type="button" id="logoutButton" class="logout-button">
+                Logout
+            </button>
+        </header>
+
+        <div class="live-clock-box">
+            <p class="eyebrow">YOUR LOCAL TIME</p>
+            <p id="liveClock" class="clock">00:00:00</p>
+            <p id="liveDate">Loading date...</p>
+        </div>
+
+        <div id="notification" class="notification" role="status"
+             aria-live="polite"></div>
+
+        <section class="panel">
+            <h2>My Profile</h2>
+            <form id="profileForm">
+                <label for="profileUsername">Username</label>
+                <input id="profileUsername" type="text" maxlength="30" required>
+
+                <label for="profileDisplayName">Display name</label>
+                <input id="profileDisplayName" type="text" maxlength="60" required>
+
+                <label for="profileBio">Bio</label>
+                <textarea id="profileBio" rows="3" maxlength="300"
+                          placeholder="Tell something about yourself"></textarea>
+
+                <button type="submit">Save Profile</button>
+            </form>
+            <p id="profileMessage" class="message"></p>
+        </section>
+
+        <section class="panel">
+            <h2>Find a User</h2>
+            <form id="searchForm">
+                <label for="userSearch">Search username</label>
+                <input id="userSearch" type="text"
+                       placeholder="Enter username" required>
+                <button type="submit">Search</button>
+            </form>
+            <div id="searchResults"></div>
+        </section>
+
+        <section class="panel">
+            <h2>Messages</h2>
+            <p class="subtitle">Choose a user from search results to start chatting.</p>
+            <p id="chatWith">No conversation selected.</p>
+            <div id="chatMessages" class="chat-messages"></div>
+
+            <form id="messageForm">
+                <label for="userMessage">Your message</label>
+                <textarea id="userMessage" rows="3" maxlength="2000"
+                          placeholder="Write your message..." required></textarea>
+                <button type="submit" id="sendMessageButton" disabled>
+                    Send Message
+                </button>
+            </form>
+            <p id="messageStatus" class="message"></p>
+        </section>
+
+        <section id="adminPanel" class="panel hidden">
+            <h2>Admin Dashboard</h2>
+            <p>Admin access verified by the database.</p>
+            <button type="button" id="loadUsersButton">Load Users</button>
+            <div id="adminUsers"></div>
+            <p class="subtitle">Use this section only for authorized moderation.</p>
+        </section>
+
+        <section class="panel">
+            <h2>Location</h2>
+            <button type="button" id="locationButton">Share My Location</button>
+            <div id="currentLocation">Location not shared.</div>
+        </section>
+
+        <p class="developer">Developed by Arnab Bhowmick</p>
+    </section>
 </div>
 
-            <!-- Message Box -->
-            <div class="message-box">
-                <h3>Send a Message</h3>
-                <form id="messageForm">
-                    <textarea id="userMessage"
-                              placeholder="Write your message here..."
-                              rows="4" required></textarea>
-
-                    <button type="submit" id="sendMessageButton">
-                        Send Message
-                    </button>
-                </form>
-
-                <p id="messageStatus" class="message"></p>
-            </div>
-
-            <button type="button" id="logoutButton"
-                    class="logout-button">Logout</button>
-
-            <p class="developer">Developed by Arnab Bhowmick</p>
-        </section>
-
-        <!-- Notification -->
-        <div id="notification" class="notification"
-             role="status" aria-live="polite"></div>
-
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <script src="script.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
 </body>
 </html>
