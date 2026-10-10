@@ -429,3 +429,15 @@ body {
     color: #006400 !important;
 }
 
+/* Center the form in the full page */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    margin: auto;
+}
+
