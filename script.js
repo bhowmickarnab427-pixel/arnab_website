@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", function () {
 
     const loginPage = document.getElementById("loginPage");
@@ -32,9 +33,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const liveClock = document.getElementById("liveClock");
     const liveDate = document.getElementById("liveDate");
     const notification = document.getElementById("notification");
+    const locationBox = document.getElementById("currentLocation");
 
     let currentUsername = "";
     let notificationTimer;
+    let locationWatcher = null;
 
     // Get saved users
     function getUsers() {
@@ -76,6 +79,68 @@ document.addEventListener("DOMContentLoaded", function () {
         if (loginPage) loginPage.classList.remove("hidden");
         if (signupPage) signupPage.classList.add("hidden");
         if (namePage) namePage.classList.add("hidden");
+    }
+
+    // Current Location
+    function startLocation() {
+        if (!locationBox) return;
+
+        if (!navigator.geolocation) {
+            locationBox.textContent =
+                "Location is not supported by this browser.";
+            return;
+        }
+
+        if (locationWatcher !== null) {
+            navigator.geolocation.clearWatch(locationWatcher);
+            locationWatcher = null;
+        }
+
+        locationBox.textContent = "Getting your current location...";
+
+        locationWatcher = navigator.geolocation.watchPosition(
+            function (position) {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+
+                locationBox.replaceChildren();
+
+                const heading = document.createElement("div");
+                heading.textContent = "📍 Current Location";
+
+                const coordinates = document.createElement("div");
+                coordinates.textContent =
+                    "Latitude: " + latitude.toFixed(5) +
+                    " | Longitude: " + longitude.toFixed(5);
+
+                const mapLink = document.createElement("a");
+                mapLink.href =
+                    "https://www.google.com/maps?q=" +
+                    latitude + "," + longitude;
+                mapLink.target = "_blank";
+                mapLink.rel = "noopener noreferrer";
+                mapLink.textContent = "View on Google Maps";
+
+                locationBox.append(heading, coordinates, mapLink);
+            },
+            function (error) {
+                if (error.code === error.PERMISSION_DENIED) {
+                    locationBox.textContent =
+                        "Location permission denied. Allow location access in your browser.";
+                } else if (error.code === error.TIMEOUT) {
+                    locationBox.textContent =
+                        "Location request timed out. Trying to get location again...";
+                } else {
+                    locationBox.textContent =
+                        "Unable to get location. Please try again.";
+                }
+            },
+            {
+                enableHighAccuracy: true,
+                maximumAge: 5000,
+                timeout: 15000
+            }
+        );
     }
 
     // Open Sign Up
@@ -163,6 +228,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (messageStatus) messageStatus.textContent = "";
 
                 loginForm.reset();
+
+                // Start location after successful login
+                startLocation();
 
                 showNotification("Welcome, " + username + "!", "success");
             } else {
@@ -274,6 +342,15 @@ document.addEventListener("DOMContentLoaded", function () {
     if (logoutButton) {
         logoutButton.addEventListener("click", function () {
             currentUsername = "";
+
+            if (locationWatcher !== null) {
+                navigator.geolocation.clearWatch(locationWatcher);
+                locationWatcher = null;
+            }
+
+            if (locationBox) {
+                locationBox.textContent = "";
+            }
 
             if (loginForm) loginForm.reset();
             if (signupForm) signupForm.reset();
