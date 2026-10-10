@@ -9,6 +9,7 @@
 </head>
 <body>
 
+    <!-- Login Page -->
     <div class="form-box" id="loginPage">
         <h1>Welcome Back</h1>
         <p>Login to your account</p>
@@ -34,48 +35,52 @@
         <p class="developer">Developed by Arnab Bhowmick</p>
     </div>
 
+    <!-- Create Account -->
     <div class="form-box hidden" id="signupPage">
         <h1>Create Account</h1>
-        <p>Register a new account</p>
+        <p>Create your new account</p>
 
         <form id="signupForm">
             <input type="text" id="signupUsername"
-                   placeholder="Create Username" minlength="3" required>
-
-            <input type="email" id="signupEmail"
-                   placeholder="Enter Email" required>
+                   placeholder="Create Username"
+                   minlength="3" required>
 
             <input type="password" id="signupPassword"
-                   placeholder="Create Password" minlength="6" required>
+                   placeholder="Create Password"
+                   minlength="6" required>
 
             <button type="submit">Sign Up</button>
         </form>
 
         <p id="signupMessage" class="message"></p>
+
         <button type="button" id="backButton">Back to Login</button>
     </div>
 
+    <!-- Forgot Password -->
     <div class="form-box hidden" id="resetPage">
         <h1>Reset Password</h1>
+        <p>Enter your username and choose a new password</p>
 
         <form id="resetForm">
             <input type="text" id="resetUsername"
                    placeholder="Enter Username" required>
 
-            <input type="email" id="resetEmail"
-                   placeholder="Enter Email" required>
-
             <input type="password" id="resetPassword"
-                   placeholder="New Password" minlength="6" required>
+                   placeholder="New Password"
+                   minlength="6" required>
 
             <button type="submit">Change Password</button>
         </form>
 
         <p id="resetMessage" class="message"></p>
+
         <button type="button" id="resetBackButton">Back to Login</button>
     </div>
 
+    <!-- Dashboard -->
     <div class="dashboard hidden" id="namePage">
+
         <div class="top-bar">
             <span>My Dashboard</span>
             <button type="button" id="logoutButton">Logout</button>
@@ -97,12 +102,16 @@
         </div>
 
         <div class="info-card">
-            <h3>Send a Message</h3>
+            <h3>Message Box</h3>
+
             <form id="messageForm">
                 <textarea id="userMessage"
-                          placeholder="Write your message..." required></textarea>
-                <button type="submit" id="sendButton">Send Message</button>
+                          placeholder="Write your message..."
+                          required></textarea>
+
+                <button type="submit" id="sendButton">Save Message</button>
             </form>
+
             <p id="messageStatus" class="message"></p>
         </div>
 
