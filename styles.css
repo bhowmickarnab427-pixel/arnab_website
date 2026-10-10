@@ -441,3 +441,16 @@ body {
     margin: auto;
 }
 
+/* Make the form slightly wider */
+.container {
+    width: 100%;
+    max-width: 480px;
+    margin: auto;
+}
+
+.form-box,
+.welcome-page {
+    width: 100%;
+    box-sizing: border-box;
+}
+
