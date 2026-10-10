@@ -379,31 +379,3 @@ button {
     max-width: 100%;
 }
 
-/* Reduce outer spacing */
-html,
-body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    min-height: 100%;
-    overflow-x: clip;
-}
-
-body {
-    padding: 8px;
-}
-
-.container {
-    width: 100%;
-    max-width: 100%;
-    margin: 0 auto;
-    padding: 10px;
-    box-sizing: border-box;
-}
-
-.form-box,
-.welcome-page {
-    margin: 0 auto;
-    max-width: 100%;
-    box-sizing: border-box;
-}
