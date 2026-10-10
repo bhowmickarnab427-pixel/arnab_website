@@ -9,264 +9,166 @@ body {
     min-height: 100vh;
     font-family: "Segoe UI", Arial, sans-serif;
     background: linear-gradient(135deg, #0f1029, #27205a, #3438a5);
-    color: #fff;
     display: flex;
     justify-content: center;
     align-items: center;
+    color: white;
 }
 
-.container {
+.form-box,
+.dashboard {
     width: 100%;
-    max-width: 850px;
-    margin: auto;
+    max-width: 420px;
+    padding: 30px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.20);
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.30);
+    backdrop-filter: blur(12px);
+    text-align: center;
+}
+
+.dashboard {
+    max-width: 650px;
+    margin: 20px auto;
+}
+
+body:has(.dashboard:not(.hidden)) {
+    display: block;
+}
+
+h1 {
+    margin-top: 0;
+    color: white;
+}
+
+h2, h3 {
+    color: #f2f3ff;
+}
+
+p {
+    color: #e1e4ff;
+}
+
+input,
+textarea {
+    display: block;
+    width: 100%;
+    margin: 14px 0;
+    padding: 13px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 9px;
+    outline: none;
+    background: rgba(255, 255, 255, 0.95);
+    color: #17172b;
+    font-size: 15px;
+}
+
+input:focus,
+textarea:focus {
+    border-color: #ffb347;
+    box-shadow: 0 0 0 2px rgba(255, 179, 71, 0.2);
+}
+
+textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    margin: 7px 0;
+    border: none;
+    border-radius: 9px;
+    background: linear-gradient(135deg, #ff9f43, #ff6b35);
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.08);
+}
+
+.text-button {
+    background: transparent;
+    color: #ffd28b;
+    text-decoration: underline;
 }
 
 .hidden {
     display: none !important;
 }
 
-.form-box {
-    width: 100%;
-    max-width: 430px;
-    margin: auto;
-    padding: 32px;
-    background: rgba(17, 19, 48, 0.96);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 20px;
-    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.3);
-    animation: appear 0.4s ease;
-}
-
-h1, h2, p {
+.message {
+    min-height: 20px;
     overflow-wrap: anywhere;
-}
-
-.form-box h1 {
-    text-align: center;
-    margin-top: 0;
-    color: #fff;
-}
-
-.subtitle {
-    color: #bfc5e8;
-    text-align: center;
-    line-height: 1.6;
-}
-
-label {
-    display: block;
-    margin: 16px 0 7px;
-    font-size: 14px;
-    color: #e1e5ff;
-}
-
-input, textarea {
-    width: 100%;
-    padding: 12px 14px;
-    color: #fff;
-    background: #202344;
-    border: 1px solid #454b78;
-    border-radius: 9px;
-    outline: none;
-    font: inherit;
-}
-
-input:focus, textarea:focus {
-    border-color: #8e9cff;
-    box-shadow: 0 0 0 3px rgba(142, 156, 255, 0.13);
-}
-
-textarea {
-    resize: vertical;
-}
-
-button {
-    border: none;
-    border-radius: 9px;
-    padding: 12px 16px;
-    background: linear-gradient(90deg, #626cff, #8d61ff);
-    color: #fff;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.2s, opacity 0.2s;
-}
-
-form > button {
-    width: 100%;
-    margin-top: 20px;
-}
-
-button:hover {
-    transform: translateY(-1px);
-    opacity: 0.92;
-}
-
-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.text-button {
-    padding: 4px 2px;
-    background: transparent;
-    color: #b5bdff;
-    font-size: 14px;
-}
-
-.text-button:hover {
-    text-decoration: underline;
-    transform: none;
-}
-
-.bottom-text {
-    text-align: center;
-    color: #c6c9e3;
-    font-size: 14px;
-    margin-top: 20px;
+    font-weight: bold;
 }
 
 .developer {
-    text-align: center;
-    margin: 25px 0 0;
-    color: #aeb6dc;
+    margin-top: 24px;
     font-size: 12px;
-    letter-spacing: 0.4px;
+    color: #d1d5ff;
+    letter-spacing: 0.5px;
 }
 
-.message {
-    min-height: 18px;
-    overflow-wrap: anywhere;
-    font-size: 14px;
-    color: #b8e8ff;
-}
-
-.welcome-page {
-    width: 100%;
-    padding: 25px;
-    background: rgba(17, 19, 48, 0.96);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 20px;
-    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.3);
-    animation: appear 0.4s ease;
-}
-
-.topbar {
+.top-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 15px;
-    flex-wrap: wrap;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #35395e;
+    margin-bottom: 25px;
+    text-align: left;
+    font-weight: bold;
 }
 
-.eyebrow {
-    color: #9ba7ff;
-    font-size: 11px;
-    letter-spacing: 2px;
-    font-weight: 700;
+.top-bar button {
+    width: auto;
+    min-width: 90px;
 }
 
 #displayName {
-    color: #ffb45e;
-    margin: 8px 0;
-}
-
-#displayName2 {
-    color: #73e6a5;
-    margin: 8px 0;
-    font-size: 21px;
-}
-
-#displayName3 {
-    color: #d3d7f2;
-}
-
-.logout-button {
-    background: #d94d65;
-}
-
-.panel {
-    margin-top: 22px;
-    padding: 22px;
-    background: rgba(35, 39, 82, 0.72);
-    border: 1px solid #393e70;
-    border-radius: 15px;
-}
-
-.panel h2 {
-    margin-top: 0;
-}
-
-.clock-panel {
-    text-align: center;
-}
-
-.clock {
-    margin: 8px 0;
-    font-size: clamp(30px, 6vw, 45px);
-    color: #fff;
-    font-variant-numeric: tabular-nums;
-}
-
-#liveDate {
-    color: #c8ccee;
-}
-
-.notification {
-    margin-top: 18px;
-    padding: 12px;
-    border-radius: 9px;
-    background: rgba(66, 185, 125, 0.12);
-    color: #9ef0be;
+    color: #ffb347;
     overflow-wrap: anywhere;
 }
 
-#notification:empty {
-    display: none;
+#displayName2 {
+    color: #75ff9a;
 }
 
-@keyframes appear {
-    from {
-        opacity: 0;
-        transform: translateY(8px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.info-card {
+    margin: 18px 0;
+    padding: 18px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-@media (max-width: 600px) {
+#liveClock {
+    font-size: 32px;
+    letter-spacing: 2px;
+}
+
+#liveDate {
+    font-size: 14px;
+}
+
+@media (max-width: 480px) {
     body {
         padding: 12px;
-        align-items: flex-start;
     }
 
-    .form-box {
-        padding: 23px 18px;
-        margin-top: 15px;
+    .form-box,
+    .dashboard {
+        padding: 22px 16px;
     }
 
-    .welcome-page {
-        padding: 16px;
-        margin-top: 8px;
-    }
-
-    .panel {
-        padding: 16px;
-    }
-
-    .topbar {
-        align-items: flex-start;
-    }
-
-    .logout-button {
-        width: 100%;
-    }
-
-    button {
-        min-height: 42px;
+    #liveClock {
+        font-size: 26px;
     }
 }
