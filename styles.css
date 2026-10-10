@@ -320,3 +320,8 @@ button:disabled {
         max-width: calc(100vw - 28px);
     }
 }
+
+/* Orange Username Greeting */
+#displayName {
+    color: #ff9800;
+}
