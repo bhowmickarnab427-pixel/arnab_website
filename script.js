@@ -1,8 +1,8 @@
 
 document.addEventListener("DOMContentLoaded", async function () {
     // STEP 1: Put your Supabase details here
-    const SUPABASE_URL = "PASTE_YOUR_PROJECT_URL";
-    const SUPABASE_KEY = "PASTE_YOUR_PUBLISHABLE_KEY";
+    const SUPABASE_URL = "https://ckqtgfjocckptymdzeak.supabase.co";
+    const SUPABASE_KEY = "sb_publishable__QGRASJve4l7MpCow1FodQ_qoiKnesP";
 
     const sb = window.supabase.createClient(
         SUPABASE_URL,
