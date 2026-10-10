@@ -1,5 +1,6 @@
 
 document.addEventListener("DOMContentLoaded", function () {
+
     const loginPage = document.getElementById("loginPage");
     const signupPage = document.getElementById("signupPage");
     const resetPage = document.getElementById("resetPage");
@@ -18,6 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentUsername = "";
     let clockInterval = null;
 
+    // Show selected page
     function showPage(page) {
         [loginPage, signupPage, resetPage, namePage].forEach(function (item) {
             item.classList.add("hidden");
@@ -26,11 +28,13 @@ document.addEventListener("DOMContentLoaded", function () {
         page.classList.remove("hidden");
     }
 
+    // Show success or error message
     function showMessage(element, message, success = false) {
         element.textContent = message;
         element.style.color = success ? "#75ff9a" : "#ffb4b4";
     }
 
+    // Get saved accounts
     function getAccounts() {
         try {
             return JSON.parse(localStorage.getItem("arnabAccounts")) || {};
@@ -39,38 +43,42 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    // Save accounts
     function saveAccounts(accounts) {
         localStorage.setItem("arnabAccounts", JSON.stringify(accounts));
     }
 
+    // Open Create Account
     document.getElementById("signupButton").addEventListener("click", function () {
         signupForm.reset();
         signupMessage.textContent = "";
         showPage(signupPage);
     });
 
+    // Back to Login
     document.getElementById("backButton").addEventListener("click", function () {
         showPage(loginPage);
         signupMessage.textContent = "";
     });
 
+    // Open Forgot Password
     document.getElementById("forgotPasswordButton").addEventListener("click", function () {
         resetForm.reset();
         resetMessage.textContent = "";
         showPage(resetPage);
     });
 
+    // Back from Reset Password
     document.getElementById("resetBackButton").addEventListener("click", function () {
         showPage(loginPage);
         resetMessage.textContent = "";
     });
 
-    // Sign Up
+    // Create Account without Email
     signupForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
         const username = document.getElementById("signupUsername").value.trim();
-        const email = document.getElementById("signupEmail").value.trim().toLowerCase();
         const password = document.getElementById("signupPassword").value;
 
         if (username.length < 3) {
@@ -84,42 +92,41 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         const accounts = getAccounts();
+        const accountKey = username.toLowerCase();
 
-        const usernameExists = Object.values(accounts).some(function (account) {
-            return account.username.toLowerCase() === username.toLowerCase();
-        });
-
-        if (accounts[email]) {
-            showMessage(signupMessage, "This email is already registered.");
+        if (accounts[accountKey]) {
+            showMessage(signupMessage, "Username already exists. Try another.");
             return;
         }
 
-        if (usernameExists) {
-            showMessage(signupMessage, "This username already exists.");
-            return;
-        }
+        accounts[accountKey] = {
+            username: username,
+            password: password
+        };
 
-        accounts[email] = { username, email, password };
         saveAccounts(accounts);
 
         signupForm.reset();
         document.getElementById("loginUsername").value = username;
 
         showPage(loginPage);
-        showMessage(loginMessage, "Account created successfully! Please log in.", true);
+
+        showMessage(
+            loginMessage,
+            "Account created successfully! Please log in.",
+            true
+        );
     });
 
-    // Login using Username
+    // Login using Username and Password
     loginForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
         const username = document.getElementById("loginUsername").value.trim();
         const password = document.getElementById("loginPassword").value;
-        const accounts = getAccounts();
 
-        const account = Object.values(accounts).find(function (item) {
-            return item.username.toLowerCase() === username.toLowerCase();
-        });
+        const accounts = getAccounts();
+        const account = accounts[username.toLowerCase()];
 
         if (!account || account.password !== password) {
             showMessage(loginMessage, "Invalid username or password.");
@@ -127,42 +134,47 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         currentUsername = account.username;
+
         document.getElementById("loginPassword").value = "";
         loginMessage.textContent = "";
 
         loadDashboard();
     });
 
-    // Forgot Password
+    // Change Password using Username
     resetForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
         const username = document.getElementById("resetUsername").value.trim();
-        const email = document.getElementById("resetEmail").value.trim().toLowerCase();
         const newPassword = document.getElementById("resetPassword").value;
-
-        const accounts = getAccounts();
-        const account = accounts[email];
-
-        if (!account || account.username.toLowerCase() !== username.toLowerCase()) {
-            showMessage(resetMessage, "Username and email do not match.");
-            return;
-        }
 
         if (newPassword.length < 6) {
             showMessage(resetMessage, "Password must be at least 6 characters.");
             return;
         }
 
-        account.password = newPassword;
+        const accounts = getAccounts();
+        const accountKey = username.toLowerCase();
+
+        if (!accounts[accountKey]) {
+            showMessage(resetMessage, "Username does not exist.");
+            return;
+        }
+
+        accounts[accountKey].password = newPassword;
         saveAccounts(accounts);
 
         resetForm.reset();
         showPage(loginPage);
-        showMessage(loginMessage, "Password changed successfully. Please log in.", true);
+
+        showMessage(
+            loginMessage,
+            "Password changed successfully. Please log in.",
+            true
+        );
     });
 
-    // Dashboard
+    // Load Dashboard
     function loadDashboard() {
         showPage(namePage);
 
@@ -178,7 +190,9 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("displayName").textContent =
             greeting + ", " + currentUsername + "!";
 
-        document.getElementById("displayName2").textContent = "Login Successful!";
+        document.getElementById("displayName2").textContent =
+            "Login Successful!";
+
         document.getElementById("displayName3").textContent =
             "Welcome back, " + currentUsername + ".";
 
@@ -187,10 +201,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
         updateClock();
 
-        if (clockInterval) clearInterval(clockInterval);
+        if (clockInterval) {
+            clearInterval(clockInterval);
+        }
+
         clockInterval = setInterval(updateClock, 1000);
     }
 
+    // Live Clock and Date
     function updateClock() {
         const now = new Date();
 
@@ -206,7 +224,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
-    // Demo message box (does not send email or SMS)
+    // Demo Message Box
     messageForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
@@ -241,8 +259,10 @@ document.addEventListener("DOMContentLoaded", function () {
         messageForm.reset();
 
         showPage(loginPage);
+
         showMessage(loginMessage, "You have logged out successfully.", true);
     });
 
+    // Open Login Page first
     showPage(loginPage);
 });
