@@ -454,3 +454,69 @@ body {
     box-sizing: border-box;
 }
 
+/* Responsive layout for phone, tablet and laptop */
+html {
+    width: 100%;
+    min-height: 100%;
+    overflow-x: clip;
+}
+
+body {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    overflow-x: clip;
+}
+
+.container {
+    width: 100%;
+    max-width: 480px;
+    margin: auto;
+    box-sizing: border-box;
+}
+
+.form-box,
+.welcome-page {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Keep form fields inside the box */
+input,
+textarea,
+button {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Small phone screens */
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+        align-items: center;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* Short screens: allow vertical scrolling */
+@media (max-height: 600px) {
+    body {
+        align-items: flex-start;
+    }
+
+    .container {
+        margin-top: 12px;
+        margin-bottom: 12px;
+    }
+}
+
