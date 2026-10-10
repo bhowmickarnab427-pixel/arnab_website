@@ -412,3 +412,15 @@ body {
     box-sizing: border-box;
 }
 
+/* Keep form centered horizontally */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    margin-left: auto;
+    margin-right: auto;
+}
+
