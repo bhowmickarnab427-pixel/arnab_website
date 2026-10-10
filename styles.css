@@ -379,3 +379,36 @@ button {
     max-width: 100%;
 }
 
+/* Keep the form centered and fit the screen */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    overflow-x: clip;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px;
+}
+
+.container {
+    width: 100%;
+    max-width: 420px;
+    margin: auto;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.form-box,
+.welcome-page {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+}
+
