@@ -354,3 +354,27 @@ button {
     max-width: 100%;
     box-sizing: border-box;
 }
+
+/* Fix horizontal page movement */
+html,
+body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.container {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+input,
+textarea,
+button {
+    max-width: 100%;
+}
