@@ -325,3 +325,8 @@ button:disabled {
 #displayName {
     color: #ff9800;
 }
+
+/* Force Orange Color for Hi, Username! */
+#namePage h1#displayName {
+    color: #ff9800 !important;
+}
