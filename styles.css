@@ -330,3 +330,27 @@ button:disabled {
 #namePage h1#displayName {
     color: #ff9800 !important;
 }
+
+/* Fix unwanted horizontal scrolling */
+html {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.container {
+    box-sizing: border-box;
+    max-width: 100%;
+}
+
+img,
+textarea,
+input,
+button {
+    max-width: 100%;
+    box-sizing: border-box;
+}
