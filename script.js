@@ -81,22 +81,42 @@ document.addEventListener("DOMContentLoaded", function () {
         if (namePage) namePage.classList.add("hidden");
     }
 
+    // Stop Location Tracking
+    function stopLocation() {
+        if (locationWatcher !== null && navigator.geolocation) {
+            navigator.geolocation.clearWatch(locationWatcher);
+            locationWatcher = null;
+        }
+    }
+
     // Current Location
     function startLocation() {
-        if (!locationBox) return;
+        if (!locationBox) {
+            console.error(
+                'Location element missing. Add id="currentLocation" in log.html.'
+            );
+            return;
+        }
+
+        stopLocation();
+
+        locationBox.replaceChildren();
+
+        const status = document.createElement("p");
+        status.textContent = "Getting your current location...";
+        locationBox.appendChild(status);
+
+        if (!window.isSecureContext) {
+            locationBox.textContent =
+                "Location requires a secure HTTPS website.";
+            return;
+        }
 
         if (!navigator.geolocation) {
             locationBox.textContent =
                 "Location is not supported by this browser.";
             return;
         }
-
-        if (locationWatcher !== null) {
-            navigator.geolocation.clearWatch(locationWatcher);
-            locationWatcher = null;
-        }
-
-        locationBox.textContent = "Getting your current location...";
 
         locationWatcher = navigator.geolocation.watchPosition(
             function (position) {
@@ -105,13 +125,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 locationBox.replaceChildren();
 
-                const heading = document.createElement("div");
-                heading.textContent = "📍 Current Location";
+                const heading = document.createElement("h3");
+                heading.textContent = "📍 Your Current Location";
 
-                const coordinates = document.createElement("div");
+                const coordinates = document.createElement("p");
                 coordinates.textContent =
-                    "Latitude: " + latitude.toFixed(5) +
-                    " | Longitude: " + longitude.toFixed(5);
+                    "Latitude: " + latitude.toFixed(6) +
+                    " | Longitude: " + longitude.toFixed(6);
 
                 const mapLink = document.createElement("a");
                 mapLink.href =
@@ -124,21 +144,26 @@ document.addEventListener("DOMContentLoaded", function () {
                 locationBox.append(heading, coordinates, mapLink);
             },
             function (error) {
-                if (error.code === error.PERMISSION_DENIED) {
+                if (error.code === 1) {
                     locationBox.textContent =
-                        "Location permission denied. Allow location access in your browser.";
-                } else if (error.code === error.TIMEOUT) {
+                        "Location permission denied. Allow location access in your browser settings.";
+                } else if (error.code === 2) {
                     locationBox.textContent =
-                        "Location request timed out. Trying to get location again...";
+                        "Your location is unavailable. Check your device location settings.";
+                } else if (error.code === 3) {
+                    locationBox.textContent =
+                        "Location request timed out. Please try again.";
                 } else {
                     locationBox.textContent =
                         "Unable to get location. Please try again.";
                 }
+
+                console.warn("Location error:", error.message);
             },
             {
                 enableHighAccuracy: true,
                 maximumAge: 5000,
-                timeout: 15000
+                timeout: 20000
             }
         );
     }
@@ -343,10 +368,7 @@ document.addEventListener("DOMContentLoaded", function () {
         logoutButton.addEventListener("click", function () {
             currentUsername = "";
 
-            if (locationWatcher !== null) {
-                navigator.geolocation.clearWatch(locationWatcher);
-                locationWatcher = null;
-            }
+            stopLocation();
 
             if (locationBox) {
                 locationBox.textContent = "";
