@@ -1,6 +1,7 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
+    // Get HTML elements
     const loginPage = document.getElementById("loginPage");
     const signupPage = document.getElementById("signupPage");
     const resetPage = document.getElementById("resetPage");
@@ -22,19 +23,21 @@ document.addEventListener("DOMContentLoaded", function () {
     // Show selected page
     function showPage(page) {
         [loginPage, signupPage, resetPage, namePage].forEach(function (item) {
-            item.classList.add("hidden");
+            if (item) item.classList.add("hidden");
         });
 
-        page.classList.remove("hidden");
+        if (page) page.classList.remove("hidden");
     }
 
-    // Show success or error message
+    // Display messages
     function showMessage(element, message, success = false) {
+        if (!element) return;
+
         element.textContent = message;
         element.style.color = success ? "#75ff9a" : "#ffb4b4";
     }
 
-    // Get saved accounts
+    // Read saved accounts
     function getAccounts() {
         try {
             return JSON.parse(localStorage.getItem("arnabAccounts")) || {};
@@ -45,10 +48,84 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Save accounts
     function saveAccounts(accounts) {
-        localStorage.setItem("arnabAccounts", JSON.stringify(accounts));
+        try {
+            localStorage.setItem("arnabAccounts", JSON.stringify(accounts));
+            return true;
+        } catch (error) {
+            return false;
+        }
     }
 
-    // Open Create Account
+    // Add password eye buttons automatically
+    function addPasswordEyes() {
+        const passwordIds = [
+            "loginPassword",
+            "signupPassword",
+            "resetPassword"
+        ];
+
+        passwordIds.forEach(function (id) {
+            const input = document.getElementById(id);
+
+            if (!input || input.dataset.eyeAdded === "true") return;
+
+            // Create wrapper
+            const wrapper = document.createElement("div");
+            wrapper.className = "password-box";
+            wrapper.style.position = "relative";
+            wrapper.style.width = "100%";
+
+            // Place wrapper around password input
+            input.parentNode.insertBefore(wrapper, input);
+            wrapper.appendChild(input);
+
+            // Make room for the eye button
+            input.style.paddingRight = "48px";
+            input.style.width = "100%";
+            input.dataset.eyeAdded = "true";
+
+            // Create eye button
+            const eyeButton = document.createElement("button");
+            eyeButton.type = "button";
+            eyeButton.className = "eye-button";
+            eyeButton.textContent = "👁";
+            eyeButton.setAttribute("aria-label", "Show password");
+            eyeButton.title = "Show password";
+
+            eyeButton.style.position = "absolute";
+            eyeButton.style.right = "10px";
+            eyeButton.style.top = "50%";
+            eyeButton.style.transform = "translateY(-50%)";
+            eyeButton.style.zIndex = "2";
+            eyeButton.style.cursor = "pointer";
+            eyeButton.style.border = "none";
+            eyeButton.style.background = "transparent";
+            eyeButton.style.padding = "5px";
+            eyeButton.style.fontSize = "18px";
+            eyeButton.style.lineHeight = "1";
+
+            wrapper.appendChild(eyeButton);
+
+            // Toggle password visibility
+            eyeButton.addEventListener("click", function () {
+                const isHidden = input.type === "password";
+
+                input.type = isHidden ? "text" : "password";
+                eyeButton.textContent = isHidden ? "🙈" : "👁";
+                eyeButton.setAttribute(
+                    "aria-label",
+                    isHidden ? "Hide password" : "Show password"
+                );
+                eyeButton.title = isHidden ? "Hide password" : "Show password";
+
+                input.focus();
+            });
+        });
+    }
+
+    addPasswordEyes();
+
+    // Open Create Account page
     document.getElementById("signupButton").addEventListener("click", function () {
         signupForm.reset();
         signupMessage.textContent = "";
@@ -74,7 +151,7 @@ document.addEventListener("DOMContentLoaded", function () {
         resetMessage.textContent = "";
     });
 
-    // Create Account without Email
+    // Create Account
     signupForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
@@ -104,13 +181,15 @@ document.addEventListener("DOMContentLoaded", function () {
             password: password
         };
 
-        saveAccounts(accounts);
+        if (!saveAccounts(accounts)) {
+            showMessage(signupMessage, "Could not save account in this browser.");
+            return;
+        }
 
         signupForm.reset();
         document.getElementById("loginUsername").value = username;
 
         showPage(loginPage);
-
         showMessage(
             loginMessage,
             "Account created successfully! Please log in.",
@@ -118,7 +197,7 @@ document.addEventListener("DOMContentLoaded", function () {
         );
     });
 
-    // Login using Username and Password
+    // Login
     loginForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
@@ -141,7 +220,7 @@ document.addEventListener("DOMContentLoaded", function () {
         loadDashboard();
     });
 
-    // Change Password using Username
+    // Reset Password
     resetForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
@@ -162,7 +241,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         accounts[accountKey].password = newPassword;
-        saveAccounts(accounts);
+
+        if (!saveAccounts(accounts)) {
+            showMessage(resetMessage, "Could not update password.");
+            return;
+        }
 
         resetForm.reset();
         showPage(loginPage);
@@ -178,17 +261,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function loadDashboard() {
         showPage(namePage);
 
-        const hour = new Date().getHours();
-        let greeting = "Good Evening";
-
-        if (hour < 12) {
-            greeting = "Good Morning";
-        } else if (hour < 17) {
-            greeting = "Good Afternoon";
-        }
-
-        document.getElementById("displayName").textContent =
-            greeting + ", " + currentUsername + "!";
+        updateGreeting();
 
         document.getElementById("displayName2").textContent =
             "Login Successful!";
@@ -205,7 +278,27 @@ document.addEventListener("DOMContentLoaded", function () {
             clearInterval(clockInterval);
         }
 
-        clockInterval = setInterval(updateClock, 1000);
+        clockInterval = setInterval(function () {
+            updateClock();
+            updateGreeting();
+        }, 1000);
+    }
+
+    // Greeting based on the device's local time
+    function updateGreeting() {
+        const hour = new Date().getHours();
+        let greeting;
+
+        if (hour < 12) {
+            greeting = "Good Morning";
+        } else if (hour < 17) {
+            greeting = "Good Afternoon";
+        } else {
+            greeting = "Good Evening";
+        }
+
+        document.getElementById("displayName").textContent =
+            greeting + ", " + currentUsername + "!";
     }
 
     // Live Clock and Date
@@ -224,7 +317,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
-    // Demo Message Box
+    // Demo message box
     messageForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
@@ -263,6 +356,6 @@ document.addEventListener("DOMContentLoaded", function () {
         showMessage(loginMessage, "You have logged out successfully.", true);
     });
 
-    // Open Login Page first
+    // Show Login page on startup
     showPage(loginPage);
 });
