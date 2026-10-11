@@ -1,52 +1,37 @@
 
 document.addEventListener("DOMContentLoaded", function () {
-    const $ = function (id) {
-        return document.getElementById(id);
-    };
+    const $ = id => document.getElementById(id);
 
-    const pageIds = [
-        "loginPage",
-        "signupPage",
-        "resetPage",
-        "dashboardPage"
-    ];
+    const pages = ["loginPage", "signupPage", "resetPage", "dashboardPage"];
 
-    function showPage(id) {
-        pageIds.forEach(function (pageId) {
-            const page = $(pageId);
-            if (page) page.classList.add("hidden");
-        });
-
-        const selectedPage = $(id);
-        if (selectedPage) selectedPage.classList.remove("hidden");
+    function showPage(pageId) {
+        pages.forEach(id => $(id)?.classList.add("hidden"));
+        $(pageId)?.classList.remove("hidden");
     }
 
-    function message(id, text, isError) {
-        const element = $(id);
-        if (!element) return;
-
-        element.textContent = text;
-        element.classList.toggle("error", Boolean(isError));
+    function message(id, text, error = false) {
+        const el = $(id);
+        if (!el) return;
+        el.textContent = text;
+        el.classList.toggle("error", error);
     }
 
     function toast(text) {
-        const element = $("toast");
-        if (!element) return;
+        const el = $("toast");
+        if (!el) return;
 
-        element.textContent = text;
-        element.classList.add("show");
+        el.textContent = text;
+        el.classList.add("show");
 
         clearTimeout(toast.timer);
-        toast.timer = setTimeout(function () {
-            element.classList.remove("show");
-        }, 2500);
+        toast.timer = setTimeout(() => el.classList.remove("show"), 2500);
     }
 
     function readJSON(key, fallback) {
         try {
-            const value = JSON.parse(localStorage.getItem(key));
-            return value === null ? fallback : value;
-        } catch (error) {
+            const value = localStorage.getItem(key);
+            return value === null ? fallback : JSON.parse(value);
+        } catch {
             return fallback;
         }
     }
@@ -55,41 +40,22 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
             localStorage.setItem(key, JSON.stringify(value));
             return true;
-        } catch (error) {
-            toast("Could not save data in this browser.");
+        } catch {
+            toast("Could not save. Browser storage may be full.");
             return false;
         }
     }
 
-    function clean(value) {
-        return String(value || "").trim();
-    }
-
     function getAccounts() {
-        const value = readJSON("arnabAccounts", []);
+        const data = readJSON("arnabAccounts", []);
+        if (Array.isArray(data)) return data;
 
-        if (Array.isArray(value)) {
-            return value.filter(function (account) {
-                return account &&
-                    typeof account.username === "string";
-            });
-        }
-
-        if (value && typeof value === "object") {
-            return Object.entries(value).map(function (entry) {
-                const username = entry[0];
-                const item = entry[1];
-
+        if (data && typeof data === "object") {
+            return Object.entries(data).map(([username, item]) => {
                 if (item && typeof item === "object") {
-                    return Object.assign({}, item, {
-                        username: username
-                    });
+                    return { ...item, username };
                 }
-
-                return {
-                    username: username,
-                    password: String(item)
-                };
+                return { username, password: String(item) };
             });
         }
 
@@ -100,217 +66,173 @@ document.addEventListener("DOMContentLoaded", function () {
         return saveJSON("arnabAccounts", accounts);
     }
 
-    function getCurrentUser() {
+    function currentUser() {
         return sessionStorage.getItem("arnabCurrentUser");
     }
 
-    function setCurrentUser(username) {
-        try {
-            sessionStorage.setItem("arnabCurrentUser", username);
-            return true;
-        } catch (error) {
-            toast("Could not start the session.");
-            return false;
-        }
+    function key(type) {
+        return "arnab_" + type + "_" + currentUser();
     }
 
-    function userKey(type) {
-        return "arnab_" + type + "_" + getCurrentUser();
-    }
+    // SHOW / HIDE PASSWORD
+    document.querySelectorAll("[data-password]").forEach(button => {
+        button.addEventListener("click", function (event) {
+            event.preventDefault();
 
-    // Password show / hide
-    document.querySelectorAll("[data-password]").forEach(function (button) {
-        button.addEventListener("click", function () {
-            const input = $(button.getAttribute("data-password"));
+            const input = $(button.dataset.password);
             if (!input) return;
 
-            input.type = input.type === "password" ? "text" : "password";
-            button.textContent = input.type === "password" ? "👁" : "🙈";
+            const showing = input.type === "password";
+            input.type = showing ? "text" : "password";
+            button.setAttribute("aria-pressed", String(showing));
+            button.setAttribute(
+                "aria-label",
+                showing ? "Hide password" : "Show password"
+            );
+
+            // Change eye icon to crossed eye when password is visible.
+            button.innerHTML = showing
+                ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 002.8 2.8"/><path d="M9.9 5.2A10.8 10.8 0 0112 5c6.4 0 10 7 10 7a15 15 0 01-3.2 3.9"/><path d="M6.2 6.2C3.5 8 2 12 2 12s3.6 7 10 7c1.2 0 2.3-.2 3.3-.6"/></svg>'
+                : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>';
         });
     });
 
-    // Open Create Account page
-    if ($("signupButton")) {
-        $("signupButton").addEventListener("click", function () {
-            message("signupMessage", "");
-            showPage("signupPage");
-        });
-    }
+    // PAGE NAVIGATION
+    $("signupButton").addEventListener("click", function () {
+        message("signupMessage", "");
+        $("signupForm").reset();
+        showPage("signupPage");
+    });
 
-    // Back to Login
-    if ($("backButton")) {
-        $("backButton").addEventListener("click", function () {
-            showPage("loginPage");
-        });
-    }
+    $("backButton").addEventListener("click", () => showPage("loginPage"));
+    $("resetBackButton").addEventListener("click", () => showPage("loginPage"));
 
-    if ($("resetBackButton")) {
-        $("resetBackButton").addEventListener("click", function () {
-            showPage("loginPage");
-        });
-    }
+    $("forgotPasswordButton").addEventListener("click", function () {
+        $("resetForm").reset();
+        message("resetMessage", "");
+        showPage("resetPage");
+    });
 
-    // Open Forgot Password
-    if ($("forgotPasswordButton")) {
-        $("forgotPasswordButton").addEventListener("click", function () {
-            message("resetMessage", "");
-            showPage("resetPage");
-        });
-    }
+    // CREATE ACCOUNT: minimum 6 password characters
+    $("signupForm").addEventListener("submit", function (event) {
+        event.preventDefault();
 
-    // CREATE ACCOUNT
-    if ($("signupForm")) {
-        $("signupForm").addEventListener("submit", function (event) {
-            event.preventDefault();
+        const username = $("signupUsername").value.trim();
+        const password = $("signupPassword").value;
 
-            const username = clean($("signupUsername").value);
-            const password = $("signupPassword").value;
-
-            if (!/^[a-zA-Z0-9_-]{3,30}$/.test(username)) {
-                message(
-                    "signupMessage",
-                    "Username must be 3–30 letters, numbers, _ or -.",
-                    true
-                );
-                return;
-            }
-
-            if (password.length < 4) {
-                message(
-                    "signupMessage",
-                    "Password must contain at least 4 characters.",
-                    true
-                );
-                return;
-            }
-
-            const accounts = getAccounts();
-
-            const exists = accounts.some(function (account) {
-                return clean(account.username).toLowerCase() ===
-                    username.toLowerCase();
-            });
-
-            if (exists) {
-                message(
-                    "signupMessage",
-                    "This username already exists. Please log in.",
-                    true
-                );
-                return;
-            }
-
-            accounts.push({
-                username: username,
-                password: password
-            });
-
-            if (!saveAccounts(accounts)) {
-                message(
-                    "signupMessage",
-                    "Account could not be saved. Check browser storage.",
-                    true
-                );
-                return;
-            }
-
-            $("signupForm").reset();
-
+        if (!/^[a-zA-Z0-9_-]{3,30}$/.test(username)) {
             message(
-                "loginMessage",
-                "Account created! Please log in."
+                "signupMessage",
+                "Username: use 3–30 letters, numbers, _ or -.",
+                true
             );
+            return;
+        }
 
-            message("signupMessage", "");
-            toast("Account created successfully!");
+        if (password.length < 6) {
+            message(
+                "signupMessage",
+                "Password must contain at least 6 characters.",
+                true
+            );
+            return;
+        }
 
-            showPage("loginPage");
-            $("loginUsername").value = username;
-            $("loginPassword").focus();
-        });
-    }
+        const accounts = getAccounts();
+
+        const exists = accounts.some(account =>
+            String(account.username).toLowerCase() === username.toLowerCase()
+        );
+
+        if (exists) {
+            message("signupMessage", "Username already exists. Please log in.", true);
+            return;
+        }
+
+        accounts.push({ username, password });
+
+        if (!saveAccounts(accounts)) {
+            message("signupMessage", "Account could not be saved.", true);
+            return;
+        }
+
+        $("signupForm").reset();
+        message("signupMessage", "");
+        message("loginMessage", "Account created! Please log in.");
+        $("loginUsername").value = username;
+        showPage("loginPage");
+        toast("Account created successfully!");
+    });
 
     // LOGIN
-    if ($("loginForm")) {
-        $("loginForm").addEventListener("submit", function (event) {
-            event.preventDefault();
+    $("loginForm").addEventListener("submit", function (event) {
+        event.preventDefault();
 
-            const username = clean($("loginUsername").value);
-            const password = $("loginPassword").value;
-            const accounts = getAccounts();
+        const username = $("loginUsername").value.trim();
+        const password = $("loginPassword").value;
 
-            const account = accounts.find(function (item) {
-                return clean(item.username).toLowerCase() ===
-                    username.toLowerCase() &&
-                    item.password === password;
-            });
+        const account = getAccounts().find(item =>
+            String(item.username).toLowerCase() === username.toLowerCase() &&
+            item.password === password
+        );
 
-            if (!account) {
-                message(
-                    "loginMessage",
-                    "Incorrect username or password.",
-                    true
-                );
-                return;
-            }
+        if (!account) {
+            message("loginMessage", "Incorrect username or password.", true);
+            return;
+        }
 
-            if (!setCurrentUser(account.username)) return;
+        try {
+            sessionStorage.setItem("arnabCurrentUser", account.username);
+        } catch {
+            message("loginMessage", "Could not start your session.", true);
+            return;
+        }
 
-            message("loginMessage", "");
-            $("loginForm").reset();
+        $("loginForm").reset();
+        message("loginMessage", "");
+        openDashboard(account.username);
+    });
 
-            openDashboard(account.username);
-        });
-    }
+    // RESET PASSWORD: demo feature, no email verification
+    $("resetForm").addEventListener("submit", function (event) {
+        event.preventDefault();
 
-    // PASSWORD RESET - demo only
-    if ($("resetForm")) {
-        $("resetForm").addEventListener("submit", function (event) {
-            event.preventDefault();
+        const username = $("resetUsername").value.trim();
+        const newPassword = $("newPassword").value;
 
-            const username = clean($("resetUsername").value);
-            const newPassword = $("newPassword").value;
-            const accounts = getAccounts();
+        if (newPassword.length < 6) {
+            message("resetMessage", "Password must contain at least 6 characters.", true);
+            return;
+        }
 
-            if (newPassword.length < 4) {
-                message(
-                    "resetMessage",
-                    "Password must contain at least 4 characters.",
-                    true
-                );
-                return;
-            }
+        const accounts = getAccounts();
+        const index = accounts.findIndex(item =>
+            String(item.username).toLowerCase() === username.toLowerCase()
+        );
 
-            const index = accounts.findIndex(function (account) {
-                return clean(account.username).toLowerCase() ===
-                    username.toLowerCase();
-            });
+        if (index === -1) {
+            message("resetMessage", "Username not found.", true);
+            return;
+        }
 
-            if (index === -1) {
-                message("resetMessage", "Username not found.", true);
-                return;
-            }
+        accounts[index].password = newPassword;
 
-            accounts[index].password = newPassword;
+        if (!saveAccounts(accounts)) return;
 
-            if (!saveAccounts(accounts)) return;
-
-            $("resetForm").reset();
-            message("resetMessage", "");
-            message("loginMessage", "Password updated. Please log in.");
-
-            toast("Password updated successfully.");
-            showPage("loginPage");
-            $("loginUsername").value = username;
-        });
-    }
+        $("resetForm").reset();
+        message("resetMessage", "");
+        $("loginUsername").value = username;
+        message("loginMessage", "Password updated. Please log in.");
+        showPage("loginPage");
+        toast("Password updated.");
+    });
 
     // DASHBOARD
     function openDashboard(username) {
         $("welcomeText").textContent = "Welcome, " + username + "!";
         $("profileName").textContent = username;
 
-        loadProfilePhoto();
+        loadPhoto();
         loadNotifications();
         loadTasks();
         loadNotes();
@@ -320,40 +242,33 @@ document.addEventListener("DOMContentLoaded", function () {
         toast("Login successful!");
     }
 
-    // LOGOUT
-    if ($("logoutButton")) {
-        $("logoutButton").addEventListener("click", function () {
-            sessionStorage.removeItem("arnabCurrentUser");
-            showPage("loginPage");
-            message("loginMessage", "You have logged out.");
-        });
-    }
+    $("logoutButton").addEventListener("click", function () {
+        sessionStorage.removeItem("arnabCurrentUser");
+        $("loginForm").reset();
+        showPage("loginPage");
+        message("loginMessage", "You have logged out.");
+    });
 
     // LIVE CLOCK AND GREETING
     function updateClock() {
         const now = new Date();
-
-        if ($("clock")) {
-            $("clock").textContent = now.toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-                hour12: true
-            });
-        }
-
-        if ($("dateText")) {
-            $("dateText").textContent = now.toLocaleDateString([], {
-                weekday: "long",
-                day: "numeric",
-                month: "long",
-                year: "numeric"
-            });
-        }
-
-        let greeting = "Good evening";
-
         const hour = now.getHours();
+
+        $("clock").textContent = now.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true
+        });
+
+        $("dateText").textContent = now.toLocaleDateString([], {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        });
+
+        let greeting;
 
         if (hour >= 5 && hour < 12) {
             greeting = "Good morning";
@@ -365,149 +280,125 @@ document.addEventListener("DOMContentLoaded", function () {
             greeting = "Good night";
         }
 
-        if ($("greeting")) {
-            $("greeting").textContent =
-                greeting + ", " + (getCurrentUser() || "Guest") + "!";
-        }
+        $("greeting").textContent =
+            greeting + ", " + (currentUser() || "Guest") + "!";
     }
 
     updateClock();
     setInterval(updateClock, 1000);
 
     // PROFILE PHOTO
-    function loadProfilePhoto() {
-        const photo = readJSON(userKey("photo"), "");
+    function loadPhoto() {
+        const photo = readJSON(key("photo"), "");
 
-        if ($("profileImage")) {
-            if (photo) {
-                $("profileImage").src = photo;
-            } else {
-                $("profileImage").removeAttribute("src");
-            }
+        if (photo) {
+            $("profileImage").src = photo;
+        } else {
+            $("profileImage").removeAttribute("src");
         }
     }
 
-    if ($("photoInput")) {
-        $("photoInput").addEventListener("change", function () {
-            const file = this.files && this.files[0];
-            if (!file) return;
+    $("photoInput").addEventListener("change", function () {
+        const file = this.files && this.files[0];
+        if (!file) return;
 
-            if (!file.type.startsWith("image/")) {
-                toast("Please select an image.");
-                this.value = "";
-                return;
+        if (!file.type.startsWith("image/")) {
+            toast("Please select an image.");
+            this.value = "";
+            return;
+        }
+
+        if (file.size > 1024 * 1024) {
+            toast("Choose an image smaller than 1 MB.");
+            this.value = "";
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function () {
+            if (saveJSON(key("photo"), reader.result)) {
+                loadPhoto();
+                toast("Profile photo updated.");
             }
+        };
 
-            if (file.size > 1024 * 1024) {
-                toast("Choose an image smaller than 1 MB.");
-                this.value = "";
-                return;
-            }
+        reader.onerror = () => toast("Could not read the image.");
+        reader.readAsDataURL(file);
+    });
 
-            const reader = new FileReader();
-
-            reader.onload = function () {
-                if (saveJSON(userKey("photo"), reader.result)) {
-                    loadProfilePhoto();
-                    toast("Profile photo updated.");
-                }
-            };
-
-            reader.onerror = function () {
-                toast("Could not read this image.");
-            };
-
-            reader.readAsDataURL(file);
-        });
-    }
-
-    if ($("removePhotoButton")) {
-        $("removePhotoButton").addEventListener("click", function () {
-            try {
-                localStorage.removeItem(userKey("photo"));
-                loadProfilePhoto();
-                if ($("photoInput")) $("photoInput").value = "";
-                toast("Profile photo removed.");
-            } catch (error) {
-                toast("Could not remove the photo.");
-            }
-        });
-    }
+    $("removePhotoButton").addEventListener("click", function () {
+        try {
+            localStorage.removeItem(key("photo"));
+            $("photoInput").value = "";
+            loadPhoto();
+            toast("Profile photo removed.");
+        } catch {
+            toast("Could not remove the photo.");
+        }
+    });
 
     // NOTIFICATIONS
     function loadNotifications() {
         const list = $("notificationList");
-        if (!list) return;
-
         list.replaceChildren();
 
-        const notifications = readJSON(userKey("notifications"), []);
-
-        notifications.forEach(function (item) {
+        readJSON(key("notifications"), []).forEach(item => {
             const li = document.createElement("li");
             li.textContent = item;
             list.appendChild(li);
         });
     }
 
-    if ($("notificationForm")) {
-        $("notificationForm").addEventListener("submit", function (event) {
-            event.preventDefault();
+    $("notificationForm").addEventListener("submit", function (event) {
+        event.preventDefault();
 
-            const value = clean($("notificationInput").value);
-            if (!value) return;
+        const value = $("notificationInput").value.trim();
+        if (!value) return;
 
-            const notifications = readJSON(userKey("notifications"), []);
-            notifications.unshift(value);
+        const items = readJSON(key("notifications"), []);
+        items.unshift(value);
 
-            if (saveJSON(userKey("notifications"), notifications)) {
-                $("notificationForm").reset();
-                loadNotifications();
-                toast("Notification added.");
-            }
-        });
-    }
+        if (saveJSON(key("notifications"), items)) {
+            $("notificationForm").reset();
+            loadNotifications();
+            toast("Notification added.");
+        }
+    });
 
-    if ($("clearNotificationsButton")) {
-        $("clearNotificationsButton").addEventListener("click", function () {
-            if (saveJSON(userKey("notifications"), [])) {
-                loadNotifications();
-                toast("Notifications cleared.");
-            }
-        });
-    }
+    $("clearNotificationsButton").addEventListener("click", function () {
+        if (saveJSON(key("notifications"), [])) {
+            loadNotifications();
+            toast("Notifications cleared.");
+        }
+    });
 
     // DAILY TASKS
     function loadTasks() {
         const list = $("taskList");
-        if (!list) return;
-
         list.replaceChildren();
 
-        const tasks = readJSON(userKey("tasks"), []);
+        const tasks = readJSON(key("tasks"), []);
         let completed = 0;
 
-        tasks.forEach(function (task, index) {
+        tasks.forEach((task, index) => {
             if (task.done) completed++;
 
             const li = document.createElement("li");
-            const wrapper = document.createElement("div");
-            wrapper.className = "task-item" + (task.done ? " completed" : "");
+            const row = document.createElement("div");
+            row.className = "task-item" + (task.done ? " completed" : "");
 
             const checkbox = document.createElement("input");
             checkbox.type = "checkbox";
             checkbox.checked = Boolean(task.done);
-            checkbox.setAttribute("aria-label", "Mark task completed");
+            checkbox.setAttribute("aria-label", "Mark task complete");
 
             checkbox.addEventListener("change", function () {
-                const current = readJSON(userKey("tasks"), []);
-                if (!current[index]) return;
+                const latest = readJSON(key("tasks"), []);
+                if (!latest[index]) return;
 
-                current[index].done = checkbox.checked;
-
-                if (saveJSON(userKey("tasks"), current)) {
-                    loadTasks();
-                }
+                latest[index].done = checkbox.checked;
+                if (saveJSON(key("tasks"), latest)) loadTasks();
             });
 
             const span = document.createElement("span");
@@ -518,87 +409,78 @@ document.addEventListener("DOMContentLoaded", function () {
             remove.type = "button";
             remove.className = "secondary-button";
             remove.textContent = "Delete";
-            remove.addEventListener("click", function () {
-                const current = readJSON(userKey("tasks"), []);
-                current.splice(index, 1);
 
-                if (saveJSON(userKey("tasks"), current)) {
-                    loadTasks();
-                }
+            remove.addEventListener("click", function () {
+                const latest = readJSON(key("tasks"), []);
+                latest.splice(index, 1);
+                if (saveJSON(key("tasks"), latest)) loadTasks();
             });
 
-            wrapper.append(checkbox, span, remove);
-            li.appendChild(wrapper);
+            row.append(checkbox, span, remove);
+            li.appendChild(row);
             list.appendChild(li);
         });
 
-        if ($("taskProgress")) {
-            $("taskProgress").textContent =
-                completed + " of " + tasks.length + " tasks completed";
+        $("taskProgress").textContent =
+            completed + " of " + tasks.length + " tasks completed";
+    }
+
+    $("taskForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const value = $("taskInput").value.trim();
+        if (!value) return;
+
+        const tasks = readJSON(key("tasks"), []);
+        tasks.push({ text: value, done: false });
+
+        if (saveJSON(key("tasks"), tasks)) {
+            $("taskForm").reset();
+            loadTasks();
+            toast("Task added.");
         }
-    }
-
-    if ($("taskForm")) {
-        $("taskForm").addEventListener("submit", function (event) {
-            event.preventDefault();
-
-            const value = clean($("taskInput").value);
-            if (!value) return;
-
-            const tasks = readJSON(userKey("tasks"), []);
-            tasks.push({ text: value, done: false });
-
-            if (saveJSON(userKey("tasks"), tasks)) {
-                $("taskForm").reset();
-                loadTasks();
-                toast("Task added.");
-            }
-        });
-    }
+    });
 
     // PERSONAL NOTES
     function loadNotes() {
-        if ($("notesInput")) {
-            $("notesInput").value = readJSON(userKey("notes"), "");
+        $("notesInput").value = readJSON(key("notes"), "");
+    }
+
+    $("saveNotesButton").addEventListener("click", function () {
+        if (saveJSON(key("notes"), $("notesInput").value)) {
+            message("notesMessage", "Notes saved.");
+            toast("Notes saved successfully.");
         }
-    }
-
-    if ($("saveNotesButton")) {
-        $("saveNotesButton").addEventListener("click", function () {
-            const success = saveJSON(userKey("notes"), $("notesInput").value);
-
-            if (success) {
-                message("notesMessage", "Notes saved.");
-                toast("Notes saved successfully.");
-            }
-        });
-    }
+    });
 
     // LIGHT / DARK THEME
     try {
         if (localStorage.getItem("arnabTheme") === "light") {
             document.body.classList.add("light-theme");
         }
-    } catch (error) {
-        // The default theme will still work.
+    } catch {}
+
+    $("themeButton").addEventListener("click", function () {
+        document.body.classList.toggle("light-theme");
+
+        const theme = document.body.classList.contains("light-theme")
+            ? "light"
+            : "dark";
+
+        try {
+            localStorage.setItem("arnabTheme", theme);
+        } catch {}
+
+        toast(theme === "light" ? "Light theme enabled." : "Dark theme enabled.");
+    });
+
+    // OPEN SAVED SESSION AFTER REFRESH
+    const savedUser = currentUser();
+
+    if (savedUser && getAccounts().some(account => account.username === savedUser)) {
+        openDashboard(savedUser);
+    } else {
+        sessionStorage.removeItem("arnabCurrentUser");
+        showPage("loginPage");
     }
-
-    if ($("themeButton")) {
-        $("themeButton").addEventListener("click", function () {
-            document.body.classList.toggle("light-theme");
-
-            const theme = document.body.classList.contains("light-theme")
-                ? "light"
-                : "dark";
-
-            try {
-                localStorage.setItem("arnabTheme", theme);
-            } catch (error) {
-                // Theme still changes for the current page.
-            }
-        });
-    }
-
-    // Start at Login
-    showPage("loginPage");
 });
