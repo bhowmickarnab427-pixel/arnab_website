@@ -1,306 +1,471 @@
+/* =========================================
+   ARNAB'S PERSONAL WEBSITE
+   Login + Profile + Clock + Daily Tasks
+   Theme + Notifications + Personal Notes
+========================================= */
 
 document.addEventListener("DOMContentLoaded", function () {
-    // ===== Get HTML elements =====
+
+    // =====================================
+    // 1. GET HTML ELEMENTS
+    // =====================================
+
     const loginPage = document.getElementById("loginPage");
     const signupPage = document.getElementById("signupPage");
     const resetPage = document.getElementById("resetPage");
-    const namePage = document.getElementById("namePage");
+    const dashboard = document.getElementById("namePage");
 
     const loginForm = document.getElementById("loginForm");
     const signupForm = document.getElementById("signupForm");
     const resetForm = document.getElementById("resetForm");
     const messageForm = document.getElementById("messageForm");
+    const taskForm = document.getElementById("premiumTaskForm");
 
     const loginMessage = document.getElementById("loginMessage");
     const signupMessage = document.getElementById("signupMessage");
     const resetMessage = document.getElementById("resetMessage");
     const messageStatus = document.getElementById("messageStatus");
 
+    const loginUsername = document.getElementById("loginUsername");
+    const loginPassword = document.getElementById("loginPassword");
+    const signupUsername = document.getElementById("signupUsername");
+    const signupPassword = document.getElementById("signupPassword");
+    const resetUsername = document.getElementById("resetUsername");
+    const resetPassword = document.getElementById("resetPassword");
+
+    const themeButton = document.getElementById("themeButton");
+    const logoutButton = document.getElementById("logoutButton");
+
+    const displayName = document.getElementById("displayName");
+    const displayName2 = document.getElementById("displayName2");
+    const greetingText = document.getElementById("greetingText");
+
+    const liveClock = document.getElementById("liveClock");
+    const liveDate = document.getElementById("liveDate");
+    const notification = document.getElementById("notification");
+
     const profilePhoto = document.getElementById("profilePhoto");
     const profilePhotoPlaceholder =
         document.getElementById("profilePhotoPlaceholder");
-    const profilePhotoInput =
-        document.getElementById("profilePhotoInput");
-    const removeProfilePhoto =
-        document.getElementById("removeProfilePhoto");
+    const profilePhotoInput = document.getElementById("profilePhotoInput");
+    const removeProfilePhoto = document.getElementById("removeProfilePhoto");
+
+    const taskInput = document.getElementById("premiumTaskInput");
+    const taskList = document.getElementById("premiumTaskList");
+    const taskCount = document.getElementById("premiumTaskCount");
+    const progressFill = document.getElementById("premiumProgressFill");
+    const progressPercent = document.getElementById("progressPercent");
+
+    const userMessage = document.getElementById("userMessage");
+    const toastContainer = document.getElementById("toastContainer");
+
+
+    // =====================================
+    // 2. APP VARIABLES
+    // =====================================
 
     let currentUsername = "";
     let clockInterval = null;
+    let toastTimer = null;
+    let tasks = [];
 
-    // ===== Show selected page =====
+    const STORAGE_ACCOUNTS = "arnabAccounts";
+    const STORAGE_THEME = "arnabTheme";
+
+
+    // =====================================
+    // 3. PAGE NAVIGATION
+    // =====================================
+
     function showPage(page) {
-        [loginPage, signupPage, resetPage, namePage].forEach(function (item) {
+        [loginPage, signupPage, resetPage, dashboard].forEach(function (item) {
             item.classList.add("hidden");
         });
 
         page.classList.remove("hidden");
+        window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    // ===== Show status messages =====
-    function showMessage(element, message, success = false) {
+
+    // =====================================
+    // 4. TOAST NOTIFICATIONS
+    // =====================================
+
+    function showToast(message, type) {
+        if (!toastContainer) return;
+
+        if (toastTimer) {
+            clearTimeout(toastTimer);
+        }
+
+        toastContainer.replaceChildren();
+
+        const toast = document.createElement("div");
+        toast.className = "toast";
+
+        if (type === "error") {
+            toast.classList.add("error");
+        }
+
+        toast.textContent = message;
+        toastContainer.appendChild(toast);
+
+        toastTimer = setTimeout(function () {
+            toast.remove();
+        }, 3000);
+    }
+
+
+    function showFormMessage(element, message, isError) {
         if (!element) return;
 
         element.textContent = message;
-        element.style.color = success ? "#75ff9a" : "#ffb4b4";
+        element.style.color = isError ? "#fca5a5" : "#86efac";
     }
 
-    // ===== Read accounts from localStorage =====
+
+    // =====================================
+    // 5. ACCOUNT STORAGE
+    // =====================================
+
     function getAccounts() {
         try {
-            const data = JSON.parse(localStorage.getItem("arnabAccounts"));
-            return data && typeof data === "object" && !Array.isArray(data)
-                ? data
-                : {};
+            const accounts = JSON.parse(
+                localStorage.getItem(STORAGE_ACCOUNTS) || "[]"
+            );
+
+            return Array.isArray(accounts) ? accounts : [];
         } catch (error) {
-            return {};
+            return [];
         }
     }
 
-    // ===== Save accounts =====
+
     function saveAccounts(accounts) {
-        try {
-            localStorage.setItem("arnabAccounts", JSON.stringify(accounts));
-            return true;
-        } catch (error) {
-            return false;
-        }
+        localStorage.setItem(
+            STORAGE_ACCOUNTS,
+            JSON.stringify(accounts)
+        );
     }
 
-    // ===== Password show/hide eye buttons =====
-    document.querySelectorAll(".eye-button").forEach(function (button) {
-        button.addEventListener("click", function () {
-            const input = document.getElementById(
-                button.getAttribute("data-password")
-            );
 
-            if (!input) return;
+    function normaliseUsername(username) {
+        return username.trim().toLowerCase();
+    }
 
-            const showPassword = input.type === "password";
 
-            input.type = showPassword ? "text" : "password";
-            button.textContent = showPassword ? "🙈" : "👁";
-            button.setAttribute(
-                "aria-label",
-                showPassword ? "Hide password" : "Show password"
-            );
-            button.title = showPassword ? "Hide password" : "Show password";
+    function getAccount() {
+        return getAccounts().find(function (account) {
+            return normaliseUsername(account.username) ===
+                normaliseUsername(currentUsername);
         });
+    }
+
+
+    // =====================================
+    // 6. SHOW / HIDE PASSWORD
+    // =====================================
+
+    document.querySelectorAll(".eye-button").forEach(function (button) {
+
+        button.addEventListener("click", function () {
+            const inputId = button.getAttribute("data-password");
+            const passwordInput = document.getElementById(inputId);
+
+            if (!passwordInput) return;
+
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                button.textContent = "🙈";
+                button.setAttribute("aria-label", "Hide password");
+            } else {
+                passwordInput.type = "password";
+                button.textContent = "👁";
+                button.setAttribute("aria-label", "Show password");
+            }
+        });
+
     });
 
-    // ===== Open Create Account =====
+
+    // =====================================
+    // 7. SIGN UP
+    // =====================================
+
     document.getElementById("signupButton").addEventListener("click", function () {
         signupForm.reset();
-        signupMessage.textContent = "";
+        showFormMessage(signupMessage, "", false);
         showPage(signupPage);
     });
 
-    // ===== Back to Login =====
+
     document.getElementById("backButton").addEventListener("click", function () {
+        showFormMessage(loginMessage, "", false);
         showPage(loginPage);
-        signupMessage.textContent = "";
     });
 
-    // ===== Open Forgot Password =====
-    document.getElementById("forgotPasswordButton").addEventListener("click", function () {
-        resetForm.reset();
-        resetMessage.textContent = "";
-        showPage(resetPage);
-    });
 
-    // ===== Back from Reset Password =====
-    document.getElementById("resetBackButton").addEventListener("click", function () {
-        showPage(loginPage);
-        resetMessage.textContent = "";
-    });
-
-    // ===== Create Account =====
     signupForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
-        const username = document.getElementById("signupUsername").value.trim();
-        const password = document.getElementById("signupPassword").value;
+        const username = signupUsername.value.trim();
+        const password = signupPassword.value;
 
         if (username.length < 3) {
-            showMessage(signupMessage, "Username must be at least 3 characters.");
+            showFormMessage(
+                signupMessage,
+                "Username must contain at least 3 characters.",
+                true
+            );
             return;
         }
 
-        if (password.length < 6) {
-            showMessage(signupMessage, "Password must be at least 6 characters.");
+        if (password.length < 4) {
+            showFormMessage(
+                signupMessage,
+                "Password must contain at least 4 characters.",
+                true
+            );
             return;
         }
 
         const accounts = getAccounts();
-        const accountKey = username.toLowerCase();
 
-        if (Object.prototype.hasOwnProperty.call(accounts, accountKey)) {
-            showMessage(signupMessage, "Username already exists. Try another.");
+        const existingAccount = accounts.some(function (account) {
+            return normaliseUsername(account.username) ===
+                normaliseUsername(username);
+        });
+
+        if (existingAccount) {
+            showFormMessage(
+                signupMessage,
+                "This username already exists. Please login.",
+                true
+            );
             return;
         }
 
-        accounts[accountKey] = {
+        accounts.push({
             username: username,
             password: password
-        };
+        });
 
-        if (!saveAccounts(accounts)) {
-            showMessage(
+        try {
+            saveAccounts(accounts);
+        } catch (error) {
+            showFormMessage(
                 signupMessage,
-                "Could not save your account in this browser."
+                "Unable to save account in this browser.",
+                true
             );
             return;
         }
 
         signupForm.reset();
-        document.getElementById("loginUsername").value = username;
-        showPage(loginPage);
+        loginUsername.value = username;
 
-        showMessage(
+        showPage(loginPage);
+        showFormMessage(
             loginMessage,
-            "Account created successfully! Please log in.",
-            true
+            "Account created successfully! Please login.",
+            false
         );
+
+        showToast("Account created successfully!");
     });
 
-    // ===== Login =====
+
+    // =====================================
+    // 8. LOGIN
+    // =====================================
+
     loginForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
-        const username = document.getElementById("loginUsername").value.trim();
-        const password = document.getElementById("loginPassword").value;
+        const username = loginUsername.value.trim();
+        const password = loginPassword.value;
 
-        const accounts = getAccounts();
-        const accountKey = username.toLowerCase();
-        const account = Object.prototype.hasOwnProperty.call(accounts, accountKey)
-            ? accounts[accountKey]
-            : null;
+        const account = getAccounts().find(function (item) {
+            return normaliseUsername(item.username) ===
+                normaliseUsername(username) &&
+                item.password === password;
+        });
 
-        if (!account || account.password !== password) {
-            showMessage(loginMessage, "Invalid username or password.");
+        if (!account) {
+            showFormMessage(
+                loginMessage,
+                "Incorrect username or password.",
+                true
+            );
             return;
         }
 
         currentUsername = account.username;
 
-        document.getElementById("loginPassword").value = "";
-        loginMessage.textContent = "";
+        loginPassword.value = "";
+        showFormMessage(loginMessage, "", false);
 
         loadDashboard();
+
+        showPage(dashboard);
+        showToast("Welcome back, " + currentUsername + "!");
     });
 
-    // ===== Reset Password =====
+
+    // =====================================
+    // 9. FORGOT PASSWORD
+    // =====================================
+
+    document.getElementById("forgotPasswordButton")
+        .addEventListener("click", function () {
+
+            resetForm.reset();
+            showFormMessage(resetMessage, "", false);
+            showPage(resetPage);
+
+        });
+
+
+    document.getElementById("resetBackButton")
+        .addEventListener("click", function () {
+
+            showFormMessage(loginMessage, "", false);
+            showPage(loginPage);
+
+        });
+
+
     resetForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
-        const username = document.getElementById("resetUsername").value.trim();
-        const newPassword = document.getElementById("resetPassword").value;
+        const username = resetUsername.value.trim();
+        const newPassword = resetPassword.value;
 
-        if (newPassword.length < 6) {
-            showMessage(resetMessage, "Password must be at least 6 characters.");
+        if (newPassword.length < 4) {
+            showFormMessage(
+                resetMessage,
+                "Password must contain at least 4 characters.",
+                true
+            );
             return;
         }
 
         const accounts = getAccounts();
-        const accountKey = username.toLowerCase();
 
-        if (!Object.prototype.hasOwnProperty.call(accounts, accountKey)) {
-            showMessage(resetMessage, "Username does not exist.");
+        const accountIndex = accounts.findIndex(function (account) {
+            return normaliseUsername(account.username) ===
+                normaliseUsername(username);
+        });
+
+        if (accountIndex === -1) {
+            showFormMessage(
+                resetMessage,
+                "Username not found.",
+                true
+            );
             return;
         }
 
-        accounts[accountKey].password = newPassword;
+        accounts[accountIndex].password = newPassword;
 
-        if (!saveAccounts(accounts)) {
-            showMessage(resetMessage, "Could not update your password.");
+        try {
+            saveAccounts(accounts);
+        } catch (error) {
+            showFormMessage(
+                resetMessage,
+                "Could not save the new password.",
+                true
+            );
             return;
         }
 
         resetForm.reset();
+        loginUsername.value = username;
+
         showPage(loginPage);
 
-        showMessage(
+        showFormMessage(
             loginMessage,
-            "Password changed successfully. Please log in.",
-            true
+            "Password updated. You can login now.",
+            false
         );
+
+        showToast("Password updated successfully!");
     });
 
-    // ===== Load Dashboard =====
-    function loadDashboard() {
-        showPage(namePage);
 
-        document.getElementById("displayName2").textContent =
-            "Login Successful!";
+    // =====================================
+    // 10. GREETING
+    // =====================================
 
-        document.getElementById("displayName3").textContent =
-            "Welcome back, " + currentUsername + ".";
-
-        document.getElementById("notification").textContent =
-            "Welcome " + currentUsername + "! You are logged in.";
-
-        loadProfilePhoto();
-        updateClock();
-        updateGreeting();
-
-        if (clockInterval) {
-            clearInterval(clockInterval);
-        }
-
-        clockInterval = setInterval(function () {
-            updateClock();
-            updateGreeting();
-        }, 1000);
-    }
-
-    // ===== Greeting based on local device time =====
     function updateGreeting() {
         const hour = new Date().getHours();
-        let greeting;
+        let greeting = "";
 
         if (hour < 12) {
             greeting = "Good Morning";
         } else if (hour < 17) {
             greeting = "Good Afternoon";
-        } else {
+        } else if (hour < 21) {
             greeting = "Good Evening";
+        } else {
+            greeting = "Good Night";
         }
 
-        document.getElementById("displayName").textContent =
-            greeting + ", " + currentUsername + "!";
+        if (displayName2) {
+            displayName2.textContent =
+                greeting + ", " + currentUsername + "!";
+        }
+
+        if (greetingText) {
+            greetingText.textContent =
+                "Keep learning, stay focused, and make today count.";
+        }
     }
 
-    // ===== Live Clock and Date =====
+
+    // =====================================
+    // 11. LIVE CLOCK AND DATE
+    // =====================================
+
     function updateClock() {
         const now = new Date();
 
-        document.getElementById("liveClock").textContent =
-            now.toLocaleTimeString();
+        if (liveClock) {
+            liveClock.textContent = now.toLocaleTimeString(undefined, {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: true
+            });
+        }
 
-        document.getElementById("liveDate").textContent =
-            now.toLocaleDateString(undefined, {
+        if (liveDate) {
+            liveDate.textContent = now.toLocaleDateString(undefined, {
                 weekday: "long",
                 year: "numeric",
                 month: "long",
                 day: "numeric"
             });
+        }
+
+        updateGreeting();
     }
 
-    // ===== Get the current user's photo key =====
-    function getProfilePhotoKey() {
-        return "arnabProfilePhoto_" + currentUsername.toLowerCase();
+
+    // =====================================
+    // 12. PROFILE PHOTO
+    // =====================================
+
+    function photoStorageKey() {
+        return "arnabProfilePhoto_" + normaliseUsername(currentUsername);
     }
 
-    // ===== Load this user's saved photo =====
+
     function loadProfilePhoto() {
         if (!currentUsername) return;
 
-        let savedPhoto = null;
-
-        try {
-            savedPhoto = localStorage.getItem(getProfilePhotoKey());
-        } catch (error) {
-            savedPhoto = null;
-        }
+        const savedPhoto = localStorage.getItem(photoStorageKey());
 
         if (savedPhoto) {
             profilePhoto.src = savedPhoto;
@@ -310,29 +475,26 @@ document.addEventListener("DOMContentLoaded", function () {
             profilePhoto.removeAttribute("src");
             profilePhoto.classList.add("hidden");
             profilePhotoPlaceholder.classList.remove("hidden");
+
+            profilePhotoPlaceholder.textContent =
+                currentUsername.charAt(0).toUpperCase();
         }
     }
 
-    // ===== Upload and save profile photo =====
+
     profilePhotoInput.addEventListener("change", function () {
         const file = profilePhotoInput.files[0];
 
         if (!file) return;
 
-        if (!currentUsername) {
-            alert("Please log in before changing your profile photo.");
-            profilePhotoInput.value = "";
-            return;
-        }
-
         if (!file.type.startsWith("image/")) {
-            alert("Please select an image file.");
+            showToast("Please select an image file.", "error");
             profilePhotoInput.value = "";
             return;
         }
 
         if (file.size > 1024 * 1024) {
-            alert("Please choose an image smaller than 1 MB.");
+            showToast("Image must be smaller than 1 MB.", "error");
             profilePhotoInput.value = "";
             return;
         }
@@ -341,78 +503,340 @@ document.addEventListener("DOMContentLoaded", function () {
 
         reader.onload = function () {
             try {
-                localStorage.setItem(getProfilePhotoKey(), reader.result);
+                localStorage.setItem(photoStorageKey(), reader.result);
                 loadProfilePhoto();
+                showToast("Profile photo updated!");
             } catch (error) {
-                alert("Could not save the photo. Try a smaller image.");
+                showToast(
+                    "Photo could not be saved. Try a smaller image.",
+                    "error"
+                );
             }
 
             profilePhotoInput.value = "";
         };
 
         reader.onerror = function () {
-            alert("Could not read the image. Please try another.");
+            showToast("Could not read this image.", "error");
             profilePhotoInput.value = "";
         };
 
         reader.readAsDataURL(file);
     });
 
-    // ===== Remove current user's profile photo =====
-    removeProfilePhoto.addEventListener("click", function () {
-        if (!currentUsername) return;
 
-        try {
-            localStorage.removeItem(getProfilePhotoKey());
-            loadProfilePhoto();
-        } catch (error) {
-            alert("Could not remove the photo. Please try again.");
-        }
+    removeProfilePhoto.addEventListener("click", function () {
+        localStorage.removeItem(photoStorageKey());
+        loadProfilePhoto();
+        showToast("Profile photo removed.");
     });
 
-    // ===== Demo message box =====
-    messageForm.addEventListener("submit", function (event) {
+
+    // =====================================
+    // 13. DARK / LIGHT MODE
+    // =====================================
+
+    function applyTheme() {
+        const savedTheme = localStorage.getItem(STORAGE_THEME);
+        const lightMode = savedTheme === "light";
+
+        document.body.classList.toggle("light-mode", lightMode);
+
+        themeButton.textContent = lightMode
+            ? "🌙 Dark Mode"
+            : "☀️ Light Mode";
+    }
+
+
+    applyTheme();
+
+
+    themeButton.addEventListener("click", function () {
+        const isLight = document.body.classList.toggle("light-mode");
+
+        localStorage.setItem(
+            STORAGE_THEME,
+            isLight ? "light" : "dark"
+        );
+
+        themeButton.textContent = isLight
+            ? "🌙 Dark Mode"
+            : "☀️ Light Mode";
+
+        showToast(isLight ? "Light mode enabled." : "Dark mode enabled.");
+    });
+
+
+    // =====================================
+    // 14. DAILY TASK STORAGE
+    // =====================================
+
+    function getTodayKey() {
+        const date = new Date();
+
+        const dateString = [
+            date.getFullYear(),
+            String(date.getMonth() + 1).padStart(2, "0"),
+            String(date.getDate()).padStart(2, "0")
+        ].join("-");
+
+        return "arnabDailyTasks_" +
+            normaliseUsername(currentUsername) + "_" + dateString;
+    }
+
+
+    function loadTasks() {
+        try {
+            const savedTasks = JSON.parse(
+                localStorage.getItem(getTodayKey()) || "[]"
+            );
+
+            tasks = Array.isArray(savedTasks) ? savedTasks : [];
+        } catch (error) {
+            tasks = [];
+        }
+    }
+
+
+    function saveTasks() {
+        try {
+            localStorage.setItem(
+                getTodayKey(),
+                JSON.stringify(tasks)
+            );
+            return true;
+        } catch (error) {
+            showToast("Unable to save tasks in this browser.", "error");
+            return false;
+        }
+    }
+
+
+    function renderTasks() {
+        taskList.replaceChildren();
+
+        let completedCount = 0;
+
+        tasks.forEach(function (task, index) {
+            if (task.done) completedCount++;
+
+            const row = document.createElement("div");
+            row.className = "task-row";
+
+            if (task.done) {
+                row.classList.add("completed");
+            }
+
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.className = "task-checkbox";
+            checkbox.checked = task.done;
+            checkbox.setAttribute("aria-label", "Mark task as complete");
+
+            const taskText = document.createElement("span");
+            taskText.className = "task-text";
+            taskText.textContent = task.text;
+
+            const deleteButton = document.createElement("button");
+            deleteButton.type = "button";
+            deleteButton.className = "task-delete";
+            deleteButton.textContent = "Delete";
+
+            checkbox.addEventListener("change", function () {
+                tasks[index].done = checkbox.checked;
+                saveTasks();
+                renderTasks();
+
+                if (checkbox.checked) {
+                    showToast("Task completed! 🎉");
+                }
+            });
+
+            deleteButton.addEventListener("click", function () {
+                tasks.splice(index, 1);
+                saveTasks();
+                renderTasks();
+                showToast("Task deleted.");
+            });
+
+            row.appendChild(checkbox);
+            row.appendChild(taskText);
+            row.appendChild(deleteButton);
+
+            taskList.appendChild(row);
+        });
+
+        if (tasks.length === 0) {
+            const emptyText = document.createElement("p");
+            emptyText.className = "empty-tasks";
+            emptyText.textContent =
+                "No tasks yet. Add your first task above!";
+            taskList.appendChild(emptyText);
+        }
+
+        const percentage = tasks.length === 0
+            ? 0
+            : Math.round((completedCount / tasks.length) * 100);
+
+        taskCount.textContent =
+            completedCount + " of " + tasks.length + " tasks completed";
+
+        progressFill.style.width = percentage + "%";
+        progressFill.setAttribute("role", "progressbar");
+        progressFill.setAttribute("aria-valuemin", "0");
+        progressFill.setAttribute("aria-valuemax", "100");
+        progressFill.setAttribute("aria-valuenow", String(percentage));
+
+        progressPercent.textContent = percentage + "%";
+    }
+
+
+    taskForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
-        const message = document.getElementById("userMessage").value.trim();
+        const value = taskInput.value.trim();
 
-        if (!message) {
-            showMessage(messageStatus, "Please write a message.");
+        if (!value) {
+            showToast("Please enter a task.", "error");
             return;
         }
 
-        showMessage(
-            messageStatus,
-            "Message saved for this demo. It has not been sent to anyone.",
-            true
-        );
+        tasks.push({
+            text: value,
+            done: false
+        });
 
-        document.getElementById("userMessage").value = "";
+        if (saveTasks()) {
+            renderTasks();
+            taskInput.value = "";
+            showToast("New task added!");
+        } else {
+            tasks.pop();
+            renderTasks();
+        }
     });
 
-    // ===== Logout =====
-    document.getElementById("logoutButton").addEventListener("click", function () {
-        currentUsername = "";
 
+    // =====================================
+    // 15. PERSONAL NOTES
+    // =====================================
+
+    function noteStorageKey() {
+        return "arnabPersonalNote_" + normaliseUsername(currentUsername);
+    }
+
+
+    function loadNote() {
+        userMessage.value =
+            localStorage.getItem(noteStorageKey()) || "";
+    }
+
+
+    messageForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        try {
+            localStorage.setItem(
+                noteStorageKey(),
+                userMessage.value
+            );
+
+            showFormMessage(
+                messageStatus,
+                "Your note has been saved in this browser.",
+                false
+            );
+
+            showToast("Personal note saved!");
+        } catch (error) {
+            showFormMessage(
+                messageStatus,
+                "Could not save your note.",
+                true
+            );
+        }
+    });
+
+
+    // =====================================
+    // 16. LOAD DASHBOARD
+    // =====================================
+
+    function loadDashboard() {
+        const account = getAccount();
+
+        if (!account) {
+            showPage(loginPage);
+            return;
+        }
+
+        currentUsername = account.username;
+
+        displayName.textContent = currentUsername;
+
+        if (displayName2) {
+            displayName2.textContent = "Hello, " + currentUsername + "!";
+        }
+
+        if (notification) {
+            notification.textContent =
+                "You are logged in as " + currentUsername + ".";
+        }
+
+        if (clockInterval) {
+            clearInterval(clockInterval);
+        }
+
+        updateClock();
+        clockInterval = setInterval(updateClock, 1000);
+
+        loadProfilePhoto();
+        loadTasks();
+        renderTasks();
+        loadNote();
+
+        const footerYear = document.getElementById("footerYear");
+
+        if (footerYear) {
+            footerYear.textContent = new Date().getFullYear();
+        }
+    }
+
+
+    // =====================================
+    // 17. LOGOUT
+    // =====================================
+
+    logoutButton.addEventListener("click", function () {
         if (clockInterval) {
             clearInterval(clockInterval);
             clockInterval = null;
         }
 
+        currentUsername = "";
+        tasks = [];
+
         loginForm.reset();
         signupForm.reset();
         resetForm.reset();
         messageForm.reset();
-        profilePhotoInput.value = "";
+        taskForm.reset();
 
-        profilePhoto.removeAttribute("src");
-        profilePhoto.classList.add("hidden");
-        profilePhotoPlaceholder.classList.remove("hidden");
+        showFormMessage(loginMessage, "", false);
+        showFormMessage(signupMessage, "", false);
+        showFormMessage(resetMessage, "", false);
+        showFormMessage(messageStatus, "", false);
 
         showPage(loginPage);
-        showMessage(loginMessage, "You have logged out successfully.", true);
+        showToast("You have logged out.");
     });
 
-    // ===== Start on Login page =====
+
+    // =====================================
+    // 18. START WEBSITE
+    // =====================================
+
+    applyTheme();
     showPage(loginPage);
+
 });
