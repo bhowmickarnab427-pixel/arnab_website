@@ -1,5 +1,5 @@
-
 document.addEventListener("DOMContentLoaded", function () {
+
     const $ = (id) => document.getElementById(id);
 
     const pages = [
@@ -16,20 +16,18 @@ document.addEventListener("DOMContentLoaded", function () {
     const keyName = (value) =>
         clean(value).toLowerCase().replace(/[^a-z0-9_-]/g, "_");
 
-    // Local date, avoiding UTC date changes around midnight.
-    const todayKey = () => {
+    // Use the local date for task storage.
+    function todayKey() {
         const date = new Date();
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, "0");
         const day = String(date.getDate()).padStart(2, "0");
+
         return `${year}-${month}-${day}`;
-    };
+    }
 
     const taskKey = (user, date = todayKey()) =>
         `arnabDailyTasks_${keyName(user)}_${date}`;
-
-    const profileKey = (user) =>
-        `arnabProfile_${keyName(user)}`;
 
     const photoKey = (user) =>
         `arnabProfilePhoto_${keyName(user)}`;
@@ -54,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
             localStorage.setItem(key, JSON.stringify(value));
             return true;
         } catch {
-            toast("Storage is full. Try a smaller photo or clear old data.", true);
+            toast("Browser storage is full. Please clear some old data.", true);
             return false;
         }
     }
@@ -74,15 +72,19 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function saveAccounts(accounts) {
-        saveJSON("arnabAccounts", accounts);
+        return saveJSON("arnabAccounts", accounts);
     }
 
     function showPage(page) {
         pages.forEach((item) => {
-            if (item) item.classList.add("hidden");
+            if (item) {
+                item.classList.add("hidden");
+            }
         });
 
-        if (page) page.classList.remove("hidden");
+        if (page) {
+            page.classList.remove("hidden");
+        }
     }
 
     function message(id, text, error = false) {
@@ -96,6 +98,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function toast(text, error = false) {
         const box = $("toastContainer");
+
         if (!box) return;
 
         const element = document.createElement("div");
@@ -107,19 +110,30 @@ document.addEventListener("DOMContentLoaded", function () {
         setTimeout(() => element.remove(), 3400);
     }
 
-    function getProfile() {
-        return readJSON(profileKey(currentUser), {
-            name: currentUser,
-            bio: "",
-            course: "",
-            skills: ""
+    // Notifications
+    function notify(text) {
+        const notification = $("notification");
+
+        if (notification) {
+            notification.textContent = text;
+        }
+
+        if (!currentUser) return;
+
+        const items = readJSON(notificationKey(currentUser), []);
+
+        items.unshift({
+            id: Date.now() + Math.random(),
+            text: text,
+            time: new Date().toISOString(),
+            read: false
         });
+
+        saveJSON(notificationKey(currentUser), items.slice(0, 50));
+        renderNotifications();
     }
 
-    function saveProfile(profile) {
-        return saveJSON(profileKey(currentUser), profile);
-    }
-
+    // Tasks
     function getTasks(date = todayKey()) {
         const raw = readJSON(taskKey(currentUser, date), []);
 
@@ -154,9 +168,10 @@ document.addEventListener("DOMContentLoaded", function () {
             ">": "&gt;",
             '"': "&quot;",
             "'": "&#39;"
-        })[character]);
+        }[character]));
     }
 
+    // Greeting based on local time
     function greeting() {
         const hour = new Date().getHours();
 
@@ -167,6 +182,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return "🌙 Good Night";
     }
 
+    // Live clock and date
     function updateClock() {
         const now = new Date();
 
@@ -189,110 +205,15 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // NOTIFICATION CENTER
-    function renderNotifications() {
-        if (!currentUser) return;
-
-        const items = readJSON(notificationKey(currentUser), []);
-        const unread = items.filter((item) => !item.read).length;
-
-        $("unreadCount").textContent = `${unread} unread`;
-
-        const box = $("notificationList");
-        box.replaceChildren();
-
-        if (!items.length) {
-            const empty = document.createElement("p");
-            empty.className = "muted-text";
-            empty.textContent = "No notifications yet.";
-            box.appendChild(empty);
-            return;
-        }
-
-        items.forEach((notification) => {
-            const item = document.createElement("div");
-
-            item.className =
-                "notification-item" + (notification.read ? "" : " unread");
-
-            const dot = document.createElement("span");
-            dot.className = "notification-dot";
-
-            const body = document.createElement("div");
-            body.className = "notification-body";
-
-            const text = document.createElement("div");
-            text.textContent = notification.text;
-
-            const time = document.createElement("div");
-            time.className = "notification-time";
-            time.textContent = new Date(notification.time).toLocaleString();
-
-            body.append(text, time);
-            item.append(dot, body);
-
-            if (!notification.read) {
-                const button = document.createElement("button");
-                button.className = "secondary-button";
-                button.type = "button";
-                button.textContent = "Read";
-
-                button.addEventListener("click", () => {
-                    const all = readJSON(notificationKey(currentUser), []);
-                    const found = all.find((entry) => entry.id === notification.id);
-
-                    if (found) found.read = true;
-
-                    saveJSON(notificationKey(currentUser), all);
-                    renderNotifications();
-                });
-
-                item.appendChild(button);
-            }
-
-            box.appendChild(item);
-        });
-    }
-
-    function notify(text) {
-        const notificationText = $("notification");
-
-        if (notificationText) {
-            notificationText.textContent = text;
-        }
-
-        if (!currentUser) return;
-
-        const items = readJSON(notificationKey(currentUser), []);
-
-        items.unshift({
-            id: Date.now() + Math.random(),
-            text,
-            time: new Date().toISOString(),
-            read: false
-        });
-
-        saveJSON(notificationKey(currentUser), items.slice(0, 50));
-        renderNotifications();
-    }
-
-    // PROFILE EDITOR AND PROFILE PHOTO
+    // Profile display only; no Profile Editor
     function loadProfileUI() {
-        const profile = getProfile();
+        if ($("displayName")) {
+            $("displayName").textContent = currentUser;
+        }
 
-        $("displayName").textContent = profile.name || currentUser;
-        $("displayName2").textContent =
-            "Hello, " + (profile.name || currentUser) + "!";
-
-        $("profileNameInput").value = profile.name || currentUser;
-        $("profileBioInput").value = profile.bio || "";
-        $("profileCourseInput").value = profile.course || "";
-        $("profileSkillsInput").value = profile.skills || "";
-
-        $("profileExtraView").innerHTML =
-            `<p><strong>Bio:</strong> ${escapeHTML(profile.bio || "Not added yet")}</p>` +
-            `<p><strong>Course:</strong> ${escapeHTML(profile.course || "Not added yet")}</p>` +
-            `<p><strong>Skills:</strong> ${escapeHTML(profile.skills || "Not added yet")}</p>`;
+        if ($("displayName2")) {
+            $("displayName2").textContent = "Hello, " + currentUser + "!";
+        }
 
         const photo = localStorage.getItem(photoKey(currentUser));
 
@@ -306,7 +227,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // DAILY TASK MANAGER
+    // Render daily tasks
     function renderTasks() {
         const tasks = getTasks();
         const list = $("premiumTaskList");
@@ -315,23 +236,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
         tasks.forEach((task) => {
             const row = document.createElement("div");
+
             row.className = "task-row" + (task.done ? " completed" : "");
 
             const checkbox = document.createElement("input");
+
             checkbox.type = "checkbox";
             checkbox.className = "task-checkbox";
             checkbox.checked = Boolean(task.done);
             checkbox.setAttribute("aria-label", "Mark task complete");
 
             checkbox.addEventListener("change", () => {
-                const all = getTasks();
-                const item = all.find(
+                const allTasks = getTasks();
+
+                const item = allTasks.find(
                     (entry) => String(entry.id) === String(task.id)
                 );
 
-                if (item) item.done = checkbox.checked;
+                if (item) {
+                    item.done = checkbox.checked;
+                }
 
-                saveTasks(all);
+                saveTasks(allTasks);
                 renderTasks();
                 renderWeekly();
 
@@ -369,155 +295,231 @@ document.addEventListener("DOMContentLoaded", function () {
             const actions = document.createElement("div");
             actions.className = "task-actions";
 
-            // Edit task name, priority and deadline.
+            // Edit task
             const edit = document.createElement("button");
+
             edit.type = "button";
             edit.textContent = "Edit";
 
             edit.addEventListener("click", () => {
-                const newText = prompt("Edit task name:", task.text);
-                if (newText === null) return;
+                const text = prompt("Edit task name:", task.text);
 
-                const value = clean(newText);
+                if (text === null) return;
+
+                const value = clean(text);
 
                 if (!value) {
                     toast("Task name cannot be empty.", true);
                     return;
                 }
 
-                const all = getTasks();
-                const item = all.find(
+                const allTasks = getTasks();
+
+                const item = allTasks.find(
                     (entry) => String(entry.id) === String(task.id)
                 );
 
-                if (!item) return;
-
-                item.text = value;
-
-                const newPriority = prompt(
-                    "Priority: High, Normal or Low",
-                    item.priority
-                );
-
-                if (newPriority !== null) {
-                    const normalized = clean(newPriority).toLowerCase();
-
-                    if (normalized === "high") item.priority = "High";
-                    else if (normalized === "low") item.priority = "Low";
-                    else item.priority = "Normal";
+                if (item) {
+                    item.text = value;
                 }
 
-                const newDeadline = prompt(
-                    "Deadline (YYYY-MM-DD), or leave blank:",
-                    item.deadline || ""
-                );
-
-                if (newDeadline !== null) {
-                    item.deadline = clean(newDeadline);
-                }
-
-                saveTasks(all);
+                saveTasks(allTasks);
                 renderTasks();
-                renderWeekly();
                 notify("Task updated.");
             });
 
-            const del = document.createElement("button");
-            del.type = "button";
-            del.textContent = "Delete";
-            del.className = "delete-task";
+            // Delete task
+            const deleteButton = document.createElement("button");
 
-            del.addEventListener("click", () => {
+            deleteButton.type = "button";
+            deleteButton.textContent = "Delete";
+            deleteButton.className = "delete-task";
+
+            deleteButton.addEventListener("click", () => {
                 if (!confirm("Delete this task?")) return;
 
-                const remaining = getTasks().filter(
+                const remainingTasks = getTasks().filter(
                     (entry) => String(entry.id) !== String(task.id)
                 );
 
-                saveTasks(remaining);
+                saveTasks(remainingTasks);
                 renderTasks();
                 renderWeekly();
                 notify("A task was deleted.");
             });
 
-            actions.append(edit, del);
+            actions.append(edit, deleteButton);
             row.append(checkbox, content, actions);
             list.appendChild(row);
         });
 
-        const done = tasks.filter((task) => task.done).length;
-        const percentage = tasks.length
-            ? Math.round((done / tasks.length) * 100)
+        const completed = tasks.filter((task) => task.done).length;
+
+        const percent = tasks.length
+            ? Math.round((completed / tasks.length) * 100)
             : 0;
 
         $("premiumTaskCount").textContent =
-            `${done} of ${tasks.length} tasks completed`;
+            `${completed} of ${tasks.length} tasks completed`;
 
-        $("progressPercent").textContent = percentage + "%";
-        $("premiumProgressFill").style.width = percentage + "%";
-        $("premiumProgressFill").setAttribute("aria-valuenow", String(percentage));
+        $("progressPercent").textContent = percent + "%";
+
+        $("premiumProgressFill").style.width = percent + "%";
+
+        $("premiumProgressFill").setAttribute(
+            "aria-valuenow",
+            String(percent)
+        );
     }
 
-    // WEEKLY PROGRESS
+    // Weekly progress
     function renderWeekly() {
         const days = [];
         const today = new Date();
 
         for (let i = 6; i >= 0; i--) {
             const dateObject = new Date(today);
+
             dateObject.setDate(today.getDate() - i);
 
             const year = dateObject.getFullYear();
             const month = String(dateObject.getMonth() + 1).padStart(2, "0");
             const day = String(dateObject.getDate()).padStart(2, "0");
+
             const date = `${year}-${month}-${day}`;
 
             const tasks = getTasks(date);
-            const done = tasks.filter((task) => task.done).length;
+            const completed = tasks.filter((task) => task.done).length;
 
             days.push({
-                date,
+                date: date,
                 label: dateObject.toLocaleDateString(undefined, {
                     weekday: "short"
                 }),
                 total: tasks.length,
-                done,
-                pct: tasks.length ? Math.round(done / tasks.length * 100) : 0
+                done: completed,
+                pct: tasks.length
+                    ? Math.round((completed / tasks.length) * 100)
+                    : 0
             });
         }
 
         const total = days.reduce((sum, day) => sum + day.total, 0);
-        const done = days.reduce((sum, day) => sum + day.done, 0);
-        const percentage = total ? Math.round(done / total * 100) : 0;
+        const completed = days.reduce((sum, day) => sum + day.done, 0);
 
-        $("weeklyProgressPercent").textContent = percentage + "%";
+        const percent = total
+            ? Math.round((completed / total) * 100)
+            : 0;
+
+        $("weeklyProgressPercent").textContent = percent + "%";
+
         $("weeklyTaskCount").textContent =
-            `${done} of ${total} tasks completed in the last 7 days`;
+            `${completed} of ${total} tasks completed in the last 7 days`;
 
-        $("weeklyProgressFill").style.width = percentage + "%";
+        $("weeklyProgressFill").style.width = percent + "%";
 
         const box = $("weeklyBreakdown");
+
         box.replaceChildren();
 
         days.forEach((day) => {
             const element = document.createElement("div");
+
             element.className = "day-stat";
 
-            const label = document.createElement("span");
-            label.textContent = day.label;
+            element.innerHTML = `
+                <span>${escapeHTML(day.label)}</span>
+                <strong>${day.pct}%</strong>
+                <small>${day.done}/${day.total}</small>
+            `;
 
-            const percent = document.createElement("strong");
-            percent.textContent = day.pct + "%";
-
-            const count = document.createElement("small");
-            count.textContent = `${day.done}/${day.total}`;
-
-            element.append(label, percent, count);
             box.appendChild(element);
         });
     }
 
-    // LOAD DASHBOARD
+    // Notification list
+    function renderNotifications() {
+        if (!currentUser) return;
+
+        const items = readJSON(notificationKey(currentUser), []);
+
+        const unread = items.filter((item) => !item.read).length;
+
+        $("unreadCount").textContent = `${unread} unread`;
+
+        const box = $("notificationList");
+
+        box.replaceChildren();
+
+        if (!items.length) {
+            const paragraph = document.createElement("p");
+
+            paragraph.className = "muted-text";
+            paragraph.textContent = "No notifications yet.";
+
+            box.appendChild(paragraph);
+
+            return;
+        }
+
+        items.forEach((notificationItem) => {
+            const item = document.createElement("div");
+
+            item.className =
+                "notification-item" +
+                (notificationItem.read ? "" : " unread");
+
+            const dot = document.createElement("span");
+            dot.className = "notification-dot";
+
+            const body = document.createElement("div");
+            body.className = "notification-body";
+
+            const text = document.createElement("div");
+            text.textContent = notificationItem.text;
+
+            const time = document.createElement("div");
+            time.className = "notification-time";
+            time.textContent = new Date(
+                notificationItem.time
+            ).toLocaleString();
+
+            body.append(text, time);
+            item.append(dot, body);
+
+            if (!notificationItem.read) {
+                const button = document.createElement("button");
+
+                button.className = "secondary-button";
+                button.type = "button";
+                button.textContent = "Read";
+
+                button.addEventListener("click", () => {
+                    const allItems = readJSON(
+                        notificationKey(currentUser),
+                        []
+                    );
+
+                    const found = allItems.find(
+                        (entry) => entry.id === notificationItem.id
+                    );
+
+                    if (found) {
+                        found.read = true;
+                    }
+
+                    saveJSON(notificationKey(currentUser), allItems);
+                    renderNotifications();
+                });
+
+                item.appendChild(button);
+            }
+
+            box.appendChild(item);
+        });
+    }
+
+    // Load dashboard after login
     function loadDashboard(username) {
         currentUser = username;
 
@@ -525,6 +527,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         $("displayName").textContent = username;
         $("displayName2").textContent = "Hello, " + username + "!";
+
         $("footerYear").textContent = new Date().getFullYear();
 
         loadProfileUI();
@@ -538,24 +541,27 @@ document.addEventListener("DOMContentLoaded", function () {
         notify("Welcome back! You are logged in.");
     }
 
-    // PASSWORD VISIBILITY
+    // Show/hide password: works on mobile and desktop
     document.querySelectorAll("[data-password]").forEach((button) => {
         button.addEventListener("click", () => {
             const input = $(button.dataset.password);
+
             if (!input) return;
 
-            input.type = input.type === "password" ? "text" : "password";
+            input.type =
+                input.type === "password" ? "text" : "password";
 
             button.setAttribute(
                 "aria-label",
                 input.type === "password" ? "Show password" : "Hide password"
             );
 
-            button.textContent = input.type === "password" ? "👁" : "🙈";
+            button.textContent =
+                input.type === "password" ? "👁" : "🙈";
         });
     });
 
-    // PAGE NAVIGATION
+    // Page navigation
     $("signupButton").addEventListener("click", () => {
         showPage($("signupPage"));
     });
@@ -573,7 +579,7 @@ document.addEventListener("DOMContentLoaded", function () {
         message("resetMessage", "");
     });
 
-    // CREATE ACCOUNT
+    // Create account
     $("signupForm").addEventListener("submit", (event) => {
         event.preventDefault();
 
@@ -591,25 +597,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const accounts = getAccounts();
 
-        if (accounts.some(
+        const exists = accounts.some(
             (account) =>
                 clean(account.username).toLowerCase() === username.toLowerCase()
-        )) {
+        );
+
+        if (exists) {
             message("signupMessage", "This username already exists.", true);
             return;
         }
 
-        accounts.push({ username, password });
-        saveAccounts(accounts);
-
-        saveProfile({
-            name: username,
-            bio: "",
-            course: "",
-            skills: ""
+        accounts.push({
+            username: username,
+            password: password
         });
 
-        message("signupMessage", "Account created! You can now log in.");
+        if (!saveAccounts(accounts)) return;
+
+        message(
+            "signupMessage",
+            "Account created! You can now log in."
+        );
+
         toast("Account created successfully.");
 
         $("signupForm").reset();
@@ -617,7 +626,7 @@ document.addEventListener("DOMContentLoaded", function () {
         setTimeout(() => showPage($("loginPage")), 700);
     });
 
-    // LOGIN
+    // Login
     $("loginForm").addEventListener("submit", (event) => {
         event.preventDefault();
 
@@ -631,20 +640,26 @@ document.addEventListener("DOMContentLoaded", function () {
         );
 
         if (!account) {
-            message("loginMessage", "Incorrect username or password.", true);
+            message(
+                "loginMessage",
+                "Incorrect username or password.",
+                true
+            );
             return;
         }
 
         message("loginMessage", "Login successful!");
+
         loadDashboard(account.username);
     });
 
-    // RESET PASSWORD
+    // Reset password (demo only)
     $("resetForm").addEventListener("submit", (event) => {
         event.preventDefault();
 
         const username = clean($("resetUsername").value);
         const password = $("resetPassword").value;
+
         const accounts = getAccounts();
 
         const account = accounts.find(
@@ -667,27 +682,38 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         account.password = password;
-        saveAccounts(accounts);
 
-        message("resetMessage", "Password updated. Please log in.");
+        if (!saveAccounts(accounts)) return;
+
+        message(
+            "resetMessage",
+            "Password updated. Please log in."
+        );
+
         setTimeout(() => showPage($("loginPage")), 800);
     });
 
-    // LOG OUT
+    // Logout
     $("logoutButton").addEventListener("click", () => {
         currentUser = "";
+
         $("loginPassword").value = "";
+
         showPage($("loginPage"));
+
         message("loginMessage", "You have logged out.");
     });
 
-    // DARK / LIGHT MODE
+    // Dark and light mode
     $("themeButton").addEventListener("click", () => {
         document.body.classList.toggle("light-mode");
 
         const light = document.body.classList.contains("light-mode");
 
-        localStorage.setItem("arnabTheme", light ? "light" : "dark");
+        localStorage.setItem(
+            "arnabTheme",
+            light ? "light" : "dark"
+        );
 
         $("themeButton").textContent =
             light ? "☀️ Light Mode" : "🌙 Dark Mode";
@@ -698,9 +724,10 @@ document.addEventListener("DOMContentLoaded", function () {
         $("themeButton").textContent = "☀️ Light Mode";
     }
 
-    // UPLOAD PROFILE PHOTO
+    // Change profile photo
     $("profilePhotoInput").addEventListener("change", (event) => {
         const file = event.target.files?.[0];
+
         if (!file) return;
 
         if (!file.type.startsWith("image/")) {
@@ -717,8 +744,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
         reader.onload = () => {
             try {
-                localStorage.setItem(photoKey(currentUser), reader.result);
+                localStorage.setItem(
+                    photoKey(currentUser),
+                    reader.result
+                );
+
                 loadProfileUI();
+
                 toast("Profile photo updated.");
             } catch {
                 toast("Photo is too large for browser storage.", true);
@@ -726,49 +758,34 @@ document.addEventListener("DOMContentLoaded", function () {
         };
 
         reader.readAsDataURL(file);
+
         event.target.value = "";
     });
 
-    // REMOVE PROFILE PHOTO
+    // Remove profile photo
     $("removeProfilePhoto").addEventListener("click", () => {
         if (!currentUser) return;
 
         localStorage.removeItem(photoKey(currentUser));
+
         loadProfileUI();
+
         toast("Profile photo removed.");
     });
 
-    // SAVE PROFILE
-    $("profileEditorForm").addEventListener("submit", (event) => {
-        event.preventDefault();
-
-        const profile = {
-            name: clean($("profileNameInput").value) || currentUser,
-            bio: clean($("profileBioInput").value),
-            course: clean($("profileCourseInput").value),
-            skills: clean($("profileSkillsInput").value)
-        };
-
-        if (!saveProfile(profile)) return;
-
-        loadProfileUI();
-        message("profileEditorStatus", "Profile saved successfully!");
-        notify("Your profile was updated.");
-        toast("Profile saved.");
-    });
-
-    // ADD TASK
+    // Add a new task
     $("premiumTaskForm").addEventListener("submit", (event) => {
         event.preventDefault();
 
         const text = clean($("premiumTaskInput").value);
+
         if (!text) return;
 
         const tasks = getTasks();
 
         tasks.push({
             id: Date.now().toString(),
-            text,
+            text: text,
             done: false,
             priority: $("taskPriorityInput").value || "Normal",
             deadline: $("taskDeadlineInput").value || ""
@@ -781,55 +798,71 @@ document.addEventListener("DOMContentLoaded", function () {
 
             renderTasks();
             renderWeekly();
+
             notify("New task added: " + text);
             toast("Task added.");
         }
     });
 
-    // SAVE PERSONAL NOTE
+    // Save personal note
     $("messageForm").addEventListener("submit", (event) => {
         event.preventDefault();
 
         if (!currentUser) return;
 
-        try {
-            localStorage.setItem(noteKey(currentUser), $("userMessage").value);
-            message("messageStatus", "Your note has been saved on this device.");
-            toast("Note saved.");
-        } catch {
-            message("messageStatus", "Could not save the note.", true);
-        }
+        localStorage.setItem(
+            noteKey(currentUser),
+            $("userMessage").value
+        );
+
+        message(
+            "messageStatus",
+            "Your note has been saved on this device."
+        );
+
+        toast("Note saved.");
     });
 
-    // MARK ALL NOTIFICATIONS AS READ
+    // Mark all notifications as read
     $("markNotificationsRead").addEventListener("click", () => {
         if (!currentUser) return;
 
-        const items = readJSON(notificationKey(currentUser), [])
-            .map((item) => ({ ...item, read: true }));
+        const items = readJSON(
+            notificationKey(currentUser),
+            []
+        ).map((item) => ({
+            ...item,
+            read: true
+        }));
 
         saveJSON(notificationKey(currentUser), items);
+
         renderNotifications();
+
         toast("All notifications marked as read.");
     });
 
-    // CLEAR NOTIFICATIONS
+    // Clear all notifications
     $("clearNotifications").addEventListener("click", () => {
         if (!currentUser) return;
+
         if (!confirm("Clear all notifications?")) return;
 
         saveJSON(notificationKey(currentUser), []);
+
         renderNotifications();
+
         toast("Notifications cleared.");
     });
 
-    // LIVE CLOCK
+    // Start live clock
     function tick() {
         updateClock();
     }
 
     tick();
+
     setInterval(tick, 1000);
 
-    // Demo only: localStorage login is not secure production authentication.
+    // This is a learning/demo website, not secure production authentication.
 });
