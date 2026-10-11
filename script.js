@@ -1,48 +1,52 @@
+
 document.addEventListener("DOMContentLoaded", function () {
+    const $ = function (id) {
+        return document.getElementById(id);
+    };
 
-    const $ = (id) => document.getElementById(id);
-
-    const pages = [
-        $("loginPage"),
-        $("signupPage"),
-        $("resetPage"),
-        $("namePage")
+    const pageIds = [
+        "loginPage",
+        "signupPage",
+        "resetPage",
+        "dashboardPage"
     ];
 
-    let currentUser = "";
+    function showPage(id) {
+        pageIds.forEach(function (pageId) {
+            const page = $(pageId);
+            if (page) page.classList.add("hidden");
+        });
 
-    const clean = (value) => String(value ?? "").trim();
-
-    const keyName = (value) =>
-        clean(value).toLowerCase().replace(/[^a-z0-9_-]/g, "_");
-
-    // Use the local date for task storage.
-    function todayKey() {
-        const date = new Date();
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-
-        return `${year}-${month}-${day}`;
+        const selectedPage = $(id);
+        if (selectedPage) selectedPage.classList.remove("hidden");
     }
 
-    const taskKey = (user, date = todayKey()) =>
-        `arnabDailyTasks_${keyName(user)}_${date}`;
+    function message(id, text, isError) {
+        const element = $(id);
+        if (!element) return;
 
-    const photoKey = (user) =>
-        `arnabProfilePhoto_${keyName(user)}`;
+        element.textContent = text;
+        element.classList.toggle("error", Boolean(isError));
+    }
 
-    const noteKey = (user) =>
-        `arnabPersonalNote_${keyName(user)}`;
+    function toast(text) {
+        const element = $("toast");
+        if (!element) return;
 
-    const notificationKey = (user) =>
-        `arnabNotifications_${keyName(user)}`;
+        element.textContent = text;
+        element.classList.add("show");
+
+        clearTimeout(toast.timer);
+        toast.timer = setTimeout(function () {
+            element.classList.remove("show");
+        }, 2500);
+    }
 
     function readJSON(key, fallback) {
         try {
             const value = JSON.parse(localStorage.getItem(key));
-            return value ?? fallback;
-        } catch {
+            return value === null ? fallback : value;
+        } catch (error) {
             return fallback;
         }
     }
@@ -51,818 +55,550 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
             localStorage.setItem(key, JSON.stringify(value));
             return true;
-        } catch {
-            toast("Browser storage is full. Please clear some old data.", true);
+        } catch (error) {
+            toast("Could not save data in this browser.");
             return false;
         }
+    }
+
+    function clean(value) {
+        return String(value || "").trim();
     }
 
     function getAccounts() {
         const value = readJSON("arnabAccounts", []);
 
         if (Array.isArray(value)) {
-            return value;
+            return value.filter(function (account) {
+                return account &&
+                    typeof account.username === "string";
+            });
         }
 
-        return Object.entries(value || {}).map(([username, item]) =>
-            typeof item === "object"
-                ? { username, ...item }
-                : { username, password: item }
-        );
+        if (value && typeof value === "object") {
+            return Object.entries(value).map(function (entry) {
+                const username = entry[0];
+                const item = entry[1];
+
+                if (item && typeof item === "object") {
+                    return Object.assign({}, item, {
+                        username: username
+                    });
+                }
+
+                return {
+                    username: username,
+                    password: String(item)
+                };
+            });
+        }
+
+        return [];
     }
 
     function saveAccounts(accounts) {
         return saveJSON("arnabAccounts", accounts);
     }
 
-    function showPage(page) {
-        pages.forEach((item) => {
-            if (item) {
-                item.classList.add("hidden");
+    function getCurrentUser() {
+        return sessionStorage.getItem("arnabCurrentUser");
+    }
+
+    function setCurrentUser(username) {
+        try {
+            sessionStorage.setItem("arnabCurrentUser", username);
+            return true;
+        } catch (error) {
+            toast("Could not start the session.");
+            return false;
+        }
+    }
+
+    function userKey(type) {
+        return "arnab_" + type + "_" + getCurrentUser();
+    }
+
+    // Password show / hide
+    document.querySelectorAll("[data-password]").forEach(function (button) {
+        button.addEventListener("click", function () {
+            const input = $(button.getAttribute("data-password"));
+            if (!input) return;
+
+            input.type = input.type === "password" ? "text" : "password";
+            button.textContent = input.type === "password" ? "👁" : "🙈";
+        });
+    });
+
+    // Open Create Account page
+    if ($("signupButton")) {
+        $("signupButton").addEventListener("click", function () {
+            message("signupMessage", "");
+            showPage("signupPage");
+        });
+    }
+
+    // Back to Login
+    if ($("backButton")) {
+        $("backButton").addEventListener("click", function () {
+            showPage("loginPage");
+        });
+    }
+
+    if ($("resetBackButton")) {
+        $("resetBackButton").addEventListener("click", function () {
+            showPage("loginPage");
+        });
+    }
+
+    // Open Forgot Password
+    if ($("forgotPasswordButton")) {
+        $("forgotPasswordButton").addEventListener("click", function () {
+            message("resetMessage", "");
+            showPage("resetPage");
+        });
+    }
+
+    // CREATE ACCOUNT
+    if ($("signupForm")) {
+        $("signupForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const username = clean($("signupUsername").value);
+            const password = $("signupPassword").value;
+
+            if (!/^[a-zA-Z0-9_-]{3,30}$/.test(username)) {
+                message(
+                    "signupMessage",
+                    "Username must be 3–30 letters, numbers, _ or -.",
+                    true
+                );
+                return;
             }
-        });
 
-        if (page) {
-            page.classList.remove("hidden");
-        }
-    }
-
-    function message(id, text, error = false) {
-        const element = $(id);
-
-        if (element) {
-            element.textContent = text;
-            element.style.color = error ? "#ff9caa" : "#9ef0be";
-        }
-    }
-
-    function toast(text, error = false) {
-        const box = $("toastContainer");
-
-        if (!box) return;
-
-        const element = document.createElement("div");
-        element.className = "toast" + (error ? " error" : "");
-        element.textContent = text;
-
-        box.appendChild(element);
-
-        setTimeout(() => element.remove(), 3400);
-    }
-
-    // Notifications
-    function notify(text) {
-        const notification = $("notification");
-
-        if (notification) {
-            notification.textContent = text;
-        }
-
-        if (!currentUser) return;
-
-        const items = readJSON(notificationKey(currentUser), []);
-
-        items.unshift({
-            id: Date.now() + Math.random(),
-            text: text,
-            time: new Date().toISOString(),
-            read: false
-        });
-
-        saveJSON(notificationKey(currentUser), items.slice(0, 50));
-        renderNotifications();
-    }
-
-    // Tasks
-    function getTasks(date = todayKey()) {
-        const raw = readJSON(taskKey(currentUser, date), []);
-
-        return (Array.isArray(raw) ? raw : []).map((task, index) => {
-            if (typeof task === "string") {
-                return {
-                    id: `${date}-${index}`,
-                    text: task,
-                    done: false,
-                    priority: "Normal",
-                    deadline: ""
-                };
+            if (password.length < 4) {
+                message(
+                    "signupMessage",
+                    "Password must contain at least 4 characters.",
+                    true
+                );
+                return;
             }
 
-            return {
-                priority: "Normal",
-                deadline: "",
-                done: false,
-                ...task
-            };
+            const accounts = getAccounts();
+
+            const exists = accounts.some(function (account) {
+                return clean(account.username).toLowerCase() ===
+                    username.toLowerCase();
+            });
+
+            if (exists) {
+                message(
+                    "signupMessage",
+                    "This username already exists. Please log in.",
+                    true
+                );
+                return;
+            }
+
+            accounts.push({
+                username: username,
+                password: password
+            });
+
+            if (!saveAccounts(accounts)) {
+                message(
+                    "signupMessage",
+                    "Account could not be saved. Check browser storage.",
+                    true
+                );
+                return;
+            }
+
+            $("signupForm").reset();
+
+            message(
+                "loginMessage",
+                "Account created! Please log in."
+            );
+
+            message("signupMessage", "");
+            toast("Account created successfully!");
+
+            showPage("loginPage");
+            $("loginUsername").value = username;
+            $("loginPassword").focus();
         });
     }
 
-    function saveTasks(tasks, date = todayKey()) {
-        return saveJSON(taskKey(currentUser, date), tasks);
+    // LOGIN
+    if ($("loginForm")) {
+        $("loginForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const username = clean($("loginUsername").value);
+            const password = $("loginPassword").value;
+            const accounts = getAccounts();
+
+            const account = accounts.find(function (item) {
+                return clean(item.username).toLowerCase() ===
+                    username.toLowerCase() &&
+                    item.password === password;
+            });
+
+            if (!account) {
+                message(
+                    "loginMessage",
+                    "Incorrect username or password.",
+                    true
+                );
+                return;
+            }
+
+            if (!setCurrentUser(account.username)) return;
+
+            message("loginMessage", "");
+            $("loginForm").reset();
+
+            openDashboard(account.username);
+        });
     }
 
-    function escapeHTML(value) {
-        return String(value).replace(/[&<>"']/g, (character) => ({
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#39;"
-        }[character]));
+    // PASSWORD RESET - demo only
+    if ($("resetForm")) {
+        $("resetForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const username = clean($("resetUsername").value);
+            const newPassword = $("newPassword").value;
+            const accounts = getAccounts();
+
+            if (newPassword.length < 4) {
+                message(
+                    "resetMessage",
+                    "Password must contain at least 4 characters.",
+                    true
+                );
+                return;
+            }
+
+            const index = accounts.findIndex(function (account) {
+                return clean(account.username).toLowerCase() ===
+                    username.toLowerCase();
+            });
+
+            if (index === -1) {
+                message("resetMessage", "Username not found.", true);
+                return;
+            }
+
+            accounts[index].password = newPassword;
+
+            if (!saveAccounts(accounts)) return;
+
+            $("resetForm").reset();
+            message("resetMessage", "");
+            message("loginMessage", "Password updated. Please log in.");
+
+            toast("Password updated successfully.");
+            showPage("loginPage");
+            $("loginUsername").value = username;
+        });
     }
 
-    // Greeting based on local time
-    function greeting() {
-        const hour = new Date().getHours();
+    // DASHBOARD
+    function openDashboard(username) {
+        $("welcomeText").textContent = "Welcome, " + username + "!";
+        $("profileName").textContent = username;
 
-        if (hour < 12) return "🌅 Good Morning";
-        if (hour < 17) return "☀️ Good Afternoon";
-        if (hour < 21) return "🌇 Good Evening";
+        loadProfilePhoto();
+        loadNotifications();
+        loadTasks();
+        loadNotes();
 
-        return "🌙 Good Night";
+        showPage("dashboardPage");
+        updateClock();
+        toast("Login successful!");
     }
 
-    // Live clock and date
+    // LOGOUT
+    if ($("logoutButton")) {
+        $("logoutButton").addEventListener("click", function () {
+            sessionStorage.removeItem("arnabCurrentUser");
+            showPage("loginPage");
+            message("loginMessage", "You have logged out.");
+        });
+    }
+
+    // LIVE CLOCK AND GREETING
     function updateClock() {
         const now = new Date();
 
-        if ($("liveClock")) {
-            $("liveClock").textContent = now.toLocaleTimeString();
-        }
-
-        if ($("liveDate")) {
-            $("liveDate").textContent = now.toLocaleDateString(undefined, {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric"
+        if ($("clock")) {
+            $("clock").textContent = now.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: true
             });
         }
 
-        if ($("greetingText")) {
-            $("greetingText").textContent =
-                greeting() + " — make today count.";
-        }
-    }
-
-    // Profile display only; no Profile Editor
-    function loadProfileUI() {
-        if ($("displayName")) {
-            $("displayName").textContent = currentUser;
+        if ($("dateText")) {
+            $("dateText").textContent = now.toLocaleDateString([], {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+            });
         }
 
-        if ($("displayName2")) {
-            $("displayName2").textContent = "Hello, " + currentUser + "!";
-        }
+        let greeting = "Good evening";
 
-        const photo = localStorage.getItem(photoKey(currentUser));
+        const hour = now.getHours();
 
-        if (photo) {
-            $("profilePhoto").src = photo;
-            $("profilePhoto").classList.remove("hidden");
-            $("profilePhotoPlaceholder").classList.add("hidden");
+        if (hour >= 5 && hour < 12) {
+            greeting = "Good morning";
+        } else if (hour >= 12 && hour < 17) {
+            greeting = "Good afternoon";
+        } else if (hour >= 17 && hour < 21) {
+            greeting = "Good evening";
         } else {
-            $("profilePhoto").classList.add("hidden");
-            $("profilePhotoPlaceholder").classList.remove("hidden");
+            greeting = "Good night";
+        }
+
+        if ($("greeting")) {
+            $("greeting").textContent =
+                greeting + ", " + (getCurrentUser() || "Guest") + "!";
         }
     }
 
-    // Render daily tasks
-    function renderTasks() {
-        const tasks = getTasks();
-        const list = $("premiumTaskList");
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // PROFILE PHOTO
+    function loadProfilePhoto() {
+        const photo = readJSON(userKey("photo"), "");
+
+        if ($("profileImage")) {
+            if (photo) {
+                $("profileImage").src = photo;
+            } else {
+                $("profileImage").removeAttribute("src");
+            }
+        }
+    }
+
+    if ($("photoInput")) {
+        $("photoInput").addEventListener("change", function () {
+            const file = this.files && this.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith("image/")) {
+                toast("Please select an image.");
+                this.value = "";
+                return;
+            }
+
+            if (file.size > 1024 * 1024) {
+                toast("Choose an image smaller than 1 MB.");
+                this.value = "";
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function () {
+                if (saveJSON(userKey("photo"), reader.result)) {
+                    loadProfilePhoto();
+                    toast("Profile photo updated.");
+                }
+            };
+
+            reader.onerror = function () {
+                toast("Could not read this image.");
+            };
+
+            reader.readAsDataURL(file);
+        });
+    }
+
+    if ($("removePhotoButton")) {
+        $("removePhotoButton").addEventListener("click", function () {
+            try {
+                localStorage.removeItem(userKey("photo"));
+                loadProfilePhoto();
+                if ($("photoInput")) $("photoInput").value = "";
+                toast("Profile photo removed.");
+            } catch (error) {
+                toast("Could not remove the photo.");
+            }
+        });
+    }
+
+    // NOTIFICATIONS
+    function loadNotifications() {
+        const list = $("notificationList");
+        if (!list) return;
 
         list.replaceChildren();
 
-        tasks.forEach((task) => {
-            const row = document.createElement("div");
+        const notifications = readJSON(userKey("notifications"), []);
 
-            row.className = "task-row" + (task.done ? " completed" : "");
+        notifications.forEach(function (item) {
+            const li = document.createElement("li");
+            li.textContent = item;
+            list.appendChild(li);
+        });
+    }
+
+    if ($("notificationForm")) {
+        $("notificationForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const value = clean($("notificationInput").value);
+            if (!value) return;
+
+            const notifications = readJSON(userKey("notifications"), []);
+            notifications.unshift(value);
+
+            if (saveJSON(userKey("notifications"), notifications)) {
+                $("notificationForm").reset();
+                loadNotifications();
+                toast("Notification added.");
+            }
+        });
+    }
+
+    if ($("clearNotificationsButton")) {
+        $("clearNotificationsButton").addEventListener("click", function () {
+            if (saveJSON(userKey("notifications"), [])) {
+                loadNotifications();
+                toast("Notifications cleared.");
+            }
+        });
+    }
+
+    // DAILY TASKS
+    function loadTasks() {
+        const list = $("taskList");
+        if (!list) return;
+
+        list.replaceChildren();
+
+        const tasks = readJSON(userKey("tasks"), []);
+        let completed = 0;
+
+        tasks.forEach(function (task, index) {
+            if (task.done) completed++;
+
+            const li = document.createElement("li");
+            const wrapper = document.createElement("div");
+            wrapper.className = "task-item" + (task.done ? " completed" : "");
 
             const checkbox = document.createElement("input");
-
             checkbox.type = "checkbox";
-            checkbox.className = "task-checkbox";
             checkbox.checked = Boolean(task.done);
-            checkbox.setAttribute("aria-label", "Mark task complete");
+            checkbox.setAttribute("aria-label", "Mark task completed");
 
-            checkbox.addEventListener("change", () => {
-                const allTasks = getTasks();
+            checkbox.addEventListener("change", function () {
+                const current = readJSON(userKey("tasks"), []);
+                if (!current[index]) return;
 
-                const item = allTasks.find(
-                    (entry) => String(entry.id) === String(task.id)
-                );
+                current[index].done = checkbox.checked;
 
-                if (item) {
-                    item.done = checkbox.checked;
+                if (saveJSON(userKey("tasks"), current)) {
+                    loadTasks();
                 }
-
-                saveTasks(allTasks);
-                renderTasks();
-                renderWeekly();
-
-                notify(
-                    checkbox.checked
-                        ? `Task completed: ${task.text}`
-                        : `Task reopened: ${task.text}`
-                );
             });
 
-            const content = document.createElement("div");
-            content.className = "task-content";
+            const span = document.createElement("span");
+            span.className = "task-text";
+            span.textContent = task.text;
 
-            const title = document.createElement("div");
-            title.className = "task-text";
-            title.textContent = task.text;
+            const remove = document.createElement("button");
+            remove.type = "button";
+            remove.className = "secondary-button";
+            remove.textContent = "Delete";
+            remove.addEventListener("click", function () {
+                const current = readJSON(userKey("tasks"), []);
+                current.splice(index, 1);
 
-            const meta = document.createElement("div");
-            meta.className = "task-meta";
+                if (saveJSON(userKey("tasks"), current)) {
+                    loadTasks();
+                }
+            });
 
-            const priority = document.createElement("span");
-            priority.className = "priority " + task.priority;
-            priority.textContent = task.priority + " priority";
+            wrapper.append(checkbox, span, remove);
+            li.appendChild(wrapper);
+            list.appendChild(li);
+        });
 
-            meta.appendChild(priority);
+        if ($("taskProgress")) {
+            $("taskProgress").textContent =
+                completed + " of " + tasks.length + " tasks completed";
+        }
+    }
 
-            if (task.deadline) {
-                const deadline = document.createElement("span");
-                deadline.textContent = "Due: " + task.deadline;
-                meta.appendChild(deadline);
+    if ($("taskForm")) {
+        $("taskForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const value = clean($("taskInput").value);
+            if (!value) return;
+
+            const tasks = readJSON(userKey("tasks"), []);
+            tasks.push({ text: value, done: false });
+
+            if (saveJSON(userKey("tasks"), tasks)) {
+                $("taskForm").reset();
+                loadTasks();
+                toast("Task added.");
             }
-
-            content.append(title, meta);
-
-            const actions = document.createElement("div");
-            actions.className = "task-actions";
-
-            // Edit task
-            const edit = document.createElement("button");
-
-            edit.type = "button";
-            edit.textContent = "Edit";
-
-            edit.addEventListener("click", () => {
-                const text = prompt("Edit task name:", task.text);
-
-                if (text === null) return;
-
-                const value = clean(text);
-
-                if (!value) {
-                    toast("Task name cannot be empty.", true);
-                    return;
-                }
-
-                const allTasks = getTasks();
-
-                const item = allTasks.find(
-                    (entry) => String(entry.id) === String(task.id)
-                );
-
-                if (item) {
-                    item.text = value;
-                }
-
-                saveTasks(allTasks);
-                renderTasks();
-                notify("Task updated.");
-            });
-
-            // Delete task
-            const deleteButton = document.createElement("button");
-
-            deleteButton.type = "button";
-            deleteButton.textContent = "Delete";
-            deleteButton.className = "delete-task";
-
-            deleteButton.addEventListener("click", () => {
-                if (!confirm("Delete this task?")) return;
-
-                const remainingTasks = getTasks().filter(
-                    (entry) => String(entry.id) !== String(task.id)
-                );
-
-                saveTasks(remainingTasks);
-                renderTasks();
-                renderWeekly();
-                notify("A task was deleted.");
-            });
-
-            actions.append(edit, deleteButton);
-            row.append(checkbox, content, actions);
-            list.appendChild(row);
-        });
-
-        const completed = tasks.filter((task) => task.done).length;
-
-        const percent = tasks.length
-            ? Math.round((completed / tasks.length) * 100)
-            : 0;
-
-        $("premiumTaskCount").textContent =
-            `${completed} of ${tasks.length} tasks completed`;
-
-        $("progressPercent").textContent = percent + "%";
-
-        $("premiumProgressFill").style.width = percent + "%";
-
-        $("premiumProgressFill").setAttribute(
-            "aria-valuenow",
-            String(percent)
-        );
-    }
-
-    // Weekly progress
-    function renderWeekly() {
-        const days = [];
-        const today = new Date();
-
-        for (let i = 6; i >= 0; i--) {
-            const dateObject = new Date(today);
-
-            dateObject.setDate(today.getDate() - i);
-
-            const year = dateObject.getFullYear();
-            const month = String(dateObject.getMonth() + 1).padStart(2, "0");
-            const day = String(dateObject.getDate()).padStart(2, "0");
-
-            const date = `${year}-${month}-${day}`;
-
-            const tasks = getTasks(date);
-            const completed = tasks.filter((task) => task.done).length;
-
-            days.push({
-                date: date,
-                label: dateObject.toLocaleDateString(undefined, {
-                    weekday: "short"
-                }),
-                total: tasks.length,
-                done: completed,
-                pct: tasks.length
-                    ? Math.round((completed / tasks.length) * 100)
-                    : 0
-            });
-        }
-
-        const total = days.reduce((sum, day) => sum + day.total, 0);
-        const completed = days.reduce((sum, day) => sum + day.done, 0);
-
-        const percent = total
-            ? Math.round((completed / total) * 100)
-            : 0;
-
-        $("weeklyProgressPercent").textContent = percent + "%";
-
-        $("weeklyTaskCount").textContent =
-            `${completed} of ${total} tasks completed in the last 7 days`;
-
-        $("weeklyProgressFill").style.width = percent + "%";
-
-        const box = $("weeklyBreakdown");
-
-        box.replaceChildren();
-
-        days.forEach((day) => {
-            const element = document.createElement("div");
-
-            element.className = "day-stat";
-
-            element.innerHTML = `
-                <span>${escapeHTML(day.label)}</span>
-                <strong>${day.pct}%</strong>
-                <small>${day.done}/${day.total}</small>
-            `;
-
-            box.appendChild(element);
         });
     }
 
-    // Notification list
-    function renderNotifications() {
-        if (!currentUser) return;
-
-        const items = readJSON(notificationKey(currentUser), []);
-
-        const unread = items.filter((item) => !item.read).length;
-
-        $("unreadCount").textContent = `${unread} unread`;
-
-        const box = $("notificationList");
-
-        box.replaceChildren();
-
-        if (!items.length) {
-            const paragraph = document.createElement("p");
-
-            paragraph.className = "muted-text";
-            paragraph.textContent = "No notifications yet.";
-
-            box.appendChild(paragraph);
-
-            return;
+    // PERSONAL NOTES
+    function loadNotes() {
+        if ($("notesInput")) {
+            $("notesInput").value = readJSON(userKey("notes"), "");
         }
+    }
 
-        items.forEach((notificationItem) => {
-            const item = document.createElement("div");
+    if ($("saveNotesButton")) {
+        $("saveNotesButton").addEventListener("click", function () {
+            const success = saveJSON(userKey("notes"), $("notesInput").value);
 
-            item.className =
-                "notification-item" +
-                (notificationItem.read ? "" : " unread");
-
-            const dot = document.createElement("span");
-            dot.className = "notification-dot";
-
-            const body = document.createElement("div");
-            body.className = "notification-body";
-
-            const text = document.createElement("div");
-            text.textContent = notificationItem.text;
-
-            const time = document.createElement("div");
-            time.className = "notification-time";
-            time.textContent = new Date(
-                notificationItem.time
-            ).toLocaleString();
-
-            body.append(text, time);
-            item.append(dot, body);
-
-            if (!notificationItem.read) {
-                const button = document.createElement("button");
-
-                button.className = "secondary-button";
-                button.type = "button";
-                button.textContent = "Read";
-
-                button.addEventListener("click", () => {
-                    const allItems = readJSON(
-                        notificationKey(currentUser),
-                        []
-                    );
-
-                    const found = allItems.find(
-                        (entry) => entry.id === notificationItem.id
-                    );
-
-                    if (found) {
-                        found.read = true;
-                    }
-
-                    saveJSON(notificationKey(currentUser), allItems);
-                    renderNotifications();
-                });
-
-                item.appendChild(button);
+            if (success) {
+                message("notesMessage", "Notes saved.");
+                toast("Notes saved successfully.");
             }
-
-            box.appendChild(item);
         });
     }
 
-    // Load dashboard after login
-    function loadDashboard(username) {
-        currentUser = username;
-
-        showPage($("namePage"));
-
-        $("displayName").textContent = username;
-        $("displayName2").textContent = "Hello, " + username + "!";
-
-        $("footerYear").textContent = new Date().getFullYear();
-
-        loadProfileUI();
-        renderTasks();
-        renderWeekly();
-        renderNotifications();
-
-        $("userMessage").value =
-            localStorage.getItem(noteKey(currentUser)) || "";
-
-        notify("Welcome back! You are logged in.");
+    // LIGHT / DARK THEME
+    try {
+        if (localStorage.getItem("arnabTheme") === "light") {
+            document.body.classList.add("light-theme");
+        }
+    } catch (error) {
+        // The default theme will still work.
     }
 
-    // Show/hide password: works on mobile and desktop
-    document.querySelectorAll("[data-password]").forEach((button) => {
-        button.addEventListener("click", () => {
-            const input = $(button.dataset.password);
+    if ($("themeButton")) {
+        $("themeButton").addEventListener("click", function () {
+            document.body.classList.toggle("light-theme");
 
-            if (!input) return;
+            const theme = document.body.classList.contains("light-theme")
+                ? "light"
+                : "dark";
 
-            input.type =
-                input.type === "password" ? "text" : "password";
-
-            button.setAttribute(
-                "aria-label",
-                input.type === "password" ? "Show password" : "Hide password"
-            );
-
-            button.textContent =
-                input.type === "password" ? "👁" : "🙈";
-        });
-    });
-
-    // Page navigation
-    $("signupButton").addEventListener("click", () => {
-        showPage($("signupPage"));
-    });
-
-    $("backButton").addEventListener("click", () => {
-        showPage($("loginPage"));
-    });
-
-    $("resetBackButton").addEventListener("click", () => {
-        showPage($("loginPage"));
-    });
-
-    $("forgotPasswordButton").addEventListener("click", () => {
-        showPage($("resetPage"));
-        message("resetMessage", "");
-    });
-
-    // Create account
-    $("signupForm").addEventListener("submit", (event) => {
-        event.preventDefault();
-
-        const username = clean($("signupUsername").value);
-        const password = $("signupPassword").value;
-
-        if (!/^[a-zA-Z0-9_-]{3,30}$/.test(username)) {
-            message(
-                "signupMessage",
-                "Use 3–30 letters, numbers, _ or -.",
-                true
-            );
-            return;
-        }
-
-        const accounts = getAccounts();
-
-        const exists = accounts.some(
-            (account) =>
-                clean(account.username).toLowerCase() === username.toLowerCase()
-        );
-
-        if (exists) {
-            message("signupMessage", "This username already exists.", true);
-            return;
-        }
-
-        accounts.push({
-            username: username,
-            password: password
-        });
-
-        if (!saveAccounts(accounts)) return;
-
-        message(
-            "signupMessage",
-            "Account created! You can now log in."
-        );
-
-        toast("Account created successfully.");
-
-        $("signupForm").reset();
-
-        setTimeout(() => showPage($("loginPage")), 700);
-    });
-
-    // Login
-    $("loginForm").addEventListener("submit", (event) => {
-        event.preventDefault();
-
-        const username = clean($("loginUsername").value);
-        const password = $("loginPassword").value;
-
-        const account = getAccounts().find(
-            (item) =>
-                clean(item.username).toLowerCase() === username.toLowerCase() &&
-                item.password === password
-        );
-
-        if (!account) {
-            message(
-                "loginMessage",
-                "Incorrect username or password.",
-                true
-            );
-            return;
-        }
-
-        message("loginMessage", "Login successful!");
-
-        loadDashboard(account.username);
-    });
-
-    // Reset password (demo only)
-    $("resetForm").addEventListener("submit", (event) => {
-        event.preventDefault();
-
-        const username = clean($("resetUsername").value);
-        const password = $("resetPassword").value;
-
-        const accounts = getAccounts();
-
-        const account = accounts.find(
-            (item) =>
-                clean(item.username).toLowerCase() === username.toLowerCase()
-        );
-
-        if (!account) {
-            message("resetMessage", "Username not found.", true);
-            return;
-        }
-
-        if (password.length < 4) {
-            message(
-                "resetMessage",
-                "Password must be at least 4 characters.",
-                true
-            );
-            return;
-        }
-
-        account.password = password;
-
-        if (!saveAccounts(accounts)) return;
-
-        message(
-            "resetMessage",
-            "Password updated. Please log in."
-        );
-
-        setTimeout(() => showPage($("loginPage")), 800);
-    });
-
-    // Logout
-    $("logoutButton").addEventListener("click", () => {
-        currentUser = "";
-
-        $("loginPassword").value = "";
-
-        showPage($("loginPage"));
-
-        message("loginMessage", "You have logged out.");
-    });
-
-    // Dark and light mode
-    $("themeButton").addEventListener("click", () => {
-        document.body.classList.toggle("light-mode");
-
-        const light = document.body.classList.contains("light-mode");
-
-        localStorage.setItem(
-            "arnabTheme",
-            light ? "light" : "dark"
-        );
-
-        $("themeButton").textContent =
-            light ? "☀️ Light Mode" : "🌙 Dark Mode";
-    });
-
-    if (localStorage.getItem("arnabTheme") === "light") {
-        document.body.classList.add("light-mode");
-        $("themeButton").textContent = "☀️ Light Mode";
-    }
-
-    // Change profile photo
-    $("profilePhotoInput").addEventListener("change", (event) => {
-        const file = event.target.files?.[0];
-
-        if (!file) return;
-
-        if (!file.type.startsWith("image/")) {
-            toast("Please choose an image file.", true);
-            return;
-        }
-
-        if (file.size > 1024 * 1024) {
-            toast("Choose a photo under 1 MB.", true);
-            return;
-        }
-
-        const reader = new FileReader();
-
-        reader.onload = () => {
             try {
-                localStorage.setItem(
-                    photoKey(currentUser),
-                    reader.result
-                );
-
-                loadProfileUI();
-
-                toast("Profile photo updated.");
-            } catch {
-                toast("Photo is too large for browser storage.", true);
+                localStorage.setItem("arnabTheme", theme);
+            } catch (error) {
+                // Theme still changes for the current page.
             }
-        };
-
-        reader.readAsDataURL(file);
-
-        event.target.value = "";
-    });
-
-    // Remove profile photo
-    $("removeProfilePhoto").addEventListener("click", () => {
-        if (!currentUser) return;
-
-        localStorage.removeItem(photoKey(currentUser));
-
-        loadProfileUI();
-
-        toast("Profile photo removed.");
-    });
-
-    // Add a new task
-    $("premiumTaskForm").addEventListener("submit", (event) => {
-        event.preventDefault();
-
-        const text = clean($("premiumTaskInput").value);
-
-        if (!text) return;
-
-        const tasks = getTasks();
-
-        tasks.push({
-            id: Date.now().toString(),
-            text: text,
-            done: false,
-            priority: $("taskPriorityInput").value || "Normal",
-            deadline: $("taskDeadlineInput").value || ""
         });
-
-        if (saveTasks(tasks)) {
-            $("premiumTaskInput").value = "";
-            $("taskPriorityInput").value = "Normal";
-            $("taskDeadlineInput").value = "";
-
-            renderTasks();
-            renderWeekly();
-
-            notify("New task added: " + text);
-            toast("Task added.");
-        }
-    });
-
-    // Save personal note
-    $("messageForm").addEventListener("submit", (event) => {
-        event.preventDefault();
-
-        if (!currentUser) return;
-
-        localStorage.setItem(
-            noteKey(currentUser),
-            $("userMessage").value
-        );
-
-        message(
-            "messageStatus",
-            "Your note has been saved on this device."
-        );
-
-        toast("Note saved.");
-    });
-
-    // Mark all notifications as read
-    $("markNotificationsRead").addEventListener("click", () => {
-        if (!currentUser) return;
-
-        const items = readJSON(
-            notificationKey(currentUser),
-            []
-        ).map((item) => ({
-            ...item,
-            read: true
-        }));
-
-        saveJSON(notificationKey(currentUser), items);
-
-        renderNotifications();
-
-        toast("All notifications marked as read.");
-    });
-
-    // Clear all notifications
-    $("clearNotifications").addEventListener("click", () => {
-        if (!currentUser) return;
-
-        if (!confirm("Clear all notifications?")) return;
-
-        saveJSON(notificationKey(currentUser), []);
-
-        renderNotifications();
-
-        toast("Notifications cleared.");
-    });
-
-    // Start live clock
-    function tick() {
-        updateClock();
     }
 
-    tick();
-
-    setInterval(tick, 1000);
-
-    // This is a learning/demo website, not secure production authentication.
+    // Start at Login
+    showPage("loginPage");
 });
