@@ -4,120 +4,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arnab Login Website</title>
+    <meta name="theme-color" content="#17162f">
+    <title>Arnab's Login Website</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
 </head>
 <body>
+    <main class="app-container">
 
-    <!-- Login Page -->
-    <div class="form-box" id="loginPage">
-        <h1>Welcome Back</h1>
-        <p>Login to your account</p>
+        <!-- LOGIN -->
+        <section class="form-box" id="loginPage">
+            <div class="brand-icon">A</div>
+            <p class="eyebrow">WELCOME BACK</p>
+            <h1>Login</h1>
+            <p class="subtitle">Sign in to continue to your dashboard.</p>
 
-        <form id="loginForm">
-            <input type="text" id="loginUsername"
-                   placeholder="Enter Username" required>
+            <form id="loginForm">
+                <label for="loginUsername">Username</label>
+                <input type="text" id="loginUsername" placeholder="Enter your username" autocomplete="username" required>
 
-            <input type="password" id="loginPassword"
-                   placeholder="Enter Password" required>
+                <label for="loginPassword">Password</label>
+                <div class="password-box">
+                    <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password" required>
+                    <button type="button" class="eye-button" data-password="loginPassword" aria-label="Show password">👁</button>
+                </div>
 
-            <button type="submit">Login</button>
-        </form>
-
-        <p id="loginMessage" class="message"></p>
-
-        <button type="button" class="text-button"
-                id="forgotPasswordButton">Forgot Password?</button>
-
-        <p>Don't have an account?</p>
-        <button type="button" id="signupButton">Create Account</button>
-
-        <p class="developer">Developed by Arnab Bhowmick</p>
-    </div>
-
-    <!-- Create Account -->
-    <div class="form-box hidden" id="signupPage">
-        <h1>Create Account</h1>
-        <p>Create your new account</p>
-
-        <form id="signupForm">
-            <input type="text" id="signupUsername"
-                   placeholder="Create Username"
-                   minlength="3" required>
-
-            <input type="password" id="signupPassword"
-                   placeholder="Create Password"
-                   minlength="6" required>
-
-            <button type="submit">Sign Up</button>
-        </form>
-
-        <p id="signupMessage" class="message"></p>
-
-        <button type="button" id="backButton">Back to Login</button>
-    </div>
-
-    <!-- Forgot Password -->
-    <div class="form-box hidden" id="resetPage">
-        <h1>Reset Password</h1>
-        <p>Enter your username and choose a new password</p>
-
-        <form id="resetForm">
-            <input type="text" id="resetUsername"
-                   placeholder="Enter Username" required>
-
-            <input type="password" id="resetPassword"
-                   placeholder="New Password"
-                   minlength="6" required>
-
-            <button type="submit">Change Password</button>
-        </form>
-
-        <p id="resetMessage" class="message"></p>
-
-        <button type="button" id="resetBackButton">Back to Login</button>
-    </div>
-
-    <!-- Dashboard -->
-    <div class="dashboard hidden" id="namePage">
-
-        <div class="top-bar">
-            <span>My Dashboard</span>
-            <button type="button" id="logoutButton">Logout</button>
-        </div>
-
-        <h1 id="displayName">Hi!</h1>
-        <h2 id="displayName2">Login Successful!</h2>
-        <p id="displayName3">Welcome to your account.</p>
-
-        <div class="info-card">
-            <h3>Live Clock</h3>
-            <h2 id="liveClock">00:00:00</h2>
-            <p id="liveDate"></p>
-        </div>
-
-        <div class="info-card">
-            <h3>Notifications</h3>
-            <p id="notification">Welcome!</p>
-        </div>
-
-        <div class="info-card">
-            <h3>Message Box</h3>
-
-            <form id="messageForm">
-                <textarea id="userMessage"
-                          placeholder="Write your message..."
-                          required></textarea>
-
-                <button type="submit" id="sendButton">Save Message</button>
+                <p class="message" id="loginMessage" role="status"></p>
+                <button class="primary-button" type="submit">Login</button>
             </form>
 
-            <p id="messageStatus" class="message"></p>
-        </div>
+            <button class="text-button" id="forgotPasswordButton" type="button">Forgot Password?</button>
+            <p class="switch-text">Don't have an account?
+                <button class="inline-button" id="signupButton" type="button">Create Account</button>
+            </p>
+            <p class="developer-credit">Developed by <strong>Arnab Bhowmick</strong></p>
+        </section>
 
-        <p class="developer">Developed by Arnab Bhowmick</p>
-    </div>
+        <!-- CREATE ACCOUNT -->
+        <section class="form-box hidden" id="signupPage">
+            <div class="brand-icon">A</div>
+            <p class="eyebrow">JOIN US</p>
+            <h1>Create Account</h1>
+            <p class="subtitle">Create your account to get started.</p>
 
-    <script src="script.js"></script>
+            <form id="signupForm">
+                <label for="signupUsername">Username</label>
+                <input type="text" id="signupUsername" placeholder="Choose a username" autocomplete="username" minlength="3" required>
+
+                <label for="signupPassword">Password</label>
+                <div class="password-box">
+                    <input type="password" id="signupPassword" placeholder="At least 6 characters" autocomplete="new-password" minlength="6" required>
+                    <button type="button" class="eye-button" data-password="signupPassword" aria-label="Show password">👁</button>
+                </div>
+
+                <p class="message" id="signupMessage" role="status"></p>
+                <button class="primary-button" type="submit">Create Account</button>
+            </form>
+
+            <p class="switch-text">Already have an account?
+                <button class="inline-button" id="backButton" type="button">Back to Login</button>
+            </p>
+            <p class="developer-credit">Developed by <strong>Arnab Bhowmick</strong></p>
+        </section>
+
+        <!-- FORGOT PASSWORD -->
+        <section class="form-box hidden" id="resetPage">
+            <div class="brand-icon">A</div>
+            <p class="eyebrow">ACCOUNT RECOVERY</p>
+            <h1>Reset Password</h1>
+            <p class="subtitle">Enter your username and choose a new password.</p>
+
+            <form id="resetForm">
+                <label for="resetUsername">Username</label>
+                <input type="text" id="resetUsername" placeholder="Enter your username" autocomplete="username" required>
+
+                <label for="resetPassword">New Password</label>
+                <div class="password-box">
+                    <input type="password" id="resetPassword" placeholder="At least 6 characters" autocomplete="new-password" minlength="6" required>
+                    <button type="button" class="eye-button" data-password="resetPassword" aria-label="Show password">👁</button>
+                </div>
+
+                <p class="message" id="resetMessage" role="status"></p>
+                <button class="primary-button" type="submit">Update Password</button>
+            </form>
+
+            <p class="switch-text">
+                <button class="inline-button" id="resetBackButton" type="button">Back to Login</button>
+            </p>
+        </section>
+
+        <!-- DASHBOARD: shown only after login -->
+        <section class="dashboard hidden" id="namePage">
+            <header class="dashboard-header">
+                <div>
+                    <p class="eyebrow">YOUR PERSONAL SPACE</p>
+                    <h1>My Dashboard</h1>
+                </div>
+                <button class="logout-button" id="logoutButton" type="button">Log Out</button>
+            </header>
+
+            <section class="welcome-card">
+                <div class="profile-section">
+                    <img id="profilePhoto" class="profile-photo hidden" alt="Your profile photo">
+                    <div id="profilePhotoPlaceholder" class="profile-photo-placeholder">👤</div>
+
+                    <div class="profile-photo-actions">
+                        <label for="profilePhotoInput" class="profile-upload-button">Change Photo</label>
+                        <input type="file" id="profilePhotoInput" accept="image/*" hidden>
+                        <button type="button" id="removeProfilePhoto" class="profile-remove-button">Remove</button>
+                    </div>
+                    <p class="photo-help">Choose an image up to 1 MB</p>
+                </div>
+
+                <div class="welcome-text">
+                    <h2 id="displayName">Welcome!</h2>
+                    <p id="displayName2">Login Successful!</p>
+                    <p id="displayName3">Welcome back.</p>
+                </div>
+            </section>
+
+            <div class="dashboard-grid">
+                <section class="info-card">
+                    <p class="card-label">LOCAL TIME</p>
+                    <h2 id="liveClock">--:--:--</h2>
+                    <p id="liveDate">Loading date...</p>
+                </section>
+
+                <section class="info-card">
+                    <p class="card-label">NOTIFICATION</p>
+                    <h2>You're signed in</h2>
+                    <p id="notification">Welcome! You are logged in.</p>
+                </section>
+            </div>
+
+            <section class="info-card message-card">
+                <p class="card-label">MESSAGE BOX</p>
+                <h2>Write a message</h2>
+                <p class="subtitle">This demo does not send messages to anyone.</p>
+
+                <form id="messageForm">
+                    <label for="userMessage">Your message</label>
+                    <textarea id="userMessage" rows="4" maxlength="1000" placeholder="Type your message here..."></textarea>
+                    <p class="message" id="messageStatus" role="status"></p>
+                    <button class="primary-button" id="sendButton" type="submit">Save Demo Message</button>
+                </form>
+            </section>
+
+            <p class="dashboard-footer">Developed by Arnab Bhowmick</p>
+        </section>
+    </main>
 </body>
 </html>
+
