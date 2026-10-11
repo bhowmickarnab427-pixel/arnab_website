@@ -4,44 +4,33 @@
 }
 
 :root {
-    --background-start: #0f1029;
-    --background-middle: #27205a;
-    --background-end: #3438a5;
-    --card: rgba(22, 24, 54, 0.96);
     --text: #f5f6ff;
     --muted: #b9bdd9;
-    --border: rgba(255, 255, 255, 0.14);
+    --card: rgba(24, 25, 57, 0.97);
     --input: #171a36;
+    --border: rgba(255, 255, 255, 0.16);
     --accent: #8175ff;
-    --accent-dark: #5d51e8;
-}
-
-body.light-theme {
-    --card: rgba(255, 255, 255, 0.97);
-    --text: #20233e;
-    --muted: #656b85;
-    --border: rgba(30, 35, 75, 0.17);
-    --input: #f5f6ff;
 }
 
 body {
     margin: 0;
-    padding: 20px;
     min-height: 100vh;
+    padding: 20px;
     font-family: "Segoe UI", Arial, sans-serif;
     color: var(--text);
-    background: linear-gradient(
-        135deg,
-        var(--background-start),
-        var(--background-middle),
-        var(--background-end)
-    );
+    background: linear-gradient(135deg, #0f1029, #27205a, #3438a5);
     background-attachment: fixed;
 }
 
-button,
-input,
-textarea {
+body.light-theme {
+    --text: #20233e;
+    --muted: #656b85;
+    --card: rgba(255, 255, 255, 0.97);
+    --input: #f5f6ff;
+    --border: rgba(30, 35, 75, 0.17);
+}
+
+button, input, textarea {
     font: inherit;
 }
 
@@ -53,22 +42,22 @@ button {
 .container {
     width: 100%;
     max-width: 760px;
+    min-height: calc(100vh - 40px);
     margin: 0 auto;
-}
-
-.auth-card,
-.panel,
-.dashboard {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .auth-card {
-    max-width: 440px;
-    margin: 35px auto;
+    width: 100%;
+    max-width: 430px;
+    margin: 0 auto;
     padding: 30px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.22);
 }
 
 h1 {
@@ -80,8 +69,7 @@ h2 {
     margin-top: 0;
 }
 
-.subtitle,
-.small-note {
+.subtitle, .small-note {
     color: var(--muted);
     font-size: 14px;
 }
@@ -93,9 +81,7 @@ label {
     font-weight: 600;
 }
 
-input,
-textarea {
-    display: block;
+input, textarea {
     width: 100%;
     min-width: 0;
     padding: 12px;
@@ -106,35 +92,26 @@ textarea {
     outline: none;
 }
 
-input:focus,
-textarea:focus {
+input:focus, textarea:focus {
     border-color: var(--accent);
-    box-shadow: 0 0 0 2px rgba(129, 117, 255, 0.18);
 }
 
-/* Password field and eye button */
 .password-box {
     display: flex;
-    align-items: stretch;
-    gap: 8px;
     width: 100%;
-    min-width: 0;
+    gap: 8px;
+    align-items: stretch;
 }
 
 .password-box input {
-    flex: 1 1 auto;
+    flex: 1;
     width: 0;
     min-width: 0;
     height: 46px;
-    padding: 12px;
-    -webkit-appearance: none;
-    appearance: none;
+    font-size: 16px;
 }
 
 .eye-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     flex: 0 0 46px;
     width: 46px;
     height: 46px;
@@ -144,31 +121,17 @@ textarea:focus {
     border: 1px solid var(--border);
     border-radius: 9px;
     touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
 }
 
-.eye-button svg {
-    width: 22px;
-    height: 22px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    pointer-events: none;
-}
-
-.primary-button,
-.secondary-button {
+.primary-button, .secondary-button {
     padding: 11px 15px;
     border-radius: 9px;
     font-weight: 600;
-    transition: opacity 0.15s;
 }
 
 .primary-button {
     color: white;
-    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    background: linear-gradient(135deg, #8175ff, #5d51e8);
     border: none;
 }
 
@@ -183,12 +146,7 @@ textarea:focus {
     border: 1px solid var(--border);
 }
 
-.primary-button:hover,
-.secondary-button:hover {
-    opacity: 0.88;
-}
-
-.inline-button {
+.link-button {
     padding: 3px;
     color: var(--accent);
     background: transparent;
@@ -198,26 +156,26 @@ textarea:focus {
 
 .center {
     text-align: center;
-    margin-top: 20px;
+    margin-top: 18px;
     font-size: 14px;
 }
 
 .developer {
-    margin-top: 25px;
+    margin-top: 24px;
     color: var(--muted);
     text-align: center;
     font-size: 13px;
 }
 
-.form-message {
-    min-height: 20px;
-    margin: 10px 0 0;
-    color: #65e6a5;
+.message {
+    min-height: 18px;
+    margin: 8px 0 0;
     font-size: 13px;
+    color: #65e6a5;
     overflow-wrap: anywhere;
 }
 
-.form-message.error {
+.message.error {
     color: #ff8e9a;
 }
 
@@ -225,22 +183,23 @@ textarea:focus {
     display: none !important;
 }
 
-/* Dashboard */
 .dashboard {
+    width: 100%;
     padding: 24px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
 }
 
-.topbar,
-.section-heading,
-.profile-area {
+.topbar, .section-heading, .profile-area {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 15px;
+    gap: 14px;
 }
 
 .topbar {
-    margin-bottom: 22px;
+    margin-bottom: 20px;
 }
 
 .topbar h1 {
@@ -249,17 +208,17 @@ textarea:focus {
 
 .topbar p {
     color: var(--muted);
-    margin-top: 0;
 }
 
 .panel {
-    padding: 22px;
     margin: 18px 0;
-    box-shadow: none;
+    padding: 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 15px;
 }
 
 .clock-panel {
-    padding: 28px 16px;
     text-align: center;
 }
 
@@ -269,9 +228,7 @@ textarea:focus {
 }
 
 #clock {
-    margin: 12px 0;
-    font-size: clamp(30px, 7vw, 52px);
-    letter-spacing: 1px;
+    font-size: clamp(30px, 7vw, 50px);
     font-variant-numeric: tabular-nums;
 }
 
@@ -281,47 +238,36 @@ textarea:focus {
 
 .profile-area {
     justify-content: flex-start;
-    margin: 18px 0;
+    margin: 15px 0;
 }
 
 .profile-image {
-    width: 76px;
-    height: 76px;
+    width: 70px;
+    height: 70px;
     flex-shrink: 0;
     object-fit: cover;
     border-radius: 50%;
-    border: 2px solid var(--accent);
     background: var(--input);
-}
-
-.profile-area h3 {
-    margin: 0 0 5px;
+    border: 2px solid var(--accent);
 }
 
 .inline-form {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 15px;
+    gap: 8px;
+    margin-top: 12px;
 }
 
 .inline-form input {
-    flex: 1 1 auto;
+    flex: 1;
     min-width: 0;
 }
 
-.inline-form button {
-    flex-shrink: 0;
-}
-
-.notification-list,
-.task-list {
+ul {
     padding-left: 22px;
 }
 
-.notification-list li,
-.task-list li {
-    padding: 8px 0;
+li {
+    margin: 9px 0;
     overflow-wrap: anywhere;
 }
 
@@ -333,12 +279,10 @@ textarea:focus {
 
 .task-item input {
     width: auto;
-    flex-shrink: 0;
 }
 
 .task-text {
     flex: 1;
-    overflow-wrap: anywhere;
 }
 
 .task-item.completed .task-text {
@@ -351,17 +295,15 @@ textarea:focus {
     z-index: 1000;
     left: 50%;
     bottom: 20px;
-    width: max-content;
     max-width: calc(100% - 30px);
     padding: 12px 18px;
     color: white;
     background: #25264a;
     border-radius: 10px;
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
     opacity: 0;
     pointer-events: none;
     transform: translate(-50%, 12px);
-    transition: opacity 0.2s, transform 0.2s;
+    transition: 0.2s;
 }
 
 .toast.show {
@@ -374,9 +316,12 @@ textarea:focus {
         padding: 12px;
     }
 
+    .container {
+        min-height: calc(100vh - 24px);
+    }
+
     .auth-card {
-        margin: 15px auto;
-        padding: 22px 17px;
+        padding: 23px 17px;
     }
 
     .dashboard {
@@ -384,15 +329,7 @@ textarea:focus {
     }
 
     .panel {
-        padding: 16px;
-    }
-
-    .topbar {
-        align-items: flex-start;
-    }
-
-    .topbar h1 {
-        font-size: 23px;
+        padding: 15px;
     }
 
     .inline-form {
@@ -407,11 +344,7 @@ textarea:focus {
         width: 100%;
     }
 
-    .section-heading {
-        align-items: center;
-    }
-
-    .password-box input {
-        font-size: 16px;
+    .topbar h1 {
+        font-size: 23px;
     }
 }
