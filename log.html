@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,6 +9,7 @@
     <script src="script.js" defer></script>
 </head>
 <body>
+
     <main class="app-container">
 
         <!-- LOGIN PAGE -->
@@ -35,7 +35,9 @@
                             aria-label="Show password">👁</button>
                 </div>
 
-                <p id="loginMessage" class="form-message" aria-live="polite"></p>
+                <p id="loginMessage" class="form-message"
+                   aria-live="polite"></p>
+
                 <button class="primary-button" type="submit">Login</button>
             </form>
 
@@ -80,8 +82,12 @@
                 </div>
 
                 <p class="small-note">Use at least 4 characters for this demo.</p>
-                <p id="signupMessage" class="form-message" aria-live="polite"></p>
-                <button class="primary-button" type="submit">Create Account</button>
+                <p id="signupMessage" class="form-message"
+                   aria-live="polite"></p>
+
+                <button class="primary-button" type="submit">
+                    Create Account
+                </button>
             </form>
 
             <p class="auth-bottom">
@@ -117,7 +123,9 @@
                             aria-label="Show password">👁</button>
                 </div>
 
-                <p id="resetMessage" class="form-message" aria-live="polite"></p>
+                <p id="resetMessage" class="form-message"
+                   aria-live="polite"></p>
+
                 <button class="primary-button" type="submit">
                     Update Password
                 </button>
@@ -156,12 +164,13 @@
                 <span class="cover-label">MY SPACE · MY JOURNEY</span>
             </div>
 
-            <!-- PROFILE PHOTO -->
+            <!-- PROFILE DISPLAY (NO PROFILE EDITOR) -->
             <section class="profile-card">
                 <div class="profile-section">
                     <div class="profile-photo-wrap">
                         <img id="profilePhoto" class="profile-photo hidden"
                              alt="Profile photo">
+
                         <div id="profilePhotoPlaceholder"
                              class="profile-photo-placeholder">A</div>
                     </div>
@@ -181,49 +190,15 @@
                     </label>
                     <input id="profilePhotoInput" type="file"
                            accept="image/*" hidden>
+
                     <button id="removeProfilePhoto" class="secondary-button"
-                            type="button">Remove Photo</button>
-                </div>
-            </section>
-
-            <!-- PROFILE EDITOR -->
-            <section class="info-card">
-                <div class="section-heading">
-                    <div>
-                        <p class="eyebrow">MAKE IT YOURS</p>
-                        <h2>✏️ Edit Profile</h2>
-                    </div>
-                </div>
-
-                <form id="profileEditorForm" class="profile-editor-form">
-                    <label for="profileNameInput">Display name</label>
-                    <input id="profileNameInput" type="text"
-                           maxlength="50" placeholder="Your name" required>
-
-                    <label for="profileBioInput">Bio</label>
-                    <textarea id="profileBioInput" rows="2"
-                              maxlength="240"
-                              placeholder="A short bio about you"></textarea>
-
-                    <label for="profileCourseInput">Course</label>
-                    <input id="profileCourseInput" type="text"
-                           maxlength="100" placeholder="e.g. B.Tech CSE">
-
-                    <label for="profileSkillsInput">Skills (comma separated)</label>
-                    <input id="profileSkillsInput" type="text"
-                           maxlength="240" placeholder="Java, HTML, CSS">
-
-                    <button class="primary-button" type="submit">
-                        Save Profile
+                            type="button">
+                        Remove Photo
                     </button>
-                    <p id="profileEditorStatus" class="form-message"
-                       aria-live="polite"></p>
-                </form>
-
-                <div id="profileExtraView" class="profile-extra-view"></div>
+                </div>
             </section>
 
-            <!-- GREETING AND LIVE CLOCK -->
+            <!-- LIVE CLOCK AND GREETING -->
             <section class="welcome-card">
                 <p class="eyebrow">A NEW DAY, A NEW OPPORTUNITY</p>
                 <h2 id="displayName2">Hello!</h2>
@@ -248,7 +223,9 @@
                         <p class="eyebrow">STAY UPDATED</p>
                         <h2>🔔 Notification Center</h2>
                     </div>
-                    <span id="unreadCount" class="progress-badge">0 unread</span>
+                    <span id="unreadCount" class="progress-badge">
+                        0 unread
+                    </span>
                 </div>
 
                 <p id="notification" aria-live="polite">
@@ -269,7 +246,7 @@
                 <div id="notificationList" class="notification-list"></div>
             </section>
 
-            <!-- ADVANCED DAILY TASK MANAGER -->
+            <!-- DAILY PROGRESS AND TASKS -->
             <section class="info-card">
                 <div class="section-heading">
                     <div>
@@ -289,6 +266,7 @@
 
                 <form id="premiumTaskForm"
                       class="task-form advanced-task-form">
+
                     <input id="premiumTaskInput" type="text"
                            placeholder="What do you want to do today?"
                            maxlength="100" required>
@@ -310,15 +288,16 @@
                 <div id="premiumTaskList" class="task-list"></div>
             </section>
 
-            <!-- WEEKLY STUDY PROGRESS -->
+            <!-- WEEKLY PROGRESS -->
             <section class="info-card">
                 <div class="section-heading">
                     <div>
                         <p class="eyebrow">YOUR CONSISTENCY</p>
                         <h2>📈 Weekly Study Progress</h2>
                     </div>
-                    <span id="weeklyProgressPercent"
-                          class="progress-badge">0%</span>
+                    <span id="weeklyProgressPercent" class="progress-badge">
+                        0%
+                    </span>
                 </div>
 
                 <p id="weeklyTaskCount" class="muted-text">
@@ -345,9 +324,11 @@
                     <textarea id="userMessage"
                               placeholder="Write your thoughts here..."
                               rows="4" maxlength="1000" required></textarea>
+
                     <button id="sendButton" class="primary-button" type="submit">
                         Save Note
                     </button>
+
                     <p id="messageStatus" class="form-message"
                        aria-live="polite"></p>
                 </form>
@@ -366,7 +347,9 @@
                     <p><strong>Goal:</strong> To become a skilled software developer</p>
                 </div>
 
-                <p class="developer-credit">Designed with ❤️ by Arnab Bhowmick</p>
+                <p class="developer-credit">
+                    Designed with ❤️ by Arnab Bhowmick
+                </p>
             </section>
 
             <footer class="dashboard-footer">
@@ -375,9 +358,11 @@
             </footer>
 
         </section>
+
     </main>
 
     <div id="toastContainer" class="toast-container"
          aria-live="polite" aria-atomic="true"></div>
+
 </body>
 </html>
