@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
@@ -8,12 +7,12 @@
     --panel2: #202449;
     --text: #f5f6ff;
     --muted: #aab1d2;
-    --line: rgba(255, 255, 255, .12);
+    --line: rgba(255,255,255,.12);
     --accent: #8b8cff;
     --accent2: #b184ff;
     --green: #38d996;
     --danger: #ff7187;
-    --shadow: 0 20px 55px rgba(0, 0, 0, .28);
+    --shadow: 0 20px 55px rgba(0,0,0,.28);
 }
 
 * {
@@ -24,7 +23,7 @@ body {
     margin: 0;
     min-height: 100vh;
     padding: 24px 14px;
-    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    font-family: Inter, Segoe UI, Arial, sans-serif;
     background:
         radial-gradient(circle at 15% 0, #29245b 0, transparent 36%),
         linear-gradient(135deg, #0b1021, #17132f 60%, #10172c);
@@ -43,7 +42,7 @@ button:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-    outline: 3px solid rgba(139, 140, 255, .5);
+    outline: 3px solid rgba(139,140,255,.5);
     outline-offset: 2px;
 }
 
@@ -61,7 +60,7 @@ select:focus-visible {
 .info-card,
 .welcome-card,
 .profile-card {
-    background: linear-gradient(145deg, rgba(29, 33, 67, .96), rgba(20, 23, 48, .96));
+    background: linear-gradient(145deg, rgba(29,33,67,.96), rgba(20,23,48,.96));
     border: 1px solid var(--line);
     border-radius: 22px;
     box-shadow: var(--shadow);
@@ -134,7 +133,7 @@ select {
     border: 1px solid var(--line);
     border-radius: 11px;
     padding: 12px 13px;
-    background: rgba(7, 10, 28, .55);
+    background: rgba(7,10,28,.55);
     color: var(--text);
     outline: none;
 }
@@ -281,8 +280,8 @@ textarea {
     margin-bottom: -40px;
 }
 
-.cover-banner::after {
-    content: "";
+.cover-banner:after {
+    content: '';
     position: absolute;
     width: 250px;
     height: 250px;
@@ -484,7 +483,11 @@ textarea {
 }
 
 .advanced-task-form {
-    grid-template-columns: minmax(150px, 1fr) minmax(125px, .5fr) minmax(135px, .6fr) auto;
+    grid-template-columns:
+        minmax(150px, 1fr)
+        minmax(125px, .5fr)
+        minmax(135px, .6fr)
+        auto;
     align-items: center;
 }
 
@@ -572,20 +575,6 @@ textarea {
 
 .task-actions .delete-task {
     color: #ff9bab;
-}
-
-.profile-editor-form {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2px;
-}
-
-.profile-extra-view {
-    font-size: 12px;
-    color: var(--muted);
-    line-height: 1.7;
-    margin-top: 10px;
-    overflow-wrap: anywhere;
 }
 
 .notification-actions {
@@ -742,7 +731,7 @@ textarea {
     --panel2: #eef0ff;
     --text: #1c2240;
     --muted: #626b8e;
-    --line: rgba(32, 42, 90, .15);
+    --line: rgba(32,42,90,.15);
     background:
         radial-gradient(circle at 15% 0, #e0ddff 0, transparent 36%),
         linear-gradient(135deg, #f8f9ff, #eef0ff 60%, #e9efff);
@@ -753,7 +742,7 @@ textarea {
 .light-mode .info-card,
 .light-mode .welcome-card,
 .light-mode .profile-card {
-    background: rgba(255, 255, 255, .88);
+    background: rgba(255,255,255,.88);
     color: var(--text);
 }
 
