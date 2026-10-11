@@ -1,14 +1,5 @@
-/* =========================================
-   ARNAB'S PERSONAL WEBSITE
-   Login + Profile + Clock + Daily Tasks
-   Theme + Notifications + Personal Notes
-========================================= */
 
 document.addEventListener("DOMContentLoaded", function () {
-
-    // =====================================
-    // 1. GET HTML ELEMENTS
-    // =====================================
 
     const loginPage = document.getElementById("loginPage");
     const signupPage = document.getElementById("signupPage");
@@ -59,11 +50,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const userMessage = document.getElementById("userMessage");
     const toastContainer = document.getElementById("toastContainer");
 
-
-    // =====================================
-    // 2. APP VARIABLES
-    // =====================================
-
     let currentUsername = "";
     let clockInterval = null;
     let toastTimer = null;
@@ -71,11 +57,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const STORAGE_ACCOUNTS = "arnabAccounts";
     const STORAGE_THEME = "arnabTheme";
-
-
-    // =====================================
-    // 3. PAGE NAVIGATION
-    // =====================================
 
     function showPage(page) {
         [loginPage, signupPage, resetPage, dashboard].forEach(function (item) {
@@ -86,26 +67,17 @@ document.addEventListener("DOMContentLoaded", function () {
         window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-
-    // =====================================
-    // 4. TOAST NOTIFICATIONS
-    // =====================================
-
     function showToast(message, type) {
         if (!toastContainer) return;
 
-        if (toastTimer) {
-            clearTimeout(toastTimer);
-        }
+        if (toastTimer) clearTimeout(toastTimer);
 
         toastContainer.replaceChildren();
 
         const toast = document.createElement("div");
         toast.className = "toast";
 
-        if (type === "error") {
-            toast.classList.add("error");
-        }
+        if (type === "error") toast.classList.add("error");
 
         toast.textContent = message;
         toastContainer.appendChild(toast);
@@ -115,18 +87,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 3000);
     }
 
-
     function showFormMessage(element, message, isError) {
         if (!element) return;
 
         element.textContent = message;
         element.style.color = isError ? "#fca5a5" : "#86efac";
     }
-
-
-    // =====================================
-    // 5. ACCOUNT STORAGE
-    // =====================================
 
     function getAccounts() {
         try {
@@ -140,7 +106,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-
     function saveAccounts(accounts) {
         localStorage.setItem(
             STORAGE_ACCOUNTS,
@@ -148,11 +113,9 @@ document.addEventListener("DOMContentLoaded", function () {
         );
     }
 
-
     function normaliseUsername(username) {
         return username.trim().toLowerCase();
     }
-
 
     function getAccount() {
         return getAccounts().find(function (account) {
@@ -161,13 +124,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-
-    // =====================================
-    // 6. SHOW / HIDE PASSWORD
-    // =====================================
+    /* PASSWORD EYE ICON */
 
     document.querySelectorAll(".eye-button").forEach(function (button) {
-
         button.addEventListener("click", function () {
             const inputId = button.getAttribute("data-password");
             const passwordInput = document.getElementById(inputId);
@@ -184,13 +143,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 button.setAttribute("aria-label", "Show password");
             }
         });
-
     });
 
-
-    // =====================================
-    // 7. SIGN UP
-    // =====================================
+    /* SIGN UP */
 
     document.getElementById("signupButton").addEventListener("click", function () {
         signupForm.reset();
@@ -198,12 +153,10 @@ document.addEventListener("DOMContentLoaded", function () {
         showPage(signupPage);
     });
 
-
     document.getElementById("backButton").addEventListener("click", function () {
         showFormMessage(loginMessage, "", false);
         showPage(loginPage);
     });
-
 
     signupForm.addEventListener("submit", function (event) {
         event.preventDefault();
@@ -220,10 +173,10 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        if (password.length < 4) {
+        if (password.length < 6) {
             showFormMessage(
                 signupMessage,
-                "Password must contain at least 4 characters.",
+                "Password must contain at least 6 characters.",
                 true
             );
             return;
@@ -274,10 +227,7 @@ document.addEventListener("DOMContentLoaded", function () {
         showToast("Account created successfully!");
     });
 
-
-    // =====================================
-    // 8. LOGIN
-    // =====================================
+    /* LOGIN */
 
     loginForm.addEventListener("submit", function (event) {
         event.preventDefault();
@@ -301,39 +251,28 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         currentUsername = account.username;
-
         loginPassword.value = "";
         showFormMessage(loginMessage, "", false);
 
         loadDashboard();
-
         showPage(dashboard);
         showToast("Welcome back, " + currentUsername + "!");
     });
 
-
-    // =====================================
-    // 9. FORGOT PASSWORD
-    // =====================================
+    /* FORGOT PASSWORD */
 
     document.getElementById("forgotPasswordButton")
         .addEventListener("click", function () {
-
             resetForm.reset();
             showFormMessage(resetMessage, "", false);
             showPage(resetPage);
-
         });
-
 
     document.getElementById("resetBackButton")
         .addEventListener("click", function () {
-
             showFormMessage(loginMessage, "", false);
             showPage(loginPage);
-
         });
-
 
     resetForm.addEventListener("submit", function (event) {
         event.preventDefault();
@@ -341,10 +280,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const username = resetUsername.value.trim();
         const newPassword = resetPassword.value;
 
-        if (newPassword.length < 4) {
+        if (newPassword.length < 6) {
             showFormMessage(
                 resetMessage,
-                "Password must contain at least 4 characters.",
+                "Password must contain at least 6 characters.",
                 true
             );
             return;
@@ -358,11 +297,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         if (accountIndex === -1) {
-            showFormMessage(
-                resetMessage,
-                "Username not found.",
-                true
-            );
+            showFormMessage(resetMessage, "Username not found.", true);
             return;
         }
 
@@ -381,7 +316,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         resetForm.reset();
         loginUsername.value = username;
-
         showPage(loginPage);
 
         showFormMessage(
@@ -393,10 +327,7 @@ document.addEventListener("DOMContentLoaded", function () {
         showToast("Password updated successfully!");
     });
 
-
-    // =====================================
-    // 10. GREETING
-    // =====================================
+    /* GREETING */
 
     function updateGreeting() {
         const hour = new Date().getHours();
@@ -423,10 +354,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-
-    // =====================================
-    // 11. LIVE CLOCK AND DATE
-    // =====================================
+    /* LIVE CLOCK AND DATE */
 
     function updateClock() {
         const now = new Date();
@@ -452,15 +380,11 @@ document.addEventListener("DOMContentLoaded", function () {
         updateGreeting();
     }
 
-
-    // =====================================
-    // 12. PROFILE PHOTO
-    // =====================================
+    /* EACH USER'S PROFILE PHOTO */
 
     function photoStorageKey() {
         return "arnabProfilePhoto_" + normaliseUsername(currentUsername);
     }
-
 
     function loadProfilePhoto() {
         if (!currentUsername) return;
@@ -475,12 +399,10 @@ document.addEventListener("DOMContentLoaded", function () {
             profilePhoto.removeAttribute("src");
             profilePhoto.classList.add("hidden");
             profilePhotoPlaceholder.classList.remove("hidden");
-
             profilePhotoPlaceholder.textContent =
                 currentUsername.charAt(0).toUpperCase();
         }
     }
-
 
     profilePhotoInput.addEventListener("change", function () {
         const file = profilePhotoInput.files[0];
@@ -524,17 +446,13 @@ document.addEventListener("DOMContentLoaded", function () {
         reader.readAsDataURL(file);
     });
 
-
     removeProfilePhoto.addEventListener("click", function () {
         localStorage.removeItem(photoStorageKey());
         loadProfilePhoto();
         showToast("Profile photo removed.");
     });
 
-
-    // =====================================
-    // 13. DARK / LIGHT MODE
-    // =====================================
+    /* DARK AND LIGHT THEME */
 
     function applyTheme() {
         const savedTheme = localStorage.getItem(STORAGE_THEME);
@@ -546,10 +464,6 @@ document.addEventListener("DOMContentLoaded", function () {
             ? "🌙 Dark Mode"
             : "☀️ Light Mode";
     }
-
-
-    applyTheme();
-
 
     themeButton.addEventListener("click", function () {
         const isLight = document.body.classList.toggle("light-mode");
@@ -566,10 +480,7 @@ document.addEventListener("DOMContentLoaded", function () {
         showToast(isLight ? "Light mode enabled." : "Dark mode enabled.");
     });
 
-
-    // =====================================
-    // 14. DAILY TASK STORAGE
-    // =====================================
+    /* DAILY TASKS */
 
     function getTodayKey() {
         const date = new Date();
@@ -584,7 +495,6 @@ document.addEventListener("DOMContentLoaded", function () {
             normaliseUsername(currentUsername) + "_" + dateString;
     }
 
-
     function loadTasks() {
         try {
             const savedTasks = JSON.parse(
@@ -597,20 +507,15 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-
     function saveTasks() {
         try {
-            localStorage.setItem(
-                getTodayKey(),
-                JSON.stringify(tasks)
-            );
+            localStorage.setItem(getTodayKey(), JSON.stringify(tasks));
             return true;
         } catch (error) {
             showToast("Unable to save tasks in this browser.", "error");
             return false;
         }
     }
-
 
     function renderTasks() {
         taskList.replaceChildren();
@@ -623,9 +528,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const row = document.createElement("div");
             row.className = "task-row";
 
-            if (task.done) {
-                row.classList.add("completed");
-            }
+            if (task.done) row.classList.add("completed");
 
             const checkbox = document.createElement("input");
             checkbox.type = "checkbox";
@@ -633,9 +536,33 @@ document.addEventListener("DOMContentLoaded", function () {
             checkbox.checked = task.done;
             checkbox.setAttribute("aria-label", "Mark task as complete");
 
+            const taskContent = document.createElement("div");
+            taskContent.className = "task-content";
+
             const taskText = document.createElement("span");
             taskText.className = "task-text";
             taskText.textContent = task.text;
+
+            const taskMeta = document.createElement("small");
+            taskMeta.className = "task-meta";
+
+            const taskDate = task.createdAt
+                ? new Date(task.createdAt)
+                : new Date();
+
+            taskMeta.textContent = "🕒 " +
+                taskDate.toLocaleDateString(undefined, {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric"
+                }) + " · " +
+                taskDate.toLocaleTimeString(undefined, {
+                    hour: "2-digit",
+                    minute: "2-digit"
+                });
+
+            taskContent.appendChild(taskText);
+            taskContent.appendChild(taskMeta);
 
             const deleteButton = document.createElement("button");
             deleteButton.type = "button";
@@ -660,9 +587,8 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             row.appendChild(checkbox);
-            row.appendChild(taskText);
+            row.appendChild(taskContent);
             row.appendChild(deleteButton);
-
             taskList.appendChild(row);
         });
 
@@ -690,7 +616,6 @@ document.addEventListener("DOMContentLoaded", function () {
         progressPercent.textContent = percentage + "%";
     }
 
-
     taskForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
@@ -703,7 +628,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         tasks.push({
             text: value,
-            done: false
+            done: false,
+            createdAt: new Date().toISOString()
         });
 
         if (saveTasks()) {
@@ -716,30 +642,22 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-
-    // =====================================
-    // 15. PERSONAL NOTES
-    // =====================================
+    /* PERSONAL NOTES */
 
     function noteStorageKey() {
         return "arnabPersonalNote_" + normaliseUsername(currentUsername);
     }
-
 
     function loadNote() {
         userMessage.value =
             localStorage.getItem(noteStorageKey()) || "";
     }
 
-
     messageForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
         try {
-            localStorage.setItem(
-                noteStorageKey(),
-                userMessage.value
-            );
+            localStorage.setItem(noteStorageKey(), userMessage.value);
 
             showFormMessage(
                 messageStatus,
@@ -757,10 +675,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-
-    // =====================================
-    // 16. LOAD DASHBOARD
-    // =====================================
+    /* LOAD DASHBOARD */
 
     function loadDashboard() {
         const account = getAccount();
@@ -771,7 +686,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         currentUsername = account.username;
-
         displayName.textContent = currentUsername;
 
         if (displayName2) {
@@ -783,9 +697,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "You are logged in as " + currentUsername + ".";
         }
 
-        if (clockInterval) {
-            clearInterval(clockInterval);
-        }
+        if (clockInterval) clearInterval(clockInterval);
 
         updateClock();
         clockInterval = setInterval(updateClock, 1000);
@@ -802,10 +714,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-
-    // =====================================
-    // 17. LOGOUT
-    // =====================================
+    /* LOG OUT */
 
     logoutButton.addEventListener("click", function () {
         if (clockInterval) {
@@ -831,12 +740,6 @@ document.addEventListener("DOMContentLoaded", function () {
         showToast("You have logged out.");
     });
 
-
-    // =====================================
-    // 18. START WEBSITE
-    // =====================================
-
     applyTheme();
     showPage(loginPage);
-
 });
