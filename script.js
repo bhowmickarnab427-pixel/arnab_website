@@ -1,400 +1,855 @@
+/* ==============================
+   ARNAB'S PERSONAL WEBSITE
+   Complete Responsive CSS
+================================= */
 
-document.addEventListener("DOMContentLoaded", function () {
-    const $ = id => document.getElementById(id);
+:root {
+    --bg1: #0e1024;
+    --bg2: #29245c;
+    --card: rgba(255, 255, 255, 0.08);
+    --border: rgba(255, 255, 255, 0.14);
+    --text: #f8fafc;
+    --muted: #b8bdd3;
+    --accent: #8b5cf6;
+    --accent2: #06b6d4;
+    --input: rgba(255, 255, 255, 0.07);
+    --shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+}
 
-    function showPage(id) {
-        ["loginPage", "signupPage", "resetPage", "dashboardPage"].forEach(page => {
-            $(page).classList.add("hidden");
-        });
-        $(id).classList.remove("hidden");
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    padding: 30px 16px;
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: var(--text);
+    background:
+        radial-gradient(circle at 10% 10%, rgba(124, 58, 237, .24), transparent 35%),
+        radial-gradient(circle at 90% 85%, rgba(6, 182, 212, .16), transparent 32%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+    transition: background .3s ease, color .3s ease;
+}
+
+button,
+input,
+textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+.upload-button:focus-within {
+    outline: 2px solid #67e8f9;
+    outline-offset: 3px;
+}
+
+.hidden,
+[hidden] {
+    display: none !important;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* LOGIN / SIGNUP / RESET */
+
+.auth-card {
+    width: 100%;
+    max-width: 440px;
+    margin: 25px auto;
+    padding: 34px;
+    border: 1px solid var(--border);
+    border-radius: 25px;
+    background: var(--card);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    animation: appear .4s ease;
+}
+
+@keyframes appear {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.brand-icon {
+    display: grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    margin-bottom: 24px;
+    border-radius: 18px;
+    font-size: 27px;
+    font-weight: 800;
+    color: white;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    box-shadow: 0 8px 22px rgba(124, 58, 237, .3);
+}
+
+.eyebrow {
+    margin: 0 0 8px;
+    color: #a5b4fc;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.auth-card h1,
+.dashboard-header h1 {
+    margin: 0;
+    font-size: clamp(25px, 4vw, 32px);
+    line-height: 1.25;
+}
+
+.subtitle {
+    margin: 12px 0 26px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.auth-card form > label {
+    display: block;
+    margin: 18px 0 8px;
+    font-size: 13px;
+    font-weight: 650;
+}
+
+.auth-card input,
+.task-form input,
+.info-card textarea {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    padding: 13px 14px;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    outline: none;
+    color: var(--text);
+    background: var(--input);
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.auth-card input:focus,
+.task-form input:focus,
+.info-card textarea:focus {
+    border-color: var(--accent2);
+    box-shadow: 0 0 0 3px rgba(6, 182, 212, .12);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--muted);
+    opacity: .8;
+}
+
+.password-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-box input {
+    padding-right: 52px;
+}
+
+.eye-button {
+    position: absolute;
+    right: 7px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    color: var(--text);
+    background: transparent;
+    font-size: 18px;
+}
+
+.eye-button:hover {
+    background: rgba(255, 255, 255, .1);
+}
+
+.primary-button,
+.logout-button,
+.secondary-button,
+.upload-button,
+.theme-toggle,
+.text-button,
+.inline-button {
+    border: 0;
+    border-radius: 11px;
+    font-weight: 700;
+    transition: transform .2s, filter .2s, background .2s;
+}
+
+.primary-button {
+    width: 100%;
+    margin-top: 18px;
+    padding: 14px 18px;
+    color: white;
+    background: linear-gradient(110deg, var(--accent), #6366f1, var(--accent2));
+    box-shadow: 0 7px 20px rgba(99, 102, 241, .2);
+}
+
+.primary-button:hover,
+.logout-button:hover,
+.upload-button:hover,
+.theme-toggle:hover,
+.secondary-button:hover {
+    filter: brightness(1.12);
+    transform: translateY(-1px);
+}
+
+.text-button {
+    display: block;
+    margin: 17px auto;
+    padding: 7px;
+    color: #c4b5fd;
+    background: transparent;
+}
+
+.inline-button {
+    padding: 4px;
+    color: #c4b5fd;
+    background: transparent;
+}
+
+.auth-bottom {
+    margin-top: 22px;
+    color: var(--muted);
+    font-size: 13px;
+    text-align: center;
+    line-height: 1.9;
+}
+
+.developer-credit {
+    margin: 28px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+}
+
+.developer-credit strong {
+    color: var(--text);
+}
+
+.small-note {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.form-message {
+    min-height: 0;
+    margin: 10px 0 0;
+    color: #fca5a5;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.form-message:empty {
+    display: none;
+}
+
+/* DASHBOARD */
+
+.dashboard {
+    animation: appear .4s ease;
+}
+
+.dashboard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin: 0 0 20px;
+}
+
+.dashboard-header h1 {
+    font-size: clamp(26px, 5vw, 35px);
+}
+
+.logout-button {
+    flex-shrink: 0;
+    padding: 11px 16px;
+    color: white;
+    background: #dc2626;
+}
+
+.theme-toggle {
+    display: block;
+    margin: 0 0 16px auto;
+    padding: 10px 15px;
+    color: var(--text);
+    border: 1px solid var(--border);
+    background: var(--card);
+}
+
+/* COVER */
+
+.cover-banner {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-height: 150px;
+    margin-bottom: 22px;
+    padding: 22px;
+    overflow: hidden;
+    border-radius: 22px;
+    background: linear-gradient(120deg, #7c3aed, #4338ca, #0891b2);
+    box-shadow: var(--shadow);
+}
+
+.cover-banner::before,
+.cover-banner::after {
+    position: absolute;
+    content: "";
+    border: 2px solid rgba(255, 255, 255, .18);
+    border-radius: 50%;
+}
+
+.cover-banner::before {
+    width: 240px;
+    height: 240px;
+    right: -20px;
+    top: -130px;
+}
+
+.cover-banner::after {
+    width: 150px;
+    height: 150px;
+    right: 150px;
+    bottom: -110px;
+}
+
+.cover-label {
+    position: relative;
+    z-index: 1;
+    color: white;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+/* PROFILE */
+
+.profile-card,
+.welcome-card,
+.info-card {
+    margin-bottom: 20px;
+    padding: 24px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--card);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.profile-section {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.profile-photo-wrap {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 94px;
+    height: 94px;
+    overflow: hidden;
+    border: 3px solid rgba(196, 181, 253, .7);
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed, #0891b2);
+}
+
+.profile-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-photo-placeholder {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    color: white;
+    font-size: 34px;
+    font-weight: 800;
+}
+
+.profile-info {
+    min-width: 0;
+}
+
+.profile-info h2 {
+    margin: 0 0 8px;
+    overflow-wrap: anywhere;
+    font-size: 25px;
+}
+
+.muted-text {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.profile-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.upload-button,
+.secondary-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 14px;
+    color: var(--text);
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, .08);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.secondary-button {
+    background: transparent;
+}
+
+/* WELCOME AND CLOCK */
+
+.welcome-card {
+    padding: 28px;
+    background: linear-gradient(125deg, rgba(124, 58, 237, .22),
+        rgba(6, 182, 212, .10));
+}
+
+.welcome-card h2 {
+    margin: 6px 0;
+    font-size: clamp(25px, 4vw, 32px);
+}
+
+.welcome-card > p:not(.eyebrow) {
+    color: var(--muted);
+}
+
+.clock-box {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 25px;
+    padding-top: 22px;
+    border-top: 1px solid var(--border);
+}
+
+.clock-label {
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.3px;
+}
+
+#liveClock {
+    margin: 9px 0 0;
+    font-size: clamp(21px, 4vw, 30px);
+    font-variant-numeric: tabular-nums;
+}
+
+#liveDate {
+    margin-top: 12px;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* INFO CARDS */
+
+.info-card h3 {
+    margin: 0 0 12px;
+}
+
+.info-card h2 {
+    margin: 5px 0 12px;
+    font-size: 22px;
+}
+
+.info-card > p {
+    line-height: 1.7;
+}
+
+/* PROGRESS TRACKER */
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.progress-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 55px;
+    padding: 8px 12px;
+    border-radius: 20px;
+    color: white;
+    background: linear-gradient(120deg, var(--accent), var(--accent2));
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.progress-track {
+    width: 100%;
+    height: 12px;
+    margin: 15px 0 22px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: rgba(128, 128, 128, .25);
+}
+
+.progress-fill {
+    width: 0;
+    height: 100%;
+    border-radius: 20px;
+    background: linear-gradient(90deg, #8b5cf6, #06b6d4);
+    transition: width .3s ease;
+}
+
+.task-form {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+}
+
+.task-form input {
+    flex: 1;
+}
+
+.add-task-button {
+    width: auto;
+    flex-shrink: 0;
+    margin: 0;
+    padding: 12px 17px;
+}
+
+.task-list {
+    margin-top: 18px;
+}
+
+.task-row {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-top: 10px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .035);
+}
+
+.task-checkbox {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    accent-color: #8b5cf6;
+    cursor: pointer;
+}
+
+.task-text {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    font-size: 14px;
+}
+
+.task-row.completed .task-text {
+    text-decoration: line-through;
+    opacity: .55;
+}
+
+.task-delete {
+    flex-shrink: 0;
+    padding: 7px 10px;
+    border: 0;
+    border-radius: 8px;
+    color: white;
+    background: #dc2626;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.empty-tasks {
+    padding: 15px 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+/* NOTES */
+
+.info-card textarea {
+    resize: vertical;
+    min-height: 110px;
+    line-height: 1.6;
+}
+
+/* ABOUT DEVELOPER */
+
+.about-card {
+    text-align: center;
+}
+
+.about-avatar {
+    display: grid;
+    place-items: center;
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 20px;
+    border: 1px solid var(--border);
+    border-radius: 23px;
+    color: white;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    font-size: 25px;
+    font-weight: 800;
+}
+
+.developer-details {
+    margin: 20px auto;
+    max-width: 520px;
+    text-align: left;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+}
+
+.developer-details p {
+    margin: 9px 0;
+}
+
+.developer-details strong {
+    color: #c4b5fd;
+}
+
+.dashboard-footer {
+    padding: 18px 10px;
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+    line-height: 1.7;
+}
+
+/* TOAST NOTIFICATIONS */
+
+.toast-container {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: min(360px, calc(100% - 40px));
+    pointer-events: none;
+}
+
+.toast {
+    padding: 14px 18px;
+    border: 1px solid rgba(255, 255, 255, .16);
+    border-radius: 13px;
+    color: white;
+    background: #166534;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
+    font-size: 13px;
+    line-height: 1.5;
+    animation: toastIn .25s ease;
+}
+
+.toast.error {
+    background: #991b1b;
+}
+
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* LIGHT MODE */
+
+body.light-mode {
+    --bg1: #eef2ff;
+    --bg2: #dbeafe;
+    --card: rgba(255, 255, 255, .86);
+    --border: rgba(30, 41, 59, .12);
+    --text: #172033;
+    --muted: #596579;
+    --input: rgba(255, 255, 255, .85);
+    --shadow: 0 15px 40px rgba(31, 41, 55, .08);
+}
+
+body.light-mode {
+    background:
+        radial-gradient(circle at 10% 10%, rgba(167, 139, 250, .24), transparent 35%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+}
+
+body.light-mode .cover-banner {
+    background: linear-gradient(120deg, #8b5cf6, #4f46e5, #0891b2);
+}
+
+body.light-mode .welcome-card {
+    background: linear-gradient(125deg, rgba(124, 58, 237, .09),
+        rgba(6, 182, 212, .07));
+}
+
+body.light-mode .task-row {
+    background: rgba(255, 255, 255, .55);
+}
+
+body.light-mode .eyebrow,
+body.light-mode .developer-details strong {
+    color: #6d28d9;
+}
+
+body.light-mode .inline-button,
+body.light-mode .text-button {
+    color: #6d28d9;
+}
+
+/* MOBILE RESPONSIVE */
+
+@media (max-width: 600px) {
+    body {
+        padding: 15px 10px;
     }
 
-    function say(id, text, error = false) {
-        $(id).textContent = text;
-        $(id).classList.toggle("error", error);
+    .auth-card {
+        margin: 10px auto;
+        padding: 24px 19px;
+        border-radius: 20px;
     }
 
-    function notify(text) {
-        $("toast").textContent = text;
-        $("toast").classList.add("show");
-        clearTimeout(notify.timer);
-        notify.timer = setTimeout(() => $("toast").classList.remove("show"), 2400);
+    .dashboard-header {
+        align-items: flex-start;
     }
 
-    function getData(key, fallback) {
-        try {
-            const value = localStorage.getItem(key);
-            return value === null ? fallback : JSON.parse(value);
-        } catch (error) {
-            return fallback;
-        }
+    .logout-button {
+        padding: 10px 12px;
+        font-size: 12px;
     }
 
-    function putData(key, value) {
-        try {
-            localStorage.setItem(key, JSON.stringify(value));
-            return true;
-        } catch (error) {
-            notify("Unable to save data in this browser.");
-            return false;
-        }
+    .cover-banner {
+        min-height: 110px;
+        padding: 16px;
+        border-radius: 17px;
     }
 
-    function getAccounts() {
-        const data = getData("arnabAccounts", []);
-        if (Array.isArray(data)) return data;
-
-        if (data && typeof data === "object") {
-            return Object.keys(data).map(username => ({
-                username,
-                password: String(
-                    typeof data[username] === "object"
-                        ? data[username].password || ""
-                        : data[username]
-                )
-            }));
-        }
-        return [];
+    .profile-card,
+    .welcome-card,
+    .info-card {
+        padding: 18px;
+        border-radius: 17px;
     }
 
-    function saveAccounts(accounts) {
-        return putData("arnabAccounts", accounts);
+    .profile-section {
+        align-items: flex-start;
+        gap: 14px;
     }
 
-    function user() {
-        return sessionStorage.getItem("arnabCurrentUser") || "";
+    .profile-photo-wrap {
+        width: 72px;
+        height: 72px;
     }
 
-    function userKey(name) {
-        return "arnab_" + name + "_" + user();
+    .profile-info h2 {
+        font-size: 20px;
     }
 
-    // Password eye button: works with mouse and touch.
-    document.querySelectorAll("[data-password]").forEach(button => {
-        button.addEventListener("click", function () {
-            const input = $(button.dataset.password);
-            const show = input.type === "password";
-            input.type = show ? "text" : "password";
-            button.textContent = show ? "🙈" : "👁";
-            button.setAttribute("aria-pressed", String(show));
-        });
-    });
-
-    // Navigation
-    $("signupButton").addEventListener("click", () => {
-        $("signupForm").reset();
-        say("signupMessage", "");
-        showPage("signupPage");
-    });
-
-    $("backButton").addEventListener("click", () => showPage("loginPage"));
-    $("resetBackButton").addEventListener("click", () => showPage("loginPage"));
-
-    $("forgotPasswordButton").addEventListener("click", () => {
-        $("resetForm").reset();
-        say("resetMessage", "");
-        showPage("resetPage");
-    });
-
-    // CREATE ACCOUNT: simple password allowed, including 1234.
-    $("signupForm").addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        const username = $("signupUsername").value.trim();
-        const password = $("signupPassword").value;
-
-        if (!username) {
-            say("signupMessage", "Please enter a username.", true);
-            return;
-        }
-
-        const accounts = getAccounts();
-
-        if (accounts.some(account =>
-            String(account.username).toLowerCase() === username.toLowerCase()
-        )) {
-            say("signupMessage", "Username already exists. Please log in.", true);
-            return;
-        }
-
-        accounts.push({ username: username, password: password });
-
-        if (!saveAccounts(accounts)) {
-            say("signupMessage", "Account could not be saved.", true);
-            return;
-        }
-
-        $("signupForm").reset();
-        $("loginUsername").value = username;
-        say("loginMessage", "Account created successfully! Now log in.");
-        showPage("loginPage");
-        notify("Account created successfully!");
-    });
-
-    // LOGIN
-    $("loginForm").addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        const username = $("loginUsername").value.trim();
-        const password = $("loginPassword").value;
-
-        const account = getAccounts().find(item =>
-            String(item.username).toLowerCase() === username.toLowerCase() &&
-            String(item.password) === password
-        );
-
-        if (!account) {
-            say("loginMessage", "Wrong username or password.", true);
-            return;
-        }
-
-        sessionStorage.setItem("arnabCurrentUser", account.username);
-        $("loginForm").reset();
-        openDashboard(account.username);
-    });
-
-    // RESET PASSWORD: demo only; it does not verify email ownership.
-    $("resetForm").addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        const username = $("resetUsername").value.trim();
-        const password = $("newPassword").value;
-        const accounts = getAccounts();
-
-        const index = accounts.findIndex(account =>
-            String(account.username).toLowerCase() === username.toLowerCase()
-        );
-
-        if (index === -1) {
-            say("resetMessage", "Username not found.", true);
-            return;
-        }
-
-        accounts[index].password = password;
-
-        if (!saveAccounts(accounts)) return;
-
-        $("resetForm").reset();
-        $("loginUsername").value = username;
-        say("loginMessage", "Password updated. Please log in.");
-        showPage("loginPage");
-        notify("Password updated.");
-    });
-
-    // Dashboard
-    function openDashboard(username) {
-        $("welcomeText").textContent = "Welcome, " + username + "!";
-        $("profileName").textContent = username;
-        loadPhoto();
-        loadNotifications();
-        loadTasks();
-        loadNotes();
-        showPage("dashboardPage");
-        updateClock();
-        notify("Login successful!");
+    .profile-info .muted-text {
+        margin-bottom: 0;
     }
 
-    $("logoutButton").addEventListener("click", function () {
-        sessionStorage.removeItem("arnabCurrentUser");
-        showPage("loginPage");
-        say("loginMessage", "You have logged out.");
-    });
-
-    // Live clock, date and greeting
-    function updateClock() {
-        const now = new Date();
-        const hour = now.getHours();
-
-        $("clock").textContent = now.toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            hour12: true
-        });
-
-        $("dateText").textContent = now.toLocaleDateString([], {
-            weekday: "long",
-            day: "numeric",
-            month: "long",
-            year: "numeric"
-        });
-
-        let greeting;
-        if (hour >= 5 && hour < 12) greeting = "Good morning";
-        else if (hour >= 12 && hour < 17) greeting = "Good afternoon";
-        else if (hour >= 17 && hour < 21) greeting = "Good evening";
-        else greeting = "Good night";
-
-        $("greeting").textContent = greeting + ", " + (user() || "Guest") + "!";
+    .profile-actions {
+        gap: 8px;
     }
 
-    updateClock();
-    setInterval(updateClock, 1000);
-
-    // Profile photo
-    function loadPhoto() {
-        const photo = getData(userKey("photo"), "");
-        if (photo) $("profileImage").src = photo;
-        else $("profileImage").removeAttribute("src");
+    .clock-box {
+        gap: 10px;
     }
 
-    $("photoInput").addEventListener("change", function () {
-        const file = this.files[0];
-        if (!file) return;
-
-        if (!file.type.startsWith("image/")) {
-            notify("Please select an image.");
-            this.value = "";
-            return;
-        }
-
-        if (file.size > 1024 * 1024) {
-            notify("Please choose an image under 1 MB.");
-            this.value = "";
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = () => {
-            if (putData(userKey("photo"), reader.result)) {
-                loadPhoto();
-                notify("Photo updated.");
-            }
-        };
-        reader.readAsDataURL(file);
-    });
-
-    $("removePhotoButton").addEventListener("click", function () {
-        localStorage.removeItem(userKey("photo"));
-        $("photoInput").value = "";
-        loadPhoto();
-        notify("Photo removed.");
-    });
-
-    // Notifications
-    function loadNotifications() {
-        const list = $("notificationList");
-        list.replaceChildren();
-
-        getData(userKey("notifications"), []).forEach(item => {
-            const li = document.createElement("li");
-            li.textContent = item;
-            list.appendChild(li);
-        });
+    .task-form {
+        flex-direction: column;
     }
 
-    $("notificationForm").addEventListener("submit", function (event) {
-        event.preventDefault();
-        const value = $("notificationInput").value.trim();
-        if (!value) return;
-
-        const items = getData(userKey("notifications"), []);
-        items.unshift(value);
-
-        if (putData(userKey("notifications"), items)) {
-            this.reset();
-            loadNotifications();
-            notify("Notification added.");
-        }
-    });
-
-    $("clearNotificationsButton").addEventListener("click", function () {
-        if (putData(userKey("notifications"), [])) loadNotifications();
-    });
-
-    // Tasks
-    function loadTasks() {
-        const list = $("taskList");
-        list.replaceChildren();
-
-        const tasks = getData(userKey("tasks"), []);
-        let completed = 0;
-
-        tasks.forEach((task, index) => {
-            if (task.done) completed++;
-
-            const li = document.createElement("li");
-            const row = document.createElement("div");
-            row.className = "task-item" + (task.done ? " completed" : "");
-
-            const checkbox = document.createElement("input");
-            checkbox.type = "checkbox";
-            checkbox.checked = Boolean(task.done);
-
-            checkbox.addEventListener("change", function () {
-                const latest = getData(userKey("tasks"), []);
-                if (!latest[index]) return;
-                latest[index].done = checkbox.checked;
-                if (putData(userKey("tasks"), latest)) loadTasks();
-            });
-
-            const span = document.createElement("span");
-            span.className = "task-text";
-            span.textContent = task.text;
-
-            const remove = document.createElement("button");
-            remove.type = "button";
-            remove.className = "secondary-button";
-            remove.textContent = "Delete";
-            remove.addEventListener("click", function () {
-                const latest = getData(userKey("tasks"), []);
-                latest.splice(index, 1);
-                if (putData(userKey("tasks"), latest)) loadTasks();
-            });
-
-            row.append(checkbox, span, remove);
-            li.appendChild(row);
-            list.appendChild(li);
-        });
-
-        $("taskProgress").textContent =
-            completed + " of " + tasks.length + " tasks completed";
+    .add-task-button {
+        width: 100%;
     }
 
-    $("taskForm").addEventListener("submit", function (event) {
-        event.preventDefault();
-        const value = $("taskInput").value.trim();
-        if (!value) return;
-
-        const tasks = getData(userKey("tasks"), []);
-        tasks.push({ text: value, done: false });
-
-        if (putData(userKey("tasks"), tasks)) {
-            this.reset();
-            loadTasks();
-        }
-    });
-
-    // Notes
-    function loadNotes() {
-        $("notesInput").value = getData(userKey("notes"), "");
+    .task-row {
+        gap: 8px;
+        padding: 10px 8px;
     }
 
-    $("saveNotesButton").addEventListener("click", function () {
-        if (putData(userKey("notes"), $("notesInput").value)) {
-            say("notesMessage", "Notes saved.");
-            notify("Notes saved.");
-        }
-    });
+    .task-delete {
+        padding: 7px 8px;
+    }
 
-    // Light/dark theme
-    try {
-        if (localStorage.getItem("arnabTheme") === "light") {
-            document.body.classList.add("light-theme");
-        }
-    } catch (error) {}
+    .toast-container {
+        right: 10px;
+        bottom: 10px;
+        width: calc(100% - 20px);
+    }
+}
 
-    $("themeButton").addEventListener("click", function () {
-        document.body.classList.toggle("light-theme");
-        const theme = document.body.classList.contains("light-theme") ? "light" : "dark";
+@media (max-width: 360px) {
+    .profile-section {
+        flex-direction: column;
+    }
 
-        try {
-            localStorage.setItem("arnabTheme", theme);
-        } catch (error) {}
+    .clock-box {
+        grid-template-columns: 1fr;
+    }
 
-        notify(theme === "light" ? "Light theme enabled." : "Dark theme enabled.");
-    });
+    .section-heading {
+        align-items: flex-start;
+    }
 
-    // Start on login page
-    showPage("loginPage");
-});
+    .task-row {
+        flex-wrap: wrap;
+    }
+}
