@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +10,6 @@
     <script src="script.js" defer></script>
 </head>
 <body>
-
     <main class="app-container">
 
         <!-- LOGIN PAGE -->
@@ -36,7 +36,6 @@
                 </div>
 
                 <p id="loginMessage" class="form-message" aria-live="polite"></p>
-
                 <button class="primary-button" type="submit">Login</button>
             </form>
 
@@ -51,9 +50,10 @@
                 </button>
             </div>
 
-            <p class="developer-credit">Developed by <strong>Arnab Bhowmick</strong></p>
+            <p class="developer-credit">
+                Developed by <strong>Arnab Bhowmick</strong>
+            </p>
         </section>
-
 
         <!-- SIGN UP PAGE -->
         <section id="signupPage" class="auth-card hidden">
@@ -81,7 +81,6 @@
 
                 <p class="small-note">Use at least 4 characters for this demo.</p>
                 <p id="signupMessage" class="form-message" aria-live="polite"></p>
-
                 <button class="primary-button" type="submit">Create Account</button>
             </form>
 
@@ -92,7 +91,6 @@
                 </button>
             </p>
         </section>
-
 
         <!-- RESET PASSWORD PAGE -->
         <section id="resetPage" class="auth-card hidden">
@@ -120,7 +118,9 @@
                 </div>
 
                 <p id="resetMessage" class="form-message" aria-live="polite"></p>
-                <button class="primary-button" type="submit">Update Password</button>
+                <button class="primary-button" type="submit">
+                    Update Password
+                </button>
             </form>
 
             <p class="auth-bottom">
@@ -133,7 +133,6 @@
                 Demo only: this reset process does not verify email or identity.
             </p>
         </section>
-
 
         <!-- DASHBOARD -->
         <section id="namePage" class="dashboard hidden">
@@ -157,13 +156,12 @@
                 <span class="cover-label">MY SPACE · MY JOURNEY</span>
             </div>
 
-            <!-- PROFILE -->
+            <!-- PROFILE PHOTO -->
             <section class="profile-card">
                 <div class="profile-section">
                     <div class="profile-photo-wrap">
                         <img id="profilePhoto" class="profile-photo hidden"
                              alt="Profile photo">
-
                         <div id="profilePhotoPlaceholder"
                              class="profile-photo-placeholder">A</div>
                     </div>
@@ -171,7 +169,9 @@
                     <div class="profile-info">
                         <p class="eyebrow">YOUR PROFILE</p>
                         <h2 id="displayName">Welcome!</h2>
-                        <p class="muted-text">Welcome to your personal dashboard.</p>
+                        <p class="muted-text">
+                            Welcome to your personal dashboard.
+                        </p>
                     </div>
                 </div>
 
@@ -186,7 +186,44 @@
                 </div>
             </section>
 
-            <!-- GREETING AND CLOCK -->
+            <!-- PROFILE EDITOR -->
+            <section class="info-card">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">MAKE IT YOURS</p>
+                        <h2>✏️ Edit Profile</h2>
+                    </div>
+                </div>
+
+                <form id="profileEditorForm" class="profile-editor-form">
+                    <label for="profileNameInput">Display name</label>
+                    <input id="profileNameInput" type="text"
+                           maxlength="50" placeholder="Your name" required>
+
+                    <label for="profileBioInput">Bio</label>
+                    <textarea id="profileBioInput" rows="2"
+                              maxlength="240"
+                              placeholder="A short bio about you"></textarea>
+
+                    <label for="profileCourseInput">Course</label>
+                    <input id="profileCourseInput" type="text"
+                           maxlength="100" placeholder="e.g. B.Tech CSE">
+
+                    <label for="profileSkillsInput">Skills (comma separated)</label>
+                    <input id="profileSkillsInput" type="text"
+                           maxlength="240" placeholder="Java, HTML, CSS">
+
+                    <button class="primary-button" type="submit">
+                        Save Profile
+                    </button>
+                    <p id="profileEditorStatus" class="form-message"
+                       aria-live="polite"></p>
+                </form>
+
+                <div id="profileExtraView" class="profile-extra-view"></div>
+            </section>
+
+            <!-- GREETING AND LIVE CLOCK -->
             <section class="welcome-card">
                 <p class="eyebrow">A NEW DAY, A NEW OPPORTUNITY</p>
                 <h2 id="displayName2">Hello!</h2>
@@ -204,15 +241,35 @@
                 </div>
             </section>
 
-            <!-- NOTIFICATION -->
+            <!-- NOTIFICATION CENTER -->
             <section class="info-card">
-                <h3>🔔 Notifications</h3>
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">STAY UPDATED</p>
+                        <h2>🔔 Notification Center</h2>
+                    </div>
+                    <span id="unreadCount" class="progress-badge">0 unread</span>
+                </div>
+
                 <p id="notification" aria-live="polite">
                     Welcome! You are logged in.
                 </p>
+
+                <div class="notification-actions">
+                    <button id="markNotificationsRead"
+                            class="secondary-button" type="button">
+                        Mark all as read
+                    </button>
+                    <button id="clearNotifications"
+                            class="secondary-button" type="button">
+                        Clear all
+                    </button>
+                </div>
+
+                <div id="notificationList" class="notification-list"></div>
             </section>
 
-            <!-- DAILY PROGRESS -->
+            <!-- ADVANCED DAILY TASK MANAGER -->
             <section class="info-card">
                 <div class="section-heading">
                     <div>
@@ -230,10 +287,21 @@
                     <div id="premiumProgressFill" class="progress-fill"></div>
                 </div>
 
-                <form id="premiumTaskForm" class="task-form">
+                <form id="premiumTaskForm"
+                      class="task-form advanced-task-form">
                     <input id="premiumTaskInput" type="text"
                            placeholder="What do you want to do today?"
                            maxlength="100" required>
+
+                    <select id="taskPriorityInput" aria-label="Task priority">
+                        <option value="Normal">Normal priority</option>
+                        <option value="High">High priority</option>
+                        <option value="Low">Low priority</option>
+                    </select>
+
+                    <input id="taskDeadlineInput" type="date"
+                           aria-label="Task deadline">
+
                     <button class="primary-button add-task-button" type="submit">
                         + Add Task
                     </button>
@@ -242,7 +310,30 @@
                 <div id="premiumTaskList" class="task-list"></div>
             </section>
 
-            <!-- MESSAGE BOX -->
+            <!-- WEEKLY STUDY PROGRESS -->
+            <section class="info-card">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">YOUR CONSISTENCY</p>
+                        <h2>📈 Weekly Study Progress</h2>
+                    </div>
+                    <span id="weeklyProgressPercent"
+                          class="progress-badge">0%</span>
+                </div>
+
+                <p id="weeklyTaskCount" class="muted-text">
+                    0 of 0 tasks completed this week
+                </p>
+
+                <div class="progress-track">
+                    <div id="weeklyProgressFill"
+                         class="progress-fill weekly-fill"></div>
+                </div>
+
+                <div id="weeklyBreakdown" class="weekly-breakdown"></div>
+            </section>
+
+            <!-- PERSONAL NOTES -->
             <section class="info-card">
                 <p class="eyebrow">PERSONAL NOTES</p>
                 <h2>💬 Message Box</h2>
@@ -267,12 +358,14 @@
                 <div class="about-avatar">AB</div>
                 <p class="eyebrow">THE PERSON BEHIND THE PROJECT</p>
                 <h2>About Developer</h2>
+
                 <div class="developer-details">
                     <p><strong>Name:</strong> Arnab Bhowmick</p>
                     <p><strong>Course:</strong> B.Tech in Computer Science & Engineering</p>
                     <p><strong>Interests:</strong> Coding, Web Development and Drawing</p>
                     <p><strong>Goal:</strong> To become a skilled software developer</p>
                 </div>
+
                 <p class="developer-credit">Designed with ❤️ by Arnab Bhowmick</p>
             </section>
 
@@ -282,11 +375,9 @@
             </footer>
 
         </section>
-
     </main>
 
     <div id="toastContainer" class="toast-container"
          aria-live="polite" aria-atomic="true"></div>
-
 </body>
 </html>
