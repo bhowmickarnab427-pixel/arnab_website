@@ -1,368 +1,161 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#17152f">
-    <title>Arnab's Personal Website</title>
+    <title>Arnab Website</title>
     <link rel="stylesheet" href="styles.css">
     <script src="script.js" defer></script>
 </head>
 <body>
+    <main class="container">
 
-    <main class="app-container">
-
-        <!-- LOGIN PAGE -->
         <section id="loginPage" class="auth-card">
-            <div class="brand-icon">A</div>
-            <p class="eyebrow">WELCOME BACK</p>
-            <h1>Login to Your Account</h1>
-            <p class="subtitle">Enter your details to continue.</p>
+            <h1>Welcome Back</h1>
+            <p class="subtitle">Login to your account</p>
 
             <form id="loginForm">
                 <label for="loginUsername">Username</label>
-                <input id="loginUsername" type="text"
-                       placeholder="Enter your username"
-                       autocomplete="username" required>
+                <input id="loginUsername" type="text" placeholder="Enter username" autocomplete="username" required>
 
                 <label for="loginPassword">Password</label>
                 <div class="password-box">
-                    <input id="loginPassword" type="password"
-                           placeholder="Enter your password"
-                           autocomplete="current-password" required>
-                    <button class="eye-button" type="button"
-                            data-password="loginPassword"
-                            aria-label="Show password">👁</button>
+                    <input id="loginPassword" type="password" placeholder="Enter password" autocomplete="current-password" required>
+                    <button class="eye-button" type="button" data-password="loginPassword">👁</button>
                 </div>
 
-                <p id="loginMessage" class="form-message"
-                   aria-live="polite"></p>
-
+                <p id="loginMessage" class="form-message" aria-live="polite"></p>
                 <button class="primary-button" type="submit">Login</button>
             </form>
 
-            <button id="forgotPasswordButton" class="text-button" type="button">
-                Forgot Password?
-            </button>
-
-            <div class="auth-bottom">
-                Don't have an account?
-                <button id="signupButton" class="inline-button" type="button">
-                    Create Account
-                </button>
-            </div>
-
-            <p class="developer-credit">
-                Developed by <strong>Arnab Bhowmick</strong>
+            <p class="center">
+                <button id="forgotPasswordButton" class="inline-button" type="button">Forgot Password?</button>
             </p>
+
+            <p class="center">Don't have an account?
+                <button id="signupButton" class="inline-button" type="button">Create Account</button>
+            </p>
+
+            <p class="developer">Developed by Arnab Bhowmick</p>
         </section>
 
-        <!-- SIGN UP PAGE -->
         <section id="signupPage" class="auth-card hidden">
-            <div class="brand-icon">A</div>
-            <p class="eyebrow">JOIN US</p>
             <h1>Create Account</h1>
-            <p class="subtitle">Create your demo account.</p>
+            <p class="subtitle">Register a new account</p>
 
             <form id="signupForm">
                 <label for="signupUsername">Username</label>
-                <input id="signupUsername" type="text"
-                       placeholder="Choose a username"
-                       minlength="3" maxlength="30"
-                       autocomplete="username" required>
+                <input id="signupUsername" type="text" minlength="3" maxlength="30" placeholder="Choose a username" required>
 
                 <label for="signupPassword">Password</label>
                 <div class="password-box">
-                    <input id="signupPassword" type="password"
-                           placeholder="Create a password"
-                           minlength="4" autocomplete="new-password" required>
-                    <button class="eye-button" type="button"
-                            data-password="signupPassword"
-                            aria-label="Show password">👁</button>
+                    <input id="signupPassword" type="password" minlength="4" placeholder="Create a password" required>
+                    <button class="eye-button" type="button" data-password="signupPassword">👁</button>
                 </div>
 
-                <p class="small-note">Use at least 4 characters for this demo.</p>
-                <p id="signupMessage" class="form-message"
-                   aria-live="polite"></p>
-
-                <button class="primary-button" type="submit">
-                    Create Account
-                </button>
+                <p class="small-note">Username: 3–30 letters, numbers, _ or -.</p>
+                <p id="signupMessage" class="form-message" aria-live="polite"></p>
+                <button class="primary-button" type="submit">Create Account</button>
             </form>
 
-            <p class="auth-bottom">
-                Already registered?
-                <button id="backButton" class="inline-button" type="button">
-                    Back to Login
-                </button>
+            <p class="center">Already registered?
+                <button id="backButton" class="inline-button" type="button">Back to Login</button>
             </p>
         </section>
 
-        <!-- RESET PASSWORD PAGE -->
         <section id="resetPage" class="auth-card hidden">
-            <div class="brand-icon">A</div>
-            <p class="eyebrow">ACCOUNT RECOVERY</p>
             <h1>Reset Password</h1>
-            <p class="subtitle">
-                Enter your username and choose a new password.
-            </p>
+            <p class="subtitle">Demo password reset</p>
 
             <form id="resetForm">
                 <label for="resetUsername">Username</label>
-                <input id="resetUsername" type="text"
-                       placeholder="Your username"
-                       autocomplete="username" required>
+                <input id="resetUsername" type="text" placeholder="Enter your username" required>
 
-                <label for="resetPassword">New Password</label>
+                <label for="newPassword">New Password</label>
                 <div class="password-box">
-                    <input id="resetPassword" type="password"
-                           placeholder="Enter new password"
-                           minlength="4" autocomplete="new-password" required>
-                    <button class="eye-button" type="button"
-                            data-password="resetPassword"
-                            aria-label="Show password">👁</button>
+                    <input id="newPassword" type="password" minlength="4" placeholder="Enter new password" required>
+                    <button class="eye-button" type="button" data-password="newPassword">👁</button>
                 </div>
 
-                <p id="resetMessage" class="form-message"
-                   aria-live="polite"></p>
-
-                <button class="primary-button" type="submit">
-                    Update Password
-                </button>
+                <p id="resetMessage" class="form-message" aria-live="polite"></p>
+                <button class="primary-button" type="submit">Update Password</button>
             </form>
 
-            <p class="auth-bottom">
-                <button id="resetBackButton" class="inline-button" type="button">
-                    Back to Login
-                </button>
-            </p>
-
-            <p class="small-note">
-                Demo only: this reset process does not verify email or identity.
+            <p class="center">
+                <button id="resetBackButton" class="inline-button" type="button">Back to Login</button>
             </p>
         </section>
 
-        <!-- DASHBOARD -->
-        <section id="namePage" class="dashboard hidden">
-
-            <header class="dashboard-header">
+        <section id="dashboardPage" class="dashboard hidden">
+            <header class="topbar">
                 <div>
-                    <p class="eyebrow">YOUR PERSONAL SPACE</p>
                     <h1>My Dashboard</h1>
+                    <p id="welcomeText">Welcome!</p>
                 </div>
-                <button id="logoutButton" class="logout-button" type="button">
-                    Log Out
-                </button>
+                <button id="logoutButton" class="secondary-button" type="button">Logout</button>
             </header>
 
-            <button id="themeButton" class="theme-toggle" type="button">
-                🌙 Dark Mode
-            </button>
-
-            <!-- COVER BANNER -->
-            <div class="cover-banner">
-                <span class="cover-label">MY SPACE · MY JOURNEY</span>
-            </div>
-
-            <!-- PROFILE DISPLAY (NO PROFILE EDITOR) -->
-            <section class="profile-card">
-                <div class="profile-section">
-                    <div class="profile-photo-wrap">
-                        <img id="profilePhoto" class="profile-photo hidden"
-                             alt="Profile photo">
-
-                        <div id="profilePhotoPlaceholder"
-                             class="profile-photo-placeholder">A</div>
-                    </div>
-
-                    <div class="profile-info">
-                        <p class="eyebrow">YOUR PROFILE</p>
-                        <h2 id="displayName">Welcome!</h2>
-                        <p class="muted-text">
-                            Welcome to your personal dashboard.
-                        </p>
-                    </div>
-                </div>
-
-                <div class="profile-actions">
-                    <label for="profilePhotoInput" class="upload-button">
-                        📷 Change Photo
-                    </label>
-                    <input id="profilePhotoInput" type="file"
-                           accept="image/*" hidden>
-
-                    <button id="removeProfilePhoto" class="secondary-button"
-                            type="button">
-                        Remove Photo
-                    </button>
-                </div>
+            <section class="panel clock-panel">
+                <p id="greeting" class="greeting">Hello!</p>
+                <h2 id="clock">00:00:00</h2>
+                <p id="dateText"></p>
+                <p id="timezoneText" class="small-note">Your device's local time</p>
             </section>
 
-            <!-- LIVE CLOCK AND GREETING -->
-            <section class="welcome-card">
-                <p class="eyebrow">A NEW DAY, A NEW OPPORTUNITY</p>
-                <h2 id="displayName2">Hello!</h2>
-                <p id="greetingText">Make today count.</p>
-
-                <div class="clock-box">
+            <section class="panel">
+                <h2>My Profile</h2>
+                <div class="profile-area">
+                    <img id="profileImage" class="profile-image" alt="Profile photo">
                     <div>
-                        <span class="clock-label">CURRENT TIME</span>
-                        <h2 id="liveClock">--:--:--</h2>
-                    </div>
-                    <div>
-                        <span class="clock-label">TODAY'S DATE</span>
-                        <p id="liveDate">Loading date...</p>
+                        <h3 id="profileName">User</h3>
+                        <p class="small-note">Your personal account</p>
                     </div>
                 </div>
+                <label for="photoInput">Change Profile Photo</label>
+                <input id="photoInput" type="file" accept="image/*">
+                <button id="removePhotoButton" class="secondary-button" type="button">Remove Photo</button>
             </section>
 
-            <!-- NOTIFICATION CENTER -->
-            <section class="info-card">
+            <section class="panel">
                 <div class="section-heading">
-                    <div>
-                        <p class="eyebrow">STAY UPDATED</p>
-                        <h2>🔔 Notification Center</h2>
-                    </div>
-                    <span id="unreadCount" class="progress-badge">
-                        0 unread
-                    </span>
+                    <h2>Notifications</h2>
+                    <button id="clearNotificationsButton" class="secondary-button" type="button">Clear</button>
                 </div>
-
-                <p id="notification" aria-live="polite">
-                    Welcome! You are logged in.
-                </p>
-
-                <div class="notification-actions">
-                    <button id="markNotificationsRead"
-                            class="secondary-button" type="button">
-                        Mark all as read
-                    </button>
-                    <button id="clearNotifications"
-                            class="secondary-button" type="button">
-                        Clear all
-                    </button>
-                </div>
-
-                <div id="notificationList" class="notification-list"></div>
-            </section>
-
-            <!-- DAILY PROGRESS AND TASKS -->
-            <section class="info-card">
-                <div class="section-heading">
-                    <div>
-                        <p class="eyebrow">STAY PRODUCTIVE</p>
-                        <h2>🎯 Daily Progress</h2>
-                    </div>
-                    <span id="progressPercent" class="progress-badge">0%</span>
-                </div>
-
-                <p id="premiumTaskCount" class="muted-text">
-                    0 of 0 tasks completed
-                </p>
-
-                <div class="progress-track">
-                    <div id="premiumProgressFill" class="progress-fill"></div>
-                </div>
-
-                <form id="premiumTaskForm"
-                      class="task-form advanced-task-form">
-
-                    <input id="premiumTaskInput" type="text"
-                           placeholder="What do you want to do today?"
-                           maxlength="100" required>
-
-                    <select id="taskPriorityInput" aria-label="Task priority">
-                        <option value="Normal">Normal priority</option>
-                        <option value="High">High priority</option>
-                        <option value="Low">Low priority</option>
-                    </select>
-
-                    <input id="taskDeadlineInput" type="date"
-                           aria-label="Task deadline">
-
-                    <button class="primary-button add-task-button" type="submit">
-                        + Add Task
-                    </button>
-                </form>
-
-                <div id="premiumTaskList" class="task-list"></div>
-            </section>
-
-            <!-- WEEKLY PROGRESS -->
-            <section class="info-card">
-                <div class="section-heading">
-                    <div>
-                        <p class="eyebrow">YOUR CONSISTENCY</p>
-                        <h2>📈 Weekly Study Progress</h2>
-                    </div>
-                    <span id="weeklyProgressPercent" class="progress-badge">
-                        0%
-                    </span>
-                </div>
-
-                <p id="weeklyTaskCount" class="muted-text">
-                    0 of 0 tasks completed this week
-                </p>
-
-                <div class="progress-track">
-                    <div id="weeklyProgressFill"
-                         class="progress-fill weekly-fill"></div>
-                </div>
-
-                <div id="weeklyBreakdown" class="weekly-breakdown"></div>
-            </section>
-
-            <!-- PERSONAL NOTES -->
-            <section class="info-card">
-                <p class="eyebrow">PERSONAL NOTES</p>
-                <h2>💬 Message Box</h2>
-                <p class="muted-text">
-                    Write a note for yourself. It is not sent to anyone.
-                </p>
-
-                <form id="messageForm">
-                    <textarea id="userMessage"
-                              placeholder="Write your thoughts here..."
-                              rows="4" maxlength="1000" required></textarea>
-
-                    <button id="sendButton" class="primary-button" type="submit">
-                        Save Note
-                    </button>
-
-                    <p id="messageStatus" class="form-message"
-                       aria-live="polite"></p>
+                <ul id="notificationList" class="notification-list"></ul>
+                <form id="notificationForm" class="inline-form">
+                    <input id="notificationInput" type="text" placeholder="Write a notification" required>
+                    <button class="primary-button" type="submit">Add</button>
                 </form>
             </section>
 
-            <!-- ABOUT DEVELOPER -->
-            <section class="info-card about-card">
-                <div class="about-avatar">AB</div>
-                <p class="eyebrow">THE PERSON BEHIND THE PROJECT</p>
-                <h2>About Developer</h2>
-
-                <div class="developer-details">
-                    <p><strong>Name:</strong> Arnab Bhowmick</p>
-                    <p><strong>Course:</strong> B.Tech in Computer Science & Engineering</p>
-                    <p><strong>Interests:</strong> Coding, Web Development and Drawing</p>
-                    <p><strong>Goal:</strong> To become a skilled software developer</p>
-                </div>
-
-                <p class="developer-credit">
-                    Designed with ❤️ by Arnab Bhowmick
-                </p>
+            <section class="panel">
+                <h2>Daily Tasks</h2>
+                <form id="taskForm" class="inline-form">
+                    <input id="taskInput" type="text" placeholder="Enter a task" required>
+                    <button class="primary-button" type="submit">Add Task</button>
+                </form>
+                <ul id="taskList" class="task-list"></ul>
+                <p id="taskProgress">0 tasks completed</p>
             </section>
 
-            <footer class="dashboard-footer">
-                <p>© <span id="footerYear"></span> Arnab Bhowmick</p>
-                <p>Keep learning. Keep building. Keep growing.</p>
-            </footer>
+            <section class="panel">
+                <h2>Personal Notes</h2>
+                <textarea id="notesInput" rows="5" placeholder="Write your notes here..."></textarea>
+                <button id="saveNotesButton" class="primary-button" type="button">Save Notes</button>
+                <p id="notesMessage" class="form-message"></p>
+            </section>
 
+            <section class="panel">
+                <h2>Settings</h2>
+                <button id="themeButton" class="secondary-button" type="button">Toggle Light / Dark Theme</button>
+            </section>
+
+            <footer class="developer">Developed by Arnab Bhowmick</footer>
         </section>
 
     </main>
 
-    <div id="toastContainer" class="toast-container"
-         aria-live="polite" aria-atomic="true"></div>
-
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
