@@ -9,209 +9,143 @@
     <script src="script.js" defer></script>
 </head>
 <body>
-    <main class="container">
+<main class="container">
 
-        <!-- LOGIN -->
-        <section id="loginPage" class="auth-card">
-            <h1>Welcome Back</h1>
-            <p class="subtitle">Login to your account</p>
+    <section id="loginPage" class="auth-card">
+        <h1>Welcome Back</h1>
+        <p class="subtitle">Login to your account</p>
 
-            <form id="loginForm">
-                <label for="loginUsername">Username</label>
-                <input id="loginUsername" type="text"
-                       placeholder="Enter username" autocomplete="username" required>
+        <form id="loginForm">
+            <label for="loginUsername">Username</label>
+            <input id="loginUsername" type="text" placeholder="Enter username" required>
 
-                <label for="loginPassword">Password</label>
-                <div class="password-box">
-                    <input id="loginPassword" type="password"
-                           placeholder="Enter password"
-                           autocomplete="current-password" required>
-                    <button class="eye-button" type="button"
-                            data-password="loginPassword"
-                            aria-label="Show password" aria-pressed="false">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/>
-                            <circle cx="12" cy="12" r="3"/>
-                        </svg>
-                    </button>
-                </div>
+            <label for="loginPassword">Password</label>
+            <div class="password-box">
+                <input id="loginPassword" type="password" placeholder="Enter password" required>
+                <button class="eye-button" type="button" data-password="loginPassword" aria-label="Show or hide password">👁</button>
+            </div>
 
-                <p id="loginMessage" class="form-message" aria-live="polite"></p>
-                <button class="primary-button" type="submit">Login</button>
+            <p id="loginMessage" class="message"></p>
+            <button class="primary-button" type="submit">Login</button>
+        </form>
+
+        <p class="center">
+            <button id="forgotPasswordButton" class="link-button" type="button">Forgot Password?</button>
+        </p>
+        <p class="center">Don't have an account?
+            <button id="signupButton" class="link-button" type="button">Create Account</button>
+        </p>
+        <p class="developer">Developed by Arnab Bhowmick</p>
+    </section>
+
+    <section id="signupPage" class="auth-card hidden">
+        <h1>Create Account</h1>
+        <p class="subtitle">Create your new account</p>
+
+        <form id="signupForm">
+            <label for="signupUsername">Username</label>
+            <input id="signupUsername" type="text" placeholder="Choose username" required>
+
+            <label for="signupPassword">Password</label>
+            <div class="password-box">
+                <input id="signupPassword" type="password" placeholder="Choose password" required>
+                <button class="eye-button" type="button" data-password="signupPassword" aria-label="Show or hide password">👁</button>
+            </div>
+
+            <p class="small-note">You can use a simple password, for example 1234.</p>
+            <p id="signupMessage" class="message"></p>
+            <button class="primary-button" type="submit">Create Account</button>
+        </form>
+
+        <p class="center">Already have an account?
+            <button id="backButton" class="link-button" type="button">Back to Login</button>
+        </p>
+    </section>
+
+    <section id="resetPage" class="auth-card hidden">
+        <h1>Reset Password</h1>
+        <form id="resetForm">
+            <label for="resetUsername">Username</label>
+            <input id="resetUsername" type="text" required>
+
+            <label for="newPassword">New Password</label>
+            <div class="password-box">
+                <input id="newPassword" type="password" placeholder="Enter new password" required>
+                <button class="eye-button" type="button" data-password="newPassword" aria-label="Show or hide password">👁</button>
+            </div>
+
+            <p id="resetMessage" class="message"></p>
+            <button class="primary-button" type="submit">Update Password</button>
+        </form>
+        <p class="center">
+            <button id="resetBackButton" class="link-button" type="button">Back to Login</button>
+        </p>
+    </section>
+
+    <section id="dashboardPage" class="dashboard hidden">
+        <header class="topbar">
+            <div>
+                <h1>My Dashboard</h1>
+                <p id="welcomeText">Welcome!</p>
+            </div>
+            <button id="logoutButton" class="secondary-button" type="button">Logout</button>
+        </header>
+
+        <section class="panel clock-panel">
+            <p id="greeting" class="greeting">Hello!</p>
+            <h2 id="clock">00:00:00</h2>
+            <p id="dateText"></p>
+        </section>
+
+        <section class="panel">
+            <h2>My Profile</h2>
+            <div class="profile-area">
+                <img id="profileImage" class="profile-image" alt="Profile photo">
+                <h3 id="profileName">User</h3>
+            </div>
+            <label for="photoInput">Change Profile Photo</label>
+            <input id="photoInput" type="file" accept="image/*">
+            <button id="removePhotoButton" class="secondary-button" type="button">Remove Photo</button>
+        </section>
+
+        <section class="panel">
+            <div class="section-heading">
+                <h2>Notifications</h2>
+                <button id="clearNotificationsButton" class="secondary-button" type="button">Clear</button>
+            </div>
+            <ul id="notificationList"></ul>
+            <form id="notificationForm" class="inline-form">
+                <input id="notificationInput" placeholder="Write notification" required>
+                <button class="primary-button" type="submit">Add</button>
             </form>
-
-            <p class="center">
-                <button id="forgotPasswordButton" class="inline-button" type="button">
-                    Forgot Password?
-                </button>
-            </p>
-
-            <p class="center">
-                Don't have an account?
-                <button id="signupButton" class="inline-button" type="button">
-                    Create Account
-                </button>
-            </p>
-
-            <p class="developer">Developed by Arnab Bhowmick</p>
         </section>
 
-        <!-- CREATE ACCOUNT -->
-        <section id="signupPage" class="auth-card hidden">
-            <h1>Create Account</h1>
-            <p class="subtitle">Register a new account</p>
-
-            <form id="signupForm">
-                <label for="signupUsername">Username</label>
-                <input id="signupUsername" type="text"
-                       minlength="3" maxlength="30"
-                       placeholder="Choose a username" autocomplete="username" required>
-
-                <label for="signupPassword">Password</label>
-                <div class="password-box">
-                    <input id="signupPassword" type="password"
-                           minlength="6" placeholder="Minimum 6 characters"
-                           autocomplete="new-password" required>
-                    <button class="eye-button" type="button"
-                            data-password="signupPassword"
-                            aria-label="Show password" aria-pressed="false">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/>
-                            <circle cx="12" cy="12" r="3"/>
-                        </svg>
-                    </button>
-                </div>
-
-                <p class="small-note">Use at least 6 characters for your password.</p>
-                <p id="signupMessage" class="form-message" aria-live="polite"></p>
-                <button class="primary-button" type="submit">Create Account</button>
+        <section class="panel">
+            <h2>Daily Tasks</h2>
+            <form id="taskForm" class="inline-form">
+                <input id="taskInput" placeholder="Enter a task" required>
+                <button class="primary-button" type="submit">Add Task</button>
             </form>
-
-            <p class="center">
-                Already have an account?
-                <button id="backButton" class="inline-button" type="button">
-                    Back to Login
-                </button>
-            </p>
+            <ul id="taskList"></ul>
+            <p id="taskProgress">0 tasks completed</p>
         </section>
 
-        <!-- RESET PASSWORD -->
-        <section id="resetPage" class="auth-card hidden">
-            <h1>Reset Password</h1>
-            <p class="subtitle">Enter your username and new password</p>
-
-            <form id="resetForm">
-                <label for="resetUsername">Username</label>
-                <input id="resetUsername" type="text"
-                       placeholder="Enter username" required>
-
-                <label for="newPassword">New Password</label>
-                <div class="password-box">
-                    <input id="newPassword" type="password"
-                           minlength="6" placeholder="Minimum 6 characters"
-                           autocomplete="new-password" required>
-                    <button class="eye-button" type="button"
-                            data-password="newPassword"
-                            aria-label="Show password" aria-pressed="false">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/>
-                            <circle cx="12" cy="12" r="3"/>
-                        </svg>
-                    </button>
-                </div>
-
-                <p id="resetMessage" class="form-message" aria-live="polite"></p>
-                <button class="primary-button" type="submit">Update Password</button>
-            </form>
-
-            <p class="center">
-                <button id="resetBackButton" class="inline-button" type="button">
-                    Back to Login
-                </button>
-            </p>
+        <section class="panel">
+            <h2>Personal Notes</h2>
+            <textarea id="notesInput" rows="5" placeholder="Write your notes..."></textarea>
+            <button id="saveNotesButton" class="primary-button" type="button">Save Notes</button>
+            <p id="notesMessage" class="message"></p>
         </section>
 
-        <!-- DASHBOARD -->
-        <section id="dashboardPage" class="dashboard hidden">
-            <header class="topbar">
-                <div>
-                    <h1>My Dashboard</h1>
-                    <p id="welcomeText">Welcome!</p>
-                </div>
-                <button id="logoutButton" class="secondary-button" type="button">
-                    Logout
-                </button>
-            </header>
-
-            <section class="panel clock-panel">
-                <p id="greeting" class="greeting">Good evening!</p>
-                <h2 id="clock">00:00:00</h2>
-                <p id="dateText"></p>
-                <p class="small-note">Your device's local time</p>
-            </section>
-
-            <section class="panel">
-                <h2>My Profile</h2>
-                <div class="profile-area">
-                    <img id="profileImage" class="profile-image" alt="Profile photo">
-                    <div>
-                        <h3 id="profileName">User</h3>
-                        <p class="small-note">Your personal account</p>
-                    </div>
-                </div>
-
-                <label for="photoInput">Change Profile Photo</label>
-                <input id="photoInput" type="file" accept="image/*">
-                <button id="removePhotoButton" class="secondary-button" type="button">
-                    Remove Photo
-                </button>
-            </section>
-
-            <section class="panel">
-                <div class="section-heading">
-                    <h2>Notifications</h2>
-                    <button id="clearNotificationsButton"
-                            class="secondary-button" type="button">Clear</button>
-                </div>
-                <ul id="notificationList" class="notification-list"></ul>
-                <form id="notificationForm" class="inline-form">
-                    <input id="notificationInput" type="text"
-                           placeholder="Write a notification" required>
-                    <button class="primary-button" type="submit">Add</button>
-                </form>
-            </section>
-
-            <section class="panel">
-                <h2>Daily Tasks</h2>
-                <form id="taskForm" class="inline-form">
-                    <input id="taskInput" type="text" placeholder="Enter a task" required>
-                    <button class="primary-button" type="submit">Add Task</button>
-                </form>
-                <ul id="taskList" class="task-list"></ul>
-                <p id="taskProgress">0 tasks completed</p>
-            </section>
-
-            <section class="panel">
-                <h2>Personal Notes</h2>
-                <textarea id="notesInput" rows="5"
-                          placeholder="Write your notes here..."></textarea>
-                <button id="saveNotesButton" class="primary-button" type="button">
-                    Save Notes
-                </button>
-                <p id="notesMessage" class="form-message"></p>
-            </section>
-
-            <section class="panel">
-                <h2>Settings</h2>
-                <button id="themeButton" class="secondary-button" type="button">
-                    Toggle Light / Dark Theme
-                </button>
-            </section>
-
-            <footer class="developer">Developed by Arnab Bhowmick</footer>
+        <section class="panel">
+            <h2>Settings</h2>
+            <button id="themeButton" class="secondary-button" type="button">Toggle Light / Dark Theme</button>
         </section>
-    </main>
 
-    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+        <p class="developer">Developed by Arnab Bhowmick</p>
+    </section>
+
+</main>
+<div id="toast" class="toast" role="status"></div>
 </body>
 </html>
