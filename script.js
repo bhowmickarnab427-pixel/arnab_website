@@ -1,447 +1,181 @@
-/* =========================================
-   ARNAB'S PERSONAL WEBSITE
-   Login + Profile + Clock + Daily Tasks
-   Theme + Notifications + Personal Notes
-========================================= */
 
 document.addEventListener("DOMContentLoaded", function () {
+    const $ = (id) => document.getElementById(id);
 
-    // =====================================
-    // 1. GET HTML ELEMENTS
-    // =====================================
+    const pages = [
+        $("loginPage"),
+        $("signupPage"),
+        $("resetPage"),
+        $("namePage")
+    ];
 
-    const loginPage = document.getElementById("loginPage");
-    const signupPage = document.getElementById("signupPage");
-    const resetPage = document.getElementById("resetPage");
-    const dashboard = document.getElementById("namePage");
+    let currentUser = "";
 
-    const loginForm = document.getElementById("loginForm");
-    const signupForm = document.getElementById("signupForm");
-    const resetForm = document.getElementById("resetForm");
-    const messageForm = document.getElementById("messageForm");
-    const taskForm = document.getElementById("premiumTaskForm");
+    const clean = (value) => String(value ?? "").trim();
 
-    const loginMessage = document.getElementById("loginMessage");
-    const signupMessage = document.getElementById("signupMessage");
-    const resetMessage = document.getElementById("resetMessage");
-    const messageStatus = document.getElementById("messageStatus");
+    const keyName = (value) =>
+        clean(value).toLowerCase().replace(/[^a-z0-9_-]/g, "_");
 
-    const loginUsername = document.getElementById("loginUsername");
-    const loginPassword = document.getElementById("loginPassword");
-    const signupUsername = document.getElementById("signupUsername");
-    const signupPassword = document.getElementById("signupPassword");
-    const resetUsername = document.getElementById("resetUsername");
-    const resetPassword = document.getElementById("resetPassword");
+    // Local date, avoiding UTC date changes around midnight.
+    const todayKey = () => {
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    };
 
-    const themeButton = document.getElementById("themeButton");
-    const logoutButton = document.getElementById("logoutButton");
+    const taskKey = (user, date = todayKey()) =>
+        `arnabDailyTasks_${keyName(user)}_${date}`;
 
-    const displayName = document.getElementById("displayName");
-    const displayName2 = document.getElementById("displayName2");
-    const greetingText = document.getElementById("greetingText");
+    const profileKey = (user) =>
+        `arnabProfile_${keyName(user)}`;
 
-    const liveClock = document.getElementById("liveClock");
-    const liveDate = document.getElementById("liveDate");
-    const notification = document.getElementById("notification");
+    const photoKey = (user) =>
+        `arnabProfilePhoto_${keyName(user)}`;
 
-    const profilePhoto = document.getElementById("profilePhoto");
-    const profilePhotoPlaceholder =
-        document.getElementById("profilePhotoPlaceholder");
-    const profilePhotoInput = document.getElementById("profilePhotoInput");
-    const removeProfilePhoto = document.getElementById("removeProfilePhoto");
+    const noteKey = (user) =>
+        `arnabPersonalNote_${keyName(user)}`;
 
-    const taskInput = document.getElementById("premiumTaskInput");
-    const taskList = document.getElementById("premiumTaskList");
-    const taskCount = document.getElementById("premiumTaskCount");
-    const progressFill = document.getElementById("premiumProgressFill");
-    const progressPercent = document.getElementById("progressPercent");
+    const notificationKey = (user) =>
+        `arnabNotifications_${keyName(user)}`;
 
-    const userMessage = document.getElementById("userMessage");
-    const toastContainer = document.getElementById("toastContainer");
-
-
-    // =====================================
-    // 2. APP VARIABLES
-    // =====================================
-
-    let currentUsername = "";
-    let clockInterval = null;
-    let toastTimer = null;
-    let tasks = [];
-
-    const STORAGE_ACCOUNTS = "arnabAccounts";
-    const STORAGE_THEME = "arnabTheme";
-
-
-    // =====================================
-    // 3. PAGE NAVIGATION
-    // =====================================
-
-    function showPage(page) {
-        [loginPage, signupPage, resetPage, dashboard].forEach(function (item) {
-            item.classList.add("hidden");
-        });
-
-        page.classList.remove("hidden");
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-
-    // =====================================
-    // 4. TOAST NOTIFICATIONS
-    // =====================================
-
-    function showToast(message, type) {
-        if (!toastContainer) return;
-
-        if (toastTimer) {
-            clearTimeout(toastTimer);
+    function readJSON(key, fallback) {
+        try {
+            const value = JSON.parse(localStorage.getItem(key));
+            return value ?? fallback;
+        } catch {
+            return fallback;
         }
+    }
 
-        toastContainer.replaceChildren();
-
-        const toast = document.createElement("div");
-        toast.className = "toast";
-
-        if (type === "error") {
-            toast.classList.add("error");
+    function saveJSON(key, value) {
+        try {
+            localStorage.setItem(key, JSON.stringify(value));
+            return true;
+        } catch {
+            toast("Storage is full. Try a smaller photo or clear old data.", true);
+            return false;
         }
-
-        toast.textContent = message;
-        toastContainer.appendChild(toast);
-
-        toastTimer = setTimeout(function () {
-            toast.remove();
-        }, 3000);
     }
-
-
-    function showFormMessage(element, message, isError) {
-        if (!element) return;
-
-        element.textContent = message;
-        element.style.color = isError ? "#fca5a5" : "#86efac";
-    }
-
-
-    // =====================================
-    // 5. ACCOUNT STORAGE
-    // =====================================
 
     function getAccounts() {
-        try {
-            const accounts = JSON.parse(
-                localStorage.getItem(STORAGE_ACCOUNTS) || "[]"
-            );
+        const value = readJSON("arnabAccounts", []);
 
-            return Array.isArray(accounts) ? accounts : [];
-        } catch (error) {
-            return [];
+        if (Array.isArray(value)) {
+            return value;
         }
-    }
 
+        return Object.entries(value || {}).map(([username, item]) =>
+            typeof item === "object"
+                ? { username, ...item }
+                : { username, password: item }
+        );
+    }
 
     function saveAccounts(accounts) {
-        localStorage.setItem(
-            STORAGE_ACCOUNTS,
-            JSON.stringify(accounts)
-        );
+        saveJSON("arnabAccounts", accounts);
     }
 
+    function showPage(page) {
+        pages.forEach((item) => {
+            if (item) item.classList.add("hidden");
+        });
 
-    function normaliseUsername(username) {
-        return username.trim().toLowerCase();
+        if (page) page.classList.remove("hidden");
     }
 
+    function message(id, text, error = false) {
+        const element = $(id);
 
-    function getAccount() {
-        return getAccounts().find(function (account) {
-            return normaliseUsername(account.username) ===
-                normaliseUsername(currentUsername);
+        if (element) {
+            element.textContent = text;
+            element.style.color = error ? "#ff9caa" : "#9ef0be";
+        }
+    }
+
+    function toast(text, error = false) {
+        const box = $("toastContainer");
+        if (!box) return;
+
+        const element = document.createElement("div");
+        element.className = "toast" + (error ? " error" : "");
+        element.textContent = text;
+
+        box.appendChild(element);
+
+        setTimeout(() => element.remove(), 3400);
+    }
+
+    function getProfile() {
+        return readJSON(profileKey(currentUser), {
+            name: currentUser,
+            bio: "",
+            course: "",
+            skills: ""
         });
     }
 
+    function saveProfile(profile) {
+        return saveJSON(profileKey(currentUser), profile);
+    }
 
-    // =====================================
-    // 6. SHOW / HIDE PASSWORD
-    // =====================================
+    function getTasks(date = todayKey()) {
+        const raw = readJSON(taskKey(currentUser, date), []);
 
-    document.querySelectorAll(".eye-button").forEach(function (button) {
-
-        button.addEventListener("click", function () {
-            const inputId = button.getAttribute("data-password");
-            const passwordInput = document.getElementById(inputId);
-
-            if (!passwordInput) return;
-
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text";
-                button.textContent = "🙈";
-                button.setAttribute("aria-label", "Hide password");
-            } else {
-                passwordInput.type = "password";
-                button.textContent = "👁";
-                button.setAttribute("aria-label", "Show password");
+        return (Array.isArray(raw) ? raw : []).map((task, index) => {
+            if (typeof task === "string") {
+                return {
+                    id: `${date}-${index}`,
+                    text: task,
+                    done: false,
+                    priority: "Normal",
+                    deadline: ""
+                };
             }
+
+            return {
+                priority: "Normal",
+                deadline: "",
+                done: false,
+                ...task
+            };
         });
-
-    });
-
-
-    // =====================================
-    // 7. SIGN UP
-    // =====================================
-
-    document.getElementById("signupButton").addEventListener("click", function () {
-        signupForm.reset();
-        showFormMessage(signupMessage, "", false);
-        showPage(signupPage);
-    });
-
-
-    document.getElementById("backButton").addEventListener("click", function () {
-        showFormMessage(loginMessage, "", false);
-        showPage(loginPage);
-    });
-
-
-    signupForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        const username = signupUsername.value.trim();
-        const password = signupPassword.value;
-
-        if (username.length < 3) {
-            showFormMessage(
-                signupMessage,
-                "Username must contain at least 3 characters.",
-                true
-            );
-            return;
-        }
-
-        if (password.length < 4) {
-            showFormMessage(
-                signupMessage,
-                "Password must contain at least 4 characters.",
-                true
-            );
-            return;
-        }
-
-        const accounts = getAccounts();
-
-        const existingAccount = accounts.some(function (account) {
-            return normaliseUsername(account.username) ===
-                normaliseUsername(username);
-        });
-
-        if (existingAccount) {
-            showFormMessage(
-                signupMessage,
-                "This username already exists. Please login.",
-                true
-            );
-            return;
-        }
-
-        accounts.push({
-            username: username,
-            password: password
-        });
-
-        try {
-            saveAccounts(accounts);
-        } catch (error) {
-            showFormMessage(
-                signupMessage,
-                "Unable to save account in this browser.",
-                true
-            );
-            return;
-        }
-
-        signupForm.reset();
-        loginUsername.value = username;
-
-        showPage(loginPage);
-        showFormMessage(
-            loginMessage,
-            "Account created successfully! Please login.",
-            false
-        );
-
-        showToast("Account created successfully!");
-    });
-
-
-    // =====================================
-    // 8. LOGIN
-    // =====================================
-
-    loginForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        const username = loginUsername.value.trim();
-        const password = loginPassword.value;
-
-        const account = getAccounts().find(function (item) {
-            return normaliseUsername(item.username) ===
-                normaliseUsername(username) &&
-                item.password === password;
-        });
-
-        if (!account) {
-            showFormMessage(
-                loginMessage,
-                "Incorrect username or password.",
-                true
-            );
-            return;
-        }
-
-        currentUsername = account.username;
-
-        loginPassword.value = "";
-        showFormMessage(loginMessage, "", false);
-
-        loadDashboard();
-
-        showPage(dashboard);
-        showToast("Welcome back, " + currentUsername + "!");
-    });
-
-
-    // =====================================
-    // 9. FORGOT PASSWORD
-    // =====================================
-
-    document.getElementById("forgotPasswordButton")
-        .addEventListener("click", function () {
-
-            resetForm.reset();
-            showFormMessage(resetMessage, "", false);
-            showPage(resetPage);
-
-        });
-
-
-    document.getElementById("resetBackButton")
-        .addEventListener("click", function () {
-
-            showFormMessage(loginMessage, "", false);
-            showPage(loginPage);
-
-        });
-
-
-    resetForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        const username = resetUsername.value.trim();
-        const newPassword = resetPassword.value;
-
-        if (newPassword.length < 4) {
-            showFormMessage(
-                resetMessage,
-                "Password must contain at least 4 characters.",
-                true
-            );
-            return;
-        }
-
-        const accounts = getAccounts();
-
-        const accountIndex = accounts.findIndex(function (account) {
-            return normaliseUsername(account.username) ===
-                normaliseUsername(username);
-        });
-
-        if (accountIndex === -1) {
-            showFormMessage(
-                resetMessage,
-                "Username not found.",
-                true
-            );
-            return;
-        }
-
-        accounts[accountIndex].password = newPassword;
-
-        try {
-            saveAccounts(accounts);
-        } catch (error) {
-            showFormMessage(
-                resetMessage,
-                "Could not save the new password.",
-                true
-            );
-            return;
-        }
-
-        resetForm.reset();
-        loginUsername.value = username;
-
-        showPage(loginPage);
-
-        showFormMessage(
-            loginMessage,
-            "Password updated. You can login now.",
-            false
-        );
-
-        showToast("Password updated successfully!");
-    });
-
-
-    // =====================================
-    // 10. GREETING
-    // =====================================
-
-    function updateGreeting() {
-        const hour = new Date().getHours();
-        let greeting = "";
-
-        if (hour < 12) {
-            greeting = "Good Morning";
-        } else if (hour < 17) {
-            greeting = "Good Afternoon";
-        } else if (hour < 21) {
-            greeting = "Good Evening";
-        } else {
-            greeting = "Good Night";
-        }
-
-        if (displayName2) {
-            displayName2.textContent =
-                greeting + ", " + currentUsername + "!";
-        }
-
-        if (greetingText) {
-            greetingText.textContent =
-                "Keep learning, stay focused, and make today count.";
-        }
     }
 
+    function saveTasks(tasks, date = todayKey()) {
+        return saveJSON(taskKey(currentUser, date), tasks);
+    }
 
-    // =====================================
-    // 11. LIVE CLOCK AND DATE
-    // =====================================
+    function escapeHTML(value) {
+        return String(value).replace(/[&<>"']/g, (character) => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[character]);
+    }
+
+    function greeting() {
+        const hour = new Date().getHours();
+
+        if (hour < 12) return "🌅 Good Morning";
+        if (hour < 17) return "☀️ Good Afternoon";
+        if (hour < 21) return "🌇 Good Evening";
+
+        return "🌙 Good Night";
+    }
 
     function updateClock() {
         const now = new Date();
 
-        if (liveClock) {
-            liveClock.textContent = now.toLocaleTimeString(undefined, {
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-                hour12: true
-            });
+        if ($("liveClock")) {
+            $("liveClock").textContent = now.toLocaleTimeString();
         }
 
-        if (liveDate) {
-            liveDate.textContent = now.toLocaleDateString(undefined, {
+        if ($("liveDate")) {
+            $("liveDate").textContent = now.toLocaleDateString(undefined, {
                 weekday: "long",
                 year: "numeric",
                 month: "long",
@@ -449,394 +183,653 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
 
-        updateGreeting();
-    }
-
-
-    // =====================================
-    // 12. PROFILE PHOTO
-    // =====================================
-
-    function photoStorageKey() {
-        return "arnabProfilePhoto_" + normaliseUsername(currentUsername);
-    }
-
-
-    function loadProfilePhoto() {
-        if (!currentUsername) return;
-
-        const savedPhoto = localStorage.getItem(photoStorageKey());
-
-        if (savedPhoto) {
-            profilePhoto.src = savedPhoto;
-            profilePhoto.classList.remove("hidden");
-            profilePhotoPlaceholder.classList.add("hidden");
-        } else {
-            profilePhoto.removeAttribute("src");
-            profilePhoto.classList.add("hidden");
-            profilePhotoPlaceholder.classList.remove("hidden");
-
-            profilePhotoPlaceholder.textContent =
-                currentUsername.charAt(0).toUpperCase();
+        if ($("greetingText")) {
+            $("greetingText").textContent =
+                greeting() + " — make today count.";
         }
     }
 
+    // NOTIFICATION CENTER
+    function renderNotifications() {
+        if (!currentUser) return;
 
-    profilePhotoInput.addEventListener("change", function () {
-        const file = profilePhotoInput.files[0];
+        const items = readJSON(notificationKey(currentUser), []);
+        const unread = items.filter((item) => !item.read).length;
 
+        $("unreadCount").textContent = `${unread} unread`;
+
+        const box = $("notificationList");
+        box.replaceChildren();
+
+        if (!items.length) {
+            const empty = document.createElement("p");
+            empty.className = "muted-text";
+            empty.textContent = "No notifications yet.";
+            box.appendChild(empty);
+            return;
+        }
+
+        items.forEach((notification) => {
+            const item = document.createElement("div");
+
+            item.className =
+                "notification-item" + (notification.read ? "" : " unread");
+
+            const dot = document.createElement("span");
+            dot.className = "notification-dot";
+
+            const body = document.createElement("div");
+            body.className = "notification-body";
+
+            const text = document.createElement("div");
+            text.textContent = notification.text;
+
+            const time = document.createElement("div");
+            time.className = "notification-time";
+            time.textContent = new Date(notification.time).toLocaleString();
+
+            body.append(text, time);
+            item.append(dot, body);
+
+            if (!notification.read) {
+                const button = document.createElement("button");
+                button.className = "secondary-button";
+                button.type = "button";
+                button.textContent = "Read";
+
+                button.addEventListener("click", () => {
+                    const all = readJSON(notificationKey(currentUser), []);
+                    const found = all.find((entry) => entry.id === notification.id);
+
+                    if (found) found.read = true;
+
+                    saveJSON(notificationKey(currentUser), all);
+                    renderNotifications();
+                });
+
+                item.appendChild(button);
+            }
+
+            box.appendChild(item);
+        });
+    }
+
+    function notify(text) {
+        const notificationText = $("notification");
+
+        if (notificationText) {
+            notificationText.textContent = text;
+        }
+
+        if (!currentUser) return;
+
+        const items = readJSON(notificationKey(currentUser), []);
+
+        items.unshift({
+            id: Date.now() + Math.random(),
+            text,
+            time: new Date().toISOString(),
+            read: false
+        });
+
+        saveJSON(notificationKey(currentUser), items.slice(0, 50));
+        renderNotifications();
+    }
+
+    // PROFILE EDITOR AND PROFILE PHOTO
+    function loadProfileUI() {
+        const profile = getProfile();
+
+        $("displayName").textContent = profile.name || currentUser;
+        $("displayName2").textContent =
+            "Hello, " + (profile.name || currentUser) + "!";
+
+        $("profileNameInput").value = profile.name || currentUser;
+        $("profileBioInput").value = profile.bio || "";
+        $("profileCourseInput").value = profile.course || "";
+        $("profileSkillsInput").value = profile.skills || "";
+
+        $("profileExtraView").innerHTML =
+            `<p><strong>Bio:</strong> ${escapeHTML(profile.bio || "Not added yet")}</p>` +
+            `<p><strong>Course:</strong> ${escapeHTML(profile.course || "Not added yet")}</p>` +
+            `<p><strong>Skills:</strong> ${escapeHTML(profile.skills || "Not added yet")}</p>`;
+
+        const photo = localStorage.getItem(photoKey(currentUser));
+
+        if (photo) {
+            $("profilePhoto").src = photo;
+            $("profilePhoto").classList.remove("hidden");
+            $("profilePhotoPlaceholder").classList.add("hidden");
+        } else {
+            $("profilePhoto").classList.add("hidden");
+            $("profilePhotoPlaceholder").classList.remove("hidden");
+        }
+    }
+
+    // DAILY TASK MANAGER
+    function renderTasks() {
+        const tasks = getTasks();
+        const list = $("premiumTaskList");
+
+        list.replaceChildren();
+
+        tasks.forEach((task) => {
+            const row = document.createElement("div");
+            row.className = "task-row" + (task.done ? " completed" : "");
+
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.className = "task-checkbox";
+            checkbox.checked = Boolean(task.done);
+            checkbox.setAttribute("aria-label", "Mark task complete");
+
+            checkbox.addEventListener("change", () => {
+                const all = getTasks();
+                const item = all.find(
+                    (entry) => String(entry.id) === String(task.id)
+                );
+
+                if (item) item.done = checkbox.checked;
+
+                saveTasks(all);
+                renderTasks();
+                renderWeekly();
+
+                notify(
+                    checkbox.checked
+                        ? `Task completed: ${task.text}`
+                        : `Task reopened: ${task.text}`
+                );
+            });
+
+            const content = document.createElement("div");
+            content.className = "task-content";
+
+            const title = document.createElement("div");
+            title.className = "task-text";
+            title.textContent = task.text;
+
+            const meta = document.createElement("div");
+            meta.className = "task-meta";
+
+            const priority = document.createElement("span");
+            priority.className = "priority " + task.priority;
+            priority.textContent = task.priority + " priority";
+
+            meta.appendChild(priority);
+
+            if (task.deadline) {
+                const deadline = document.createElement("span");
+                deadline.textContent = "Due: " + task.deadline;
+                meta.appendChild(deadline);
+            }
+
+            content.append(title, meta);
+
+            const actions = document.createElement("div");
+            actions.className = "task-actions";
+
+            // Edit task name, priority and deadline.
+            const edit = document.createElement("button");
+            edit.type = "button";
+            edit.textContent = "Edit";
+
+            edit.addEventListener("click", () => {
+                const newText = prompt("Edit task name:", task.text);
+                if (newText === null) return;
+
+                const value = clean(newText);
+
+                if (!value) {
+                    toast("Task name cannot be empty.", true);
+                    return;
+                }
+
+                const all = getTasks();
+                const item = all.find(
+                    (entry) => String(entry.id) === String(task.id)
+                );
+
+                if (!item) return;
+
+                item.text = value;
+
+                const newPriority = prompt(
+                    "Priority: High, Normal or Low",
+                    item.priority
+                );
+
+                if (newPriority !== null) {
+                    const normalized = clean(newPriority).toLowerCase();
+
+                    if (normalized === "high") item.priority = "High";
+                    else if (normalized === "low") item.priority = "Low";
+                    else item.priority = "Normal";
+                }
+
+                const newDeadline = prompt(
+                    "Deadline (YYYY-MM-DD), or leave blank:",
+                    item.deadline || ""
+                );
+
+                if (newDeadline !== null) {
+                    item.deadline = clean(newDeadline);
+                }
+
+                saveTasks(all);
+                renderTasks();
+                renderWeekly();
+                notify("Task updated.");
+            });
+
+            const del = document.createElement("button");
+            del.type = "button";
+            del.textContent = "Delete";
+            del.className = "delete-task";
+
+            del.addEventListener("click", () => {
+                if (!confirm("Delete this task?")) return;
+
+                const remaining = getTasks().filter(
+                    (entry) => String(entry.id) !== String(task.id)
+                );
+
+                saveTasks(remaining);
+                renderTasks();
+                renderWeekly();
+                notify("A task was deleted.");
+            });
+
+            actions.append(edit, del);
+            row.append(checkbox, content, actions);
+            list.appendChild(row);
+        });
+
+        const done = tasks.filter((task) => task.done).length;
+        const percentage = tasks.length
+            ? Math.round((done / tasks.length) * 100)
+            : 0;
+
+        $("premiumTaskCount").textContent =
+            `${done} of ${tasks.length} tasks completed`;
+
+        $("progressPercent").textContent = percentage + "%";
+        $("premiumProgressFill").style.width = percentage + "%";
+        $("premiumProgressFill").setAttribute("aria-valuenow", String(percentage));
+    }
+
+    // WEEKLY PROGRESS
+    function renderWeekly() {
+        const days = [];
+        const today = new Date();
+
+        for (let i = 6; i >= 0; i--) {
+            const dateObject = new Date(today);
+            dateObject.setDate(today.getDate() - i);
+
+            const year = dateObject.getFullYear();
+            const month = String(dateObject.getMonth() + 1).padStart(2, "0");
+            const day = String(dateObject.getDate()).padStart(2, "0");
+            const date = `${year}-${month}-${day}`;
+
+            const tasks = getTasks(date);
+            const done = tasks.filter((task) => task.done).length;
+
+            days.push({
+                date,
+                label: dateObject.toLocaleDateString(undefined, {
+                    weekday: "short"
+                }),
+                total: tasks.length,
+                done,
+                pct: tasks.length ? Math.round(done / tasks.length * 100) : 0
+            });
+        }
+
+        const total = days.reduce((sum, day) => sum + day.total, 0);
+        const done = days.reduce((sum, day) => sum + day.done, 0);
+        const percentage = total ? Math.round(done / total * 100) : 0;
+
+        $("weeklyProgressPercent").textContent = percentage + "%";
+        $("weeklyTaskCount").textContent =
+            `${done} of ${total} tasks completed in the last 7 days`;
+
+        $("weeklyProgressFill").style.width = percentage + "%";
+
+        const box = $("weeklyBreakdown");
+        box.replaceChildren();
+
+        days.forEach((day) => {
+            const element = document.createElement("div");
+            element.className = "day-stat";
+
+            const label = document.createElement("span");
+            label.textContent = day.label;
+
+            const percent = document.createElement("strong");
+            percent.textContent = day.pct + "%";
+
+            const count = document.createElement("small");
+            count.textContent = `${day.done}/${day.total}`;
+
+            element.append(label, percent, count);
+            box.appendChild(element);
+        });
+    }
+
+    // LOAD DASHBOARD
+    function loadDashboard(username) {
+        currentUser = username;
+
+        showPage($("namePage"));
+
+        $("displayName").textContent = username;
+        $("displayName2").textContent = "Hello, " + username + "!";
+        $("footerYear").textContent = new Date().getFullYear();
+
+        loadProfileUI();
+        renderTasks();
+        renderWeekly();
+        renderNotifications();
+
+        $("userMessage").value =
+            localStorage.getItem(noteKey(currentUser)) || "";
+
+        notify("Welcome back! You are logged in.");
+    }
+
+    // PASSWORD VISIBILITY
+    document.querySelectorAll("[data-password]").forEach((button) => {
+        button.addEventListener("click", () => {
+            const input = $(button.dataset.password);
+            if (!input) return;
+
+            input.type = input.type === "password" ? "text" : "password";
+
+            button.setAttribute(
+                "aria-label",
+                input.type === "password" ? "Show password" : "Hide password"
+            );
+
+            button.textContent = input.type === "password" ? "👁" : "🙈";
+        });
+    });
+
+    // PAGE NAVIGATION
+    $("signupButton").addEventListener("click", () => {
+        showPage($("signupPage"));
+    });
+
+    $("backButton").addEventListener("click", () => {
+        showPage($("loginPage"));
+    });
+
+    $("resetBackButton").addEventListener("click", () => {
+        showPage($("loginPage"));
+    });
+
+    $("forgotPasswordButton").addEventListener("click", () => {
+        showPage($("resetPage"));
+        message("resetMessage", "");
+    });
+
+    // CREATE ACCOUNT
+    $("signupForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const username = clean($("signupUsername").value);
+        const password = $("signupPassword").value;
+
+        if (!/^[a-zA-Z0-9_-]{3,30}$/.test(username)) {
+            message(
+                "signupMessage",
+                "Use 3–30 letters, numbers, _ or -.",
+                true
+            );
+            return;
+        }
+
+        const accounts = getAccounts();
+
+        if (accounts.some(
+            (account) =>
+                clean(account.username).toLowerCase() === username.toLowerCase()
+        )) {
+            message("signupMessage", "This username already exists.", true);
+            return;
+        }
+
+        accounts.push({ username, password });
+        saveAccounts(accounts);
+
+        saveProfile({
+            name: username,
+            bio: "",
+            course: "",
+            skills: ""
+        });
+
+        message("signupMessage", "Account created! You can now log in.");
+        toast("Account created successfully.");
+
+        $("signupForm").reset();
+
+        setTimeout(() => showPage($("loginPage")), 700);
+    });
+
+    // LOGIN
+    $("loginForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const username = clean($("loginUsername").value);
+        const password = $("loginPassword").value;
+
+        const account = getAccounts().find(
+            (item) =>
+                clean(item.username).toLowerCase() === username.toLowerCase() &&
+                item.password === password
+        );
+
+        if (!account) {
+            message("loginMessage", "Incorrect username or password.", true);
+            return;
+        }
+
+        message("loginMessage", "Login successful!");
+        loadDashboard(account.username);
+    });
+
+    // RESET PASSWORD
+    $("resetForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const username = clean($("resetUsername").value);
+        const password = $("resetPassword").value;
+        const accounts = getAccounts();
+
+        const account = accounts.find(
+            (item) =>
+                clean(item.username).toLowerCase() === username.toLowerCase()
+        );
+
+        if (!account) {
+            message("resetMessage", "Username not found.", true);
+            return;
+        }
+
+        if (password.length < 4) {
+            message(
+                "resetMessage",
+                "Password must be at least 4 characters.",
+                true
+            );
+            return;
+        }
+
+        account.password = password;
+        saveAccounts(accounts);
+
+        message("resetMessage", "Password updated. Please log in.");
+        setTimeout(() => showPage($("loginPage")), 800);
+    });
+
+    // LOG OUT
+    $("logoutButton").addEventListener("click", () => {
+        currentUser = "";
+        $("loginPassword").value = "";
+        showPage($("loginPage"));
+        message("loginMessage", "You have logged out.");
+    });
+
+    // DARK / LIGHT MODE
+    $("themeButton").addEventListener("click", () => {
+        document.body.classList.toggle("light-mode");
+
+        const light = document.body.classList.contains("light-mode");
+
+        localStorage.setItem("arnabTheme", light ? "light" : "dark");
+
+        $("themeButton").textContent =
+            light ? "☀️ Light Mode" : "🌙 Dark Mode";
+    });
+
+    if (localStorage.getItem("arnabTheme") === "light") {
+        document.body.classList.add("light-mode");
+        $("themeButton").textContent = "☀️ Light Mode";
+    }
+
+    // UPLOAD PROFILE PHOTO
+    $("profilePhotoInput").addEventListener("change", (event) => {
+        const file = event.target.files?.[0];
         if (!file) return;
 
         if (!file.type.startsWith("image/")) {
-            showToast("Please select an image file.", "error");
-            profilePhotoInput.value = "";
+            toast("Please choose an image file.", true);
             return;
         }
 
         if (file.size > 1024 * 1024) {
-            showToast("Image must be smaller than 1 MB.", "error");
-            profilePhotoInput.value = "";
+            toast("Choose a photo under 1 MB.", true);
             return;
         }
 
         const reader = new FileReader();
 
-        reader.onload = function () {
+        reader.onload = () => {
             try {
-                localStorage.setItem(photoStorageKey(), reader.result);
-                loadProfilePhoto();
-                showToast("Profile photo updated!");
-            } catch (error) {
-                showToast(
-                    "Photo could not be saved. Try a smaller image.",
-                    "error"
-                );
+                localStorage.setItem(photoKey(currentUser), reader.result);
+                loadProfileUI();
+                toast("Profile photo updated.");
+            } catch {
+                toast("Photo is too large for browser storage.", true);
             }
-
-            profilePhotoInput.value = "";
-        };
-
-        reader.onerror = function () {
-            showToast("Could not read this image.", "error");
-            profilePhotoInput.value = "";
         };
 
         reader.readAsDataURL(file);
+        event.target.value = "";
     });
 
+    // REMOVE PROFILE PHOTO
+    $("removeProfilePhoto").addEventListener("click", () => {
+        if (!currentUser) return;
 
-    removeProfilePhoto.addEventListener("click", function () {
-        localStorage.removeItem(photoStorageKey());
-        loadProfilePhoto();
-        showToast("Profile photo removed.");
+        localStorage.removeItem(photoKey(currentUser));
+        loadProfileUI();
+        toast("Profile photo removed.");
     });
 
-
-    // =====================================
-    // 13. DARK / LIGHT MODE
-    // =====================================
-
-    function applyTheme() {
-        const savedTheme = localStorage.getItem(STORAGE_THEME);
-        const lightMode = savedTheme === "light";
-
-        document.body.classList.toggle("light-mode", lightMode);
-
-        themeButton.textContent = lightMode
-            ? "🌙 Dark Mode"
-            : "☀️ Light Mode";
-    }
-
-
-    applyTheme();
-
-
-    themeButton.addEventListener("click", function () {
-        const isLight = document.body.classList.toggle("light-mode");
-
-        localStorage.setItem(
-            STORAGE_THEME,
-            isLight ? "light" : "dark"
-        );
-
-        themeButton.textContent = isLight
-            ? "🌙 Dark Mode"
-            : "☀️ Light Mode";
-
-        showToast(isLight ? "Light mode enabled." : "Dark mode enabled.");
-    });
-
-
-    // =====================================
-    // 14. DAILY TASK STORAGE
-    // =====================================
-
-    function getTodayKey() {
-        const date = new Date();
-
-        const dateString = [
-            date.getFullYear(),
-            String(date.getMonth() + 1).padStart(2, "0"),
-            String(date.getDate()).padStart(2, "0")
-        ].join("-");
-
-        return "arnabDailyTasks_" +
-            normaliseUsername(currentUsername) + "_" + dateString;
-    }
-
-
-    function loadTasks() {
-        try {
-            const savedTasks = JSON.parse(
-                localStorage.getItem(getTodayKey()) || "[]"
-            );
-
-            tasks = Array.isArray(savedTasks) ? savedTasks : [];
-        } catch (error) {
-            tasks = [];
-        }
-    }
-
-
-    function saveTasks() {
-        try {
-            localStorage.setItem(
-                getTodayKey(),
-                JSON.stringify(tasks)
-            );
-            return true;
-        } catch (error) {
-            showToast("Unable to save tasks in this browser.", "error");
-            return false;
-        }
-    }
-
-
-    function renderTasks() {
-        taskList.replaceChildren();
-
-        let completedCount = 0;
-
-        tasks.forEach(function (task, index) {
-            if (task.done) completedCount++;
-
-            const row = document.createElement("div");
-            row.className = "task-row";
-
-            if (task.done) {
-                row.classList.add("completed");
-            }
-
-            const checkbox = document.createElement("input");
-            checkbox.type = "checkbox";
-            checkbox.className = "task-checkbox";
-            checkbox.checked = task.done;
-            checkbox.setAttribute("aria-label", "Mark task as complete");
-
-            const taskText = document.createElement("span");
-            taskText.className = "task-text";
-            taskText.textContent = task.text;
-
-            const deleteButton = document.createElement("button");
-            deleteButton.type = "button";
-            deleteButton.className = "task-delete";
-            deleteButton.textContent = "Delete";
-
-            checkbox.addEventListener("change", function () {
-                tasks[index].done = checkbox.checked;
-                saveTasks();
-                renderTasks();
-
-                if (checkbox.checked) {
-                    showToast("Task completed! 🎉");
-                }
-            });
-
-            deleteButton.addEventListener("click", function () {
-                tasks.splice(index, 1);
-                saveTasks();
-                renderTasks();
-                showToast("Task deleted.");
-            });
-
-            row.appendChild(checkbox);
-            row.appendChild(taskText);
-            row.appendChild(deleteButton);
-
-            taskList.appendChild(row);
-        });
-
-        if (tasks.length === 0) {
-            const emptyText = document.createElement("p");
-            emptyText.className = "empty-tasks";
-            emptyText.textContent =
-                "No tasks yet. Add your first task above!";
-            taskList.appendChild(emptyText);
-        }
-
-        const percentage = tasks.length === 0
-            ? 0
-            : Math.round((completedCount / tasks.length) * 100);
-
-        taskCount.textContent =
-            completedCount + " of " + tasks.length + " tasks completed";
-
-        progressFill.style.width = percentage + "%";
-        progressFill.setAttribute("role", "progressbar");
-        progressFill.setAttribute("aria-valuemin", "0");
-        progressFill.setAttribute("aria-valuemax", "100");
-        progressFill.setAttribute("aria-valuenow", String(percentage));
-
-        progressPercent.textContent = percentage + "%";
-    }
-
-
-    taskForm.addEventListener("submit", function (event) {
+    // SAVE PROFILE
+    $("profileEditorForm").addEventListener("submit", (event) => {
         event.preventDefault();
 
-        const value = taskInput.value.trim();
+        const profile = {
+            name: clean($("profileNameInput").value) || currentUser,
+            bio: clean($("profileBioInput").value),
+            course: clean($("profileCourseInput").value),
+            skills: clean($("profileSkillsInput").value)
+        };
 
-        if (!value) {
-            showToast("Please enter a task.", "error");
-            return;
-        }
+        if (!saveProfile(profile)) return;
+
+        loadProfileUI();
+        message("profileEditorStatus", "Profile saved successfully!");
+        notify("Your profile was updated.");
+        toast("Profile saved.");
+    });
+
+    // ADD TASK
+    $("premiumTaskForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const text = clean($("premiumTaskInput").value);
+        if (!text) return;
+
+        const tasks = getTasks();
 
         tasks.push({
-            text: value,
-            done: false
+            id: Date.now().toString(),
+            text,
+            done: false,
+            priority: $("taskPriorityInput").value || "Normal",
+            deadline: $("taskDeadlineInput").value || ""
         });
 
-        if (saveTasks()) {
+        if (saveTasks(tasks)) {
+            $("premiumTaskInput").value = "";
+            $("taskPriorityInput").value = "Normal";
+            $("taskDeadlineInput").value = "";
+
             renderTasks();
-            taskInput.value = "";
-            showToast("New task added!");
-        } else {
-            tasks.pop();
-            renderTasks();
+            renderWeekly();
+            notify("New task added: " + text);
+            toast("Task added.");
         }
     });
 
-
-    // =====================================
-    // 15. PERSONAL NOTES
-    // =====================================
-
-    function noteStorageKey() {
-        return "arnabPersonalNote_" + normaliseUsername(currentUsername);
-    }
-
-
-    function loadNote() {
-        userMessage.value =
-            localStorage.getItem(noteStorageKey()) || "";
-    }
-
-
-    messageForm.addEventListener("submit", function (event) {
+    // SAVE PERSONAL NOTE
+    $("messageForm").addEventListener("submit", (event) => {
         event.preventDefault();
 
+        if (!currentUser) return;
+
         try {
-            localStorage.setItem(
-                noteStorageKey(),
-                userMessage.value
-            );
-
-            showFormMessage(
-                messageStatus,
-                "Your note has been saved in this browser.",
-                false
-            );
-
-            showToast("Personal note saved!");
-        } catch (error) {
-            showFormMessage(
-                messageStatus,
-                "Could not save your note.",
-                true
-            );
+            localStorage.setItem(noteKey(currentUser), $("userMessage").value);
+            message("messageStatus", "Your note has been saved on this device.");
+            toast("Note saved.");
+        } catch {
+            message("messageStatus", "Could not save the note.", true);
         }
     });
 
+    // MARK ALL NOTIFICATIONS AS READ
+    $("markNotificationsRead").addEventListener("click", () => {
+        if (!currentUser) return;
 
-    // =====================================
-    // 16. LOAD DASHBOARD
-    // =====================================
+        const items = readJSON(notificationKey(currentUser), [])
+            .map((item) => ({ ...item, read: true }));
 
-    function loadDashboard() {
-        const account = getAccount();
+        saveJSON(notificationKey(currentUser), items);
+        renderNotifications();
+        toast("All notifications marked as read.");
+    });
 
-        if (!account) {
-            showPage(loginPage);
-            return;
-        }
+    // CLEAR NOTIFICATIONS
+    $("clearNotifications").addEventListener("click", () => {
+        if (!currentUser) return;
+        if (!confirm("Clear all notifications?")) return;
 
-        currentUsername = account.username;
+        saveJSON(notificationKey(currentUser), []);
+        renderNotifications();
+        toast("Notifications cleared.");
+    });
 
-        displayName.textContent = currentUsername;
-
-        if (displayName2) {
-            displayName2.textContent = "Hello, " + currentUsername + "!";
-        }
-
-        if (notification) {
-            notification.textContent =
-                "You are logged in as " + currentUsername + ".";
-        }
-
-        if (clockInterval) {
-            clearInterval(clockInterval);
-        }
-
+    // LIVE CLOCK
+    function tick() {
         updateClock();
-        clockInterval = setInterval(updateClock, 1000);
-
-        loadProfilePhoto();
-        loadTasks();
-        renderTasks();
-        loadNote();
-
-        const footerYear = document.getElementById("footerYear");
-
-        if (footerYear) {
-            footerYear.textContent = new Date().getFullYear();
-        }
     }
 
+    tick();
+    setInterval(tick, 1000);
 
-    // =====================================
-    // 17. LOGOUT
-    // =====================================
-
-    logoutButton.addEventListener("click", function () {
-        if (clockInterval) {
-            clearInterval(clockInterval);
-            clockInterval = null;
-        }
-
-        currentUsername = "";
-        tasks = [];
-
-        loginForm.reset();
-        signupForm.reset();
-        resetForm.reset();
-        messageForm.reset();
-        taskForm.reset();
-
-        showFormMessage(loginMessage, "", false);
-        showFormMessage(signupMessage, "", false);
-        showFormMessage(resetMessage, "", false);
-        showFormMessage(messageStatus, "", false);
-
-        showPage(loginPage);
-        showToast("You have logged out.");
-    });
-
-
-    // =====================================
-    // 18. START WEBSITE
-    // =====================================
-
-    applyTheme();
-    showPage(loginPage);
-
+    // Demo only: localStorage login is not secure production authentication.
 });
