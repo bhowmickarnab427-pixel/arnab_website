@@ -1,7 +1,6 @@
 
 document.addEventListener("DOMContentLoaded", function () {
-
-    // Get HTML elements
+    // ===== Get HTML elements =====
     const loginPage = document.getElementById("loginPage");
     const signupPage = document.getElementById("signupPage");
     const resetPage = document.getElementById("resetPage");
@@ -17,19 +16,27 @@ document.addEventListener("DOMContentLoaded", function () {
     const resetMessage = document.getElementById("resetMessage");
     const messageStatus = document.getElementById("messageStatus");
 
+    const profilePhoto = document.getElementById("profilePhoto");
+    const profilePhotoPlaceholder =
+        document.getElementById("profilePhotoPlaceholder");
+    const profilePhotoInput =
+        document.getElementById("profilePhotoInput");
+    const removeProfilePhoto =
+        document.getElementById("removeProfilePhoto");
+
     let currentUsername = "";
     let clockInterval = null;
 
-    // Show selected page
+    // ===== Show selected page =====
     function showPage(page) {
         [loginPage, signupPage, resetPage, namePage].forEach(function (item) {
-            if (item) item.classList.add("hidden");
+            item.classList.add("hidden");
         });
 
-        if (page) page.classList.remove("hidden");
+        page.classList.remove("hidden");
     }
 
-    // Display messages
+    // ===== Show status messages =====
     function showMessage(element, message, success = false) {
         if (!element) return;
 
@@ -37,16 +44,19 @@ document.addEventListener("DOMContentLoaded", function () {
         element.style.color = success ? "#75ff9a" : "#ffb4b4";
     }
 
-    // Read saved accounts
+    // ===== Read accounts from localStorage =====
     function getAccounts() {
         try {
-            return JSON.parse(localStorage.getItem("arnabAccounts")) || {};
+            const data = JSON.parse(localStorage.getItem("arnabAccounts"));
+            return data && typeof data === "object" && !Array.isArray(data)
+                ? data
+                : {};
         } catch (error) {
             return {};
         }
     }
 
-    // Save accounts
+    // ===== Save accounts =====
     function saveAccounts(accounts) {
         try {
             localStorage.setItem("arnabAccounts", JSON.stringify(accounts));
@@ -56,102 +66,54 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Add password eye buttons automatically
-    function addPasswordEyes() {
-        const passwordIds = [
-            "loginPassword",
-            "signupPassword",
-            "resetPassword"
-        ];
+    // ===== Password show/hide eye buttons =====
+    document.querySelectorAll(".eye-button").forEach(function (button) {
+        button.addEventListener("click", function () {
+            const input = document.getElementById(
+                button.getAttribute("data-password")
+            );
 
-        passwordIds.forEach(function (id) {
-            const input = document.getElementById(id);
+            if (!input) return;
 
-            if (!input || input.dataset.eyeAdded === "true") return;
+            const showPassword = input.type === "password";
 
-            // Create wrapper
-            const wrapper = document.createElement("div");
-            wrapper.className = "password-box";
-            wrapper.style.position = "relative";
-            wrapper.style.width = "100%";
-
-            // Place wrapper around password input
-            input.parentNode.insertBefore(wrapper, input);
-            wrapper.appendChild(input);
-
-            // Make room for the eye button
-            input.style.paddingRight = "48px";
-            input.style.width = "100%";
-            input.dataset.eyeAdded = "true";
-
-            // Create eye button
-            const eyeButton = document.createElement("button");
-            eyeButton.type = "button";
-            eyeButton.className = "eye-button";
-            eyeButton.textContent = "👁";
-            eyeButton.setAttribute("aria-label", "Show password");
-            eyeButton.title = "Show password";
-
-            eyeButton.style.position = "absolute";
-            eyeButton.style.right = "10px";
-            eyeButton.style.top = "50%";
-            eyeButton.style.transform = "translateY(-50%)";
-            eyeButton.style.zIndex = "2";
-            eyeButton.style.cursor = "pointer";
-            eyeButton.style.border = "none";
-            eyeButton.style.background = "transparent";
-            eyeButton.style.padding = "5px";
-            eyeButton.style.fontSize = "18px";
-            eyeButton.style.lineHeight = "1";
-
-            wrapper.appendChild(eyeButton);
-
-            // Toggle password visibility
-            eyeButton.addEventListener("click", function () {
-                const isHidden = input.type === "password";
-
-                input.type = isHidden ? "text" : "password";
-                eyeButton.textContent = isHidden ? "🙈" : "👁";
-                eyeButton.setAttribute(
-                    "aria-label",
-                    isHidden ? "Hide password" : "Show password"
-                );
-                eyeButton.title = isHidden ? "Hide password" : "Show password";
-
-                input.focus();
-            });
+            input.type = showPassword ? "text" : "password";
+            button.textContent = showPassword ? "🙈" : "👁";
+            button.setAttribute(
+                "aria-label",
+                showPassword ? "Hide password" : "Show password"
+            );
+            button.title = showPassword ? "Hide password" : "Show password";
         });
-    }
+    });
 
-    addPasswordEyes();
-
-    // Open Create Account page
+    // ===== Open Create Account =====
     document.getElementById("signupButton").addEventListener("click", function () {
         signupForm.reset();
         signupMessage.textContent = "";
         showPage(signupPage);
     });
 
-    // Back to Login
+    // ===== Back to Login =====
     document.getElementById("backButton").addEventListener("click", function () {
         showPage(loginPage);
         signupMessage.textContent = "";
     });
 
-    // Open Forgot Password
+    // ===== Open Forgot Password =====
     document.getElementById("forgotPasswordButton").addEventListener("click", function () {
         resetForm.reset();
         resetMessage.textContent = "";
         showPage(resetPage);
     });
 
-    // Back from Reset Password
+    // ===== Back from Reset Password =====
     document.getElementById("resetBackButton").addEventListener("click", function () {
         showPage(loginPage);
         resetMessage.textContent = "";
     });
 
-    // Create Account
+    // ===== Create Account =====
     signupForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
@@ -171,7 +133,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const accounts = getAccounts();
         const accountKey = username.toLowerCase();
 
-        if (accounts[accountKey]) {
+        if (Object.prototype.hasOwnProperty.call(accounts, accountKey)) {
             showMessage(signupMessage, "Username already exists. Try another.");
             return;
         }
@@ -182,14 +144,17 @@ document.addEventListener("DOMContentLoaded", function () {
         };
 
         if (!saveAccounts(accounts)) {
-            showMessage(signupMessage, "Could not save account in this browser.");
+            showMessage(
+                signupMessage,
+                "Could not save your account in this browser."
+            );
             return;
         }
 
         signupForm.reset();
         document.getElementById("loginUsername").value = username;
-
         showPage(loginPage);
+
         showMessage(
             loginMessage,
             "Account created successfully! Please log in.",
@@ -197,7 +162,7 @@ document.addEventListener("DOMContentLoaded", function () {
         );
     });
 
-    // Login
+    // ===== Login =====
     loginForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
@@ -205,7 +170,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const password = document.getElementById("loginPassword").value;
 
         const accounts = getAccounts();
-        const account = accounts[username.toLowerCase()];
+        const accountKey = username.toLowerCase();
+        const account = Object.prototype.hasOwnProperty.call(accounts, accountKey)
+            ? accounts[accountKey]
+            : null;
 
         if (!account || account.password !== password) {
             showMessage(loginMessage, "Invalid username or password.");
@@ -220,7 +188,7 @@ document.addEventListener("DOMContentLoaded", function () {
         loadDashboard();
     });
 
-    // Reset Password
+    // ===== Reset Password =====
     resetForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
@@ -235,7 +203,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const accounts = getAccounts();
         const accountKey = username.toLowerCase();
 
-        if (!accounts[accountKey]) {
+        if (!Object.prototype.hasOwnProperty.call(accounts, accountKey)) {
             showMessage(resetMessage, "Username does not exist.");
             return;
         }
@@ -243,7 +211,7 @@ document.addEventListener("DOMContentLoaded", function () {
         accounts[accountKey].password = newPassword;
 
         if (!saveAccounts(accounts)) {
-            showMessage(resetMessage, "Could not update password.");
+            showMessage(resetMessage, "Could not update your password.");
             return;
         }
 
@@ -257,11 +225,9 @@ document.addEventListener("DOMContentLoaded", function () {
         );
     });
 
-    // Load Dashboard
+    // ===== Load Dashboard =====
     function loadDashboard() {
         showPage(namePage);
-
-        updateGreeting();
 
         document.getElementById("displayName2").textContent =
             "Login Successful!";
@@ -272,7 +238,9 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("notification").textContent =
             "Welcome " + currentUsername + "! You are logged in.";
 
+        loadProfilePhoto();
         updateClock();
+        updateGreeting();
 
         if (clockInterval) {
             clearInterval(clockInterval);
@@ -284,7 +252,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 1000);
     }
 
-    // Greeting based on the device's local time
+    // ===== Greeting based on local device time =====
     function updateGreeting() {
         const hour = new Date().getHours();
         let greeting;
@@ -301,7 +269,7 @@ document.addEventListener("DOMContentLoaded", function () {
             greeting + ", " + currentUsername + "!";
     }
 
-    // Live Clock and Date
+    // ===== Live Clock and Date =====
     function updateClock() {
         const now = new Date();
 
@@ -317,7 +285,92 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
-    // Demo message box
+    // ===== Get the current user's photo key =====
+    function getProfilePhotoKey() {
+        return "arnabProfilePhoto_" + currentUsername.toLowerCase();
+    }
+
+    // ===== Load this user's saved photo =====
+    function loadProfilePhoto() {
+        if (!currentUsername) return;
+
+        let savedPhoto = null;
+
+        try {
+            savedPhoto = localStorage.getItem(getProfilePhotoKey());
+        } catch (error) {
+            savedPhoto = null;
+        }
+
+        if (savedPhoto) {
+            profilePhoto.src = savedPhoto;
+            profilePhoto.classList.remove("hidden");
+            profilePhotoPlaceholder.classList.add("hidden");
+        } else {
+            profilePhoto.removeAttribute("src");
+            profilePhoto.classList.add("hidden");
+            profilePhotoPlaceholder.classList.remove("hidden");
+        }
+    }
+
+    // ===== Upload and save profile photo =====
+    profilePhotoInput.addEventListener("change", function () {
+        const file = profilePhotoInput.files[0];
+
+        if (!file) return;
+
+        if (!currentUsername) {
+            alert("Please log in before changing your profile photo.");
+            profilePhotoInput.value = "";
+            return;
+        }
+
+        if (!file.type.startsWith("image/")) {
+            alert("Please select an image file.");
+            profilePhotoInput.value = "";
+            return;
+        }
+
+        if (file.size > 1024 * 1024) {
+            alert("Please choose an image smaller than 1 MB.");
+            profilePhotoInput.value = "";
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function () {
+            try {
+                localStorage.setItem(getProfilePhotoKey(), reader.result);
+                loadProfilePhoto();
+            } catch (error) {
+                alert("Could not save the photo. Try a smaller image.");
+            }
+
+            profilePhotoInput.value = "";
+        };
+
+        reader.onerror = function () {
+            alert("Could not read the image. Please try another.");
+            profilePhotoInput.value = "";
+        };
+
+        reader.readAsDataURL(file);
+    });
+
+    // ===== Remove current user's profile photo =====
+    removeProfilePhoto.addEventListener("click", function () {
+        if (!currentUsername) return;
+
+        try {
+            localStorage.removeItem(getProfilePhotoKey());
+            loadProfilePhoto();
+        } catch (error) {
+            alert("Could not remove the photo. Please try again.");
+        }
+    });
+
+    // ===== Demo message box =====
     messageForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
@@ -337,7 +390,7 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("userMessage").value = "";
     });
 
-    // Logout
+    // ===== Logout =====
     document.getElementById("logoutButton").addEventListener("click", function () {
         currentUsername = "";
 
@@ -350,12 +403,16 @@ document.addEventListener("DOMContentLoaded", function () {
         signupForm.reset();
         resetForm.reset();
         messageForm.reset();
+        profilePhotoInput.value = "";
+
+        profilePhoto.removeAttribute("src");
+        profilePhoto.classList.add("hidden");
+        profilePhotoPlaceholder.classList.remove("hidden");
 
         showPage(loginPage);
-
         showMessage(loginMessage, "You have logged out successfully.", true);
     });
 
-    // Show Login page on startup
+    // ===== Start on Login page =====
     showPage(loginPage);
 });
